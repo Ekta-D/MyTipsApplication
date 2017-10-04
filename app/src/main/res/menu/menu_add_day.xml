@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".AddDayActivity">
+
+    <item
+        android:id="@+id/dayoff"
+        android:actionLayout="@layout/menu_checkbox_dayoff"
+        android:title="@string/menu_day_off"
+        android:titleCondensed="@string/menu_day_off"
+        app:showAsAction="always" />
+
+    <item android:id="@+id/save"
+        app:showAsAction="always"
+        android:title="@string/menu_save" />
+
+</menu>

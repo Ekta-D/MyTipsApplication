@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--xmlns:tools="http://schemas.android.com/tools"-->
+    <!--android:layout_width="match_parent"-->
+
+    <!--android:layout_height="wrap_content">-->
+
+    <!--<include layout="@layout/toolbar" />-->
+
+    <!--<FrameLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+
+        <!--android:layout_marginTop="?attr/actionBarSize">-->
+
+<io.codetail.widget.RevealFrameLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="?attr/actionBarSize"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+            <include layout="@layout/menus" />
+        </io.codetail.widget.RevealFrameLayout>
+
+    <!--</FrameLayout>-->
+<!--</FrameLayout>-->
