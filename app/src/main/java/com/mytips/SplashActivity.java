@@ -23,13 +23,17 @@ public class SplashActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
     public static final String ISFIRST_TIME = "Isfirst_time";
     SharedPreferences sharedPreferences;
+    boolean isFirstTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
         sharedPreferences = getSharedPreferences("Pref", MODE_PRIVATE);
-        boolean isFirstTime = sharedPreferences.getBoolean(ISFIRST_TIME, false);
+        if(sharedPreferences!=null)
+            isFirstTime = sharedPreferences.getBoolean(ISFIRST_TIME, false);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
@@ -84,7 +88,7 @@ public class SplashActivity extends AppCompatActivity {
             case MY_PERMISSIONS_REQUEST_ACCOUNTS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    Toast.makeText(SplashActivity.this, "permissions granted successfully!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SplashActivity.this, "permissions granted!", Toast.LENGTH_SHORT).show();
                 } else {
                     Toast.makeText(SplashActivity.this, "permissions not granted!", Toast.LENGTH_SHORT).show();
                 }
