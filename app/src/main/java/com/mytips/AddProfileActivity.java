@@ -42,10 +42,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import io.codetail.animation.SupportAnimator;
-import io.codetail.animation.ViewAnimationUtils;
-
 import static com.mytips.R.id.tipeess;
+
 
 public class AddProfileActivity extends AppCompatActivity {
 

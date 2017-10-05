@@ -40,7 +40,7 @@ public class SplashActivity extends AppCompatActivity {
         findViewById(R.id.button_go).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), AddProfileActivity.class));
+                startActivity(new Intent(getBaseContext(), LandingActivity.class));
             }
         });
         if (!isFirstTime) {

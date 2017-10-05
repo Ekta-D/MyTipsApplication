@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
-    xmlns:tools="http://schemas.android.com/tools" android:layout_height="match_parent" android:layout_width="match_parent">
-<!--<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-    <!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-    <!--xmlns:tools="http://schemas.android.com/tools"-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent"-->
-    <!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-    <!--tools:context="com.mytips.LandingActivity"-->
-    <!--tools:showIn="@layout/activity_landing">-->
-
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="?attr/actionBarSize"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.mytips.LandingActivity"
+    tools:showIn="@layout/activity_landing">
 
     <Spinner
         android:id="@+id/spinner_profile"
@@ -66,14 +62,12 @@
 
     <RelativeLayout
         android:layout_width="0dp"
-
         android:layout_height="65dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginStart="8dp"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
@@ -81,7 +75,6 @@
         <RelativeLayout
             android:id="@+id/summery_total"
             android:layout_width="wrap_content"
-
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true">
 
@@ -98,7 +91,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_toRightOf="@id/lbl_total"
                 android:text="$1024"
-                android:textSize="18sp" />
+                android:textSize="18sp"/>
         </RelativeLayout>
 
         <RelativeLayout
@@ -142,5 +135,4 @@
 
         </RelativeLayout>
     </RelativeLayout>
-<!--</android.support.constraint.ConstraintLayout>-->
-</android.support.design.widget.CoordinatorLayout>
+</android.support.constraint.ConstraintLayout>

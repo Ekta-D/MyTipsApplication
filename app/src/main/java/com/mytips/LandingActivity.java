@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -21,14 +22,11 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import io.codetail.animation.SupportAnimator;
-import io.codetail.animation.ViewAnimationUtils;
-
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener {
 
     private LinearLayout mRevealView;
     private boolean hidden = true;
-    private ImageButton add_profile, share, invite, setting, user_profile;
+    private ImageButton add_day, profile, share, invite, preferences, backup;
     Spinner spinnerProfile, spinnerReportType;
     String[] profileArray = new String[]{"[none]"};
     String[] reportTypeArray = new String[]{"Daily", "Weekly", "Bi-Weekly", "Monthly", "Yearly"};
@@ -47,27 +45,30 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
         }
 
-        mRevealView = (LinearLayout) findViewById(R.id.reveal_layout);
+        mRevealView = (LinearLayout) findViewById(R.id.reveal_items);
         mRevealView.setVisibility(View.INVISIBLE);
 
-        add_profile = (ImageButton) findViewById(R.id.add_profile_icon);
+        profile = (ImageButton) findViewById(R.id.profile);
         share = (ImageButton) findViewById(R.id.share);
         invite = (ImageButton) findViewById(R.id.invite);
-        setting = (ImageButton) findViewById(R.id.settings);
-        user_profile = (ImageButton) findViewById(R.id.profile);
+        preferences = (ImageButton) findViewById(R.id.preferences);
+        backup = (ImageButton) findViewById(R.id.backup);
 
 
-        add_profile.setOnClickListener(this);
-        user_profile.setOnClickListener(this);
+        profile.setOnClickListener(this);
+        share.setOnClickListener(this);
+        invite.setOnClickListener(this);
+        preferences.setOnClickListener(this);
+        backup.setOnClickListener(this);
 
-//        spinnerProfile = (Spinner) findViewById(R.id.spinner_profile);
-//        spinnerReportType = (Spinner) findViewById(R.id.spinner_report);
-//
-//        ArrayAdapter<String> profileAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, profileArray);
-//        spinnerProfile.setAdapter(profileAdapter);
-//
-//        ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, reportTypeArray);
-//        spinnerReportType.setAdapter(typeAdapter);
+        spinnerProfile = (Spinner) findViewById(R.id.spinner_profile);
+        spinnerReportType = (Spinner) findViewById(R.id.spinner_report);
+
+        ArrayAdapter<String> profileAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, profileArray);
+        spinnerProfile.setAdapter(profileAdapter);
+
+        ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, reportTypeArray);
+        spinnerReportType.setAdapter(typeAdapter);
     }
 
     @Override
@@ -87,7 +88,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_menu:
-                int cx = (mRevealView.getLeft() + mRevealView.getRight());
+                /*int cx = (mRevealView.getLeft() + mRevealView.getRight());
                 int cy = mRevealView.getTop();
                 int radius = Math.max(mRevealView.getWidth(), mRevealView.getHeight());
 
@@ -153,8 +154,59 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         anim.start();
                     }
                 }
-                return true;
+                return true;*/
+// finding X and Y co-ordinates
+                int cx = (mRevealView.getLeft() + mRevealView.getRight());
+                int cy = (mRevealView.getTop());
 
+                // to find  radius when icon is tapped for showing layout
+                int startradius=0;
+                int endradius = Math.max(mRevealView.getWidth(), mRevealView.getHeight());
+
+                // performing circular reveal when icon will be tapped
+                Animator animator = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    animator = ViewAnimationUtils.createCircularReveal(mRevealView, cx, cy, startradius, endradius);
+                }
+                animator.setInterpolator(new AccelerateDecelerateInterpolator());
+                animator.setDuration(400);
+
+                //reverse animation
+                // to find radius when icon is tapped again for hiding layout
+                //  starting radius will be the radius or the extent to which circular reveal animation is to be shown
+
+                int reverse_startradius = Math.max(mRevealView.getWidth(),mRevealView.getHeight());
+
+                //endradius will be zero
+                int reverse_endradius=0;
+
+                // performing circular reveal for reverse animation
+                Animator animate = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                    animate = ViewAnimationUtils.createCircularReveal(mRevealView,cx,cy,reverse_startradius,reverse_endradius);
+                }
+                if(hidden){
+
+                    // to show the layout when icon is tapped
+                    mRevealView.setVisibility(View.VISIBLE);
+                    animator.start();
+                    hidden = false;
+                }
+                else {
+                    mRevealView.setVisibility(View.VISIBLE);
+
+                    // to hide layout on animation end
+                    animate.addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            super.onAnimationEnd(animation);
+                            mRevealView.setVisibility(View.INVISIBLE);
+                            hidden = true;
+                        }
+                    });
+                    animate.start();
+                }
+                return true;
 
         }
         return super.onOptionsItemSelected(item);
@@ -164,12 +216,24 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         hideRevealView();
         switch (v.getId()) {
-
-            case R.id.add_profile_icon:
-                Toast.makeText(this, "Add Profile is here", Toast.LENGTH_SHORT).show();
-                startActivity(new Intent(LandingActivity.this, SplashActivity.class));
+            case R.id.add_day:
+                startActivity(new Intent(getBaseContext(), AddDayActivity.class));
                 break;
+            case R.id.profile:
+                startActivity(new Intent(getBaseContext(), AddProfileActivity.class));
+                break;
+            case R.id.preferences:
+                startActivity(new Intent(getBaseContext(), SettingsActivity.class));
+                break;
+            case R.id.share:
 
+                break;
+            case R.id.invite:
+
+                break;
+            case R.id.backup:
+
+                break;
         }
     }
 }
