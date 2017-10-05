@@ -6,26 +6,27 @@
     android:layout_height="match_parent"
     tools:context="com.mytips.AddDayActivity">
 
+
     <TextView
         android:id="@+id/textView3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Profile"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="8dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Spinner
         android:id="@+id/spinner_profile"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView3"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginStart="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
     <ImageView
         android:id="@+id/imageView2"
@@ -43,11 +44,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="From"
         app:layout_constraintLeft_toRightOf="@+id/imageView2"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_profile"
-        android:layout_marginStart="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/spinner_profile" />
 
     <EditText
         android:id="@+id/editText_start_shift"
@@ -91,11 +92,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="To"
         app:layout_constraintLeft_toRightOf="@+id/imageView3"
-        app:layout_constraintTop_toBottomOf="@+id/editText_start_shift"
-        android:layout_marginStart="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_start_shift" />
 
     <EditText
         android:id="@+id/editText_end_shift"
@@ -128,11 +129,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Auto Calculated Hours"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText_end_shift"
-        android:layout_marginStart="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_end_shift" />
 
     <TextView
         android:id="@+id/textView_calculated_hours"
@@ -150,11 +151,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="7dp"
         android:text="Holiday Pay"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView6"
-        android:layout_marginStart="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     <Spinner
         android:id="@+id/spinner_holiday_pay"
@@ -171,10 +172,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
-        android:text="Total Tips"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:text="Total Tips"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/spinner_holiday_pay" />
 
     <EditText
@@ -188,31 +189,32 @@
         android:inputType="numberDecimal"
         android:textSize="12sp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinner_holiday_pay"
-        tools:layout_editor_absoluteX="266dp" />
+        app:layout_constraintTop_toBottomOf="@+id/spinner_holiday_pay" />
 
     <TextView
         android:id="@+id/textView11"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:text="Tip Out to Tipees"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText_total_tips"
-        android:layout_marginStart="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_total_tips" />
 
     <LinearLayout
+        android:id="@+id/linearLayout_tipees"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/textView11"
         android:layout_marginLeft="8dp"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:id="@+id/linearLayout_tipees"></LinearLayout>
+        app:layout_constraintTop_toBottomOf="@+id/textView11"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"></LinearLayout>
 
     <TextView
         android:id="@+id/textView12"
@@ -222,7 +224,8 @@
         android:layout_marginTop="8dp"
         android:text="Total Tip-Out %"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout_tipees" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout_tipees"
+        android:layout_marginStart="8dp" />
 
     <TextView
         android:id="@+id/textView_tip_out_percent"
@@ -232,7 +235,8 @@
         android:layout_marginTop="8dp"
         android:text="15%"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout_tipees" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout_tipees"
+        android:layout_marginEnd="8dp" />
 
     <TextView
         android:id="@+id/textView14"
@@ -242,7 +246,8 @@
         android:layout_marginTop="8dp"
         android:text="Tournament Downs"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+        app:layout_constraintTop_toBottomOf="@+id/textView12"
+        android:layout_marginStart="8dp" />
 
     <EditText
         android:id="@+id/editText_tournament_downs"
@@ -254,6 +259,7 @@
         android:inputType="number"
         android:textSize="12sp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_tip_out_percent" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_tip_out_percent"
+        android:layout_marginEnd="8dp" />
 
 </android.support.constraint.ConstraintLayout>

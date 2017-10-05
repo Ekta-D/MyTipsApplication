@@ -6,7 +6,5 @@
     android:layout_height="match_parent"
     tools:context="com.mytips.Settings">
 
-
-
     <include layout="@layout/toolbar"/>
 </android.support.constraint.ConstraintLayout>

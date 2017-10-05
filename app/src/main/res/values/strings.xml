@@ -12,7 +12,7 @@
     <string name="menu_day_off">Day Off</string>
     <string name="title_add_day">Add Day</string>
     <string name="label_add_profile">Add Profile</string>
-
+<string name="add_tipee_title">Add Tipee Info</string>
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
