@@ -269,7 +269,9 @@ public class AddProfileActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
+            case android.R.id.home:
+                this.finish();
+                break;
             case R.id.save_profile:
                 String joinedString = TextUtils.join(",", tipees_array);
                 try {
@@ -285,6 +287,7 @@ public class AddProfileActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
 
     public void emptyFields() {
         editText_profilename.setText("");
