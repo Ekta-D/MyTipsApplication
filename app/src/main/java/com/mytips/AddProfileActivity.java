@@ -31,17 +31,23 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
+import com.mytips.Model.TipeeInfo;
+import com.mytips.Preferences.Constants;
+import com.mytips.Preferences.Preferences;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static com.mytips.R.id.fetched_tipees;
 import static com.mytips.R.id.tipeess;
 
 
@@ -49,8 +55,8 @@ public class AddProfileActivity extends AppCompatActivity {
 
 
     ImageButton imageButton;
-    String profile_name, tipee_name;
-    int tipee_percent = 0, hourly_pay = 0;
+    String profile_name;
+    int  hourly_pay = 0;
     EditText editText_profilename, editText_hourly_pay;
     CheckBox checkBox_supervisor, checkBox_getTournament, checkBox_getTips;
     Spinner spinner_payperiod, spinner_startday, spinner_holiday_pay;
@@ -59,13 +65,12 @@ public class AddProfileActivity extends AppCompatActivity {
     String[] pay_period_array = new String[]{"Daily ", "Weekly", "Every 2 Weeks ", "1st & 15th"};
     String[] start_days = new String[]{"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"};
     String[] holiday_pays = new String[]{"[none]", "Time and a Half", "Double Pay"};
-    Button addTipee;
-    LinearLayout mlayout;
     DatabaseOperations dbOperations;
     public static int REQUEST_CAMERA = 1;
     public static int REQUEST_GALLERY = 2;
     public static final String ISFIRST_TIME = "Isfirst_time";
     SharedPreferences sharedPreferences;
+    ListView listView_fetched_tipees;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +87,7 @@ public class AddProfileActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
         initView();
+        getAllTipees();
     }
 
     public void initView() {
@@ -89,7 +95,7 @@ public class AddProfileActivity extends AppCompatActivity {
         dbOperations = new DatabaseOperations(AddProfileActivity.this);
 
         imageButton = (ImageButton) findViewById(R.id.imageButton);
-        mlayout = (LinearLayout) findViewById(tipeess);
+
         editText_profilename = (EditText) findViewById(R.id.editText);
         checkBox_supervisor = (CheckBox) findViewById(R.id.checkBox_is_supervisor);
         checkBox_getTournament = (CheckBox) findViewById(R.id.checkBox_gets_tournament_tips);
@@ -98,7 +104,7 @@ public class AddProfileActivity extends AppCompatActivity {
         spinner_startday = (Spinner) findViewById(R.id.spinner_start_day_of_week);
         spinner_holiday_pay = (Spinner) findViewById(R.id.spinner_holiday_pay);
         editText_hourly_pay = (EditText) findViewById(R.id.editText_houly_pay);
-        addTipee = (Button) findViewById(R.id.add_tipee);
+        //  addTipee = (Button) findViewById(R.id.add_tipee);
         profile_name = editText_profilename.getText().toString().trim();
         String hourPay = editText_hourly_pay.getText().toString().trim();
         if (!hourPay.equalsIgnoreCase("")) {
@@ -170,45 +176,7 @@ public class AddProfileActivity extends AppCompatActivity {
             }
         });
 
-        addTipee.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final Dialog dialog = new Dialog(AddProfileActivity.this);
-                dialog.setContentView(R.layout.add_tipee_dialog);
 
-                Button button_ok, button_cancel;
-                final EditText editText_tipeename, editText_tipee_out;
-
-                editText_tipeename = (EditText) dialog.findViewById(R.id.tipee_name);
-                editText_tipee_out = (EditText) dialog.findViewById(R.id.tipee_out);
-
-                button_ok = (Button) dialog.findViewById(R.id.ok_button);
-                button_cancel = (Button) dialog.findViewById(R.id.cancel_button);
-
-                button_ok.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        final String name = editText_tipeename.getText().toString().trim();
-                        final String percent = editText_tipee_out.getText().toString().trim();
-                        tipee_name = name;
-                        if (!percent.equalsIgnoreCase("")) {
-                            tipee_percent = Integer.parseInt(percent);
-                        }
-
-                        mlayout.addView(createNewTextView(tipee_name, percent));
-                        dialog.dismiss();
-                    }
-                });
-                button_cancel.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dialog.dismiss();
-                    }
-                });
-
-                dialog.show();
-            }
-        });
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -332,5 +300,12 @@ public class AddProfileActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public void getAllTipees() {
+        ArrayList<TipeeInfo> tipeeInfos = Preferences.getInstance(AddProfileActivity.this).getTipeeList(Constants.TipeeListKey);
+        listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
+        FetchedTipeeAdapter adapter = new FetchedTipeeAdapter(AddProfileActivity.this, tipeeInfos);
+        listView_fetched_tipees.setAdapter(adapter);
     }
 }

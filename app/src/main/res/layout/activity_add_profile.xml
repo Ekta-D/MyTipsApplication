@@ -8,7 +8,8 @@
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context="com.mytips.AddProfileActivity">
 
         <View
             android:id="@+id/view2"
@@ -209,8 +210,8 @@
 
         <EditText
             android:id="@+id/editText_houly_pay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="95dp"
+            android:layout_height="33dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
@@ -265,27 +266,35 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView20" />
+            app:layout_constraintTop_toBottomOf="@+id/textView20">
 
-        <Button
-            android:id="@+id/add_tipee"
-            android:layout_width="wrap_content"
-            android:layout_height="30dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="7dp"
 
-            android:background="@drawable/button_corners"
-            android:padding="5dp"
-            android:text="Add Tipee"
-            android:textAllCaps="false"
-            android:textSize="15dp"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tipeess" />
+            <ListView
+                android:layout_width="match_parent"
+                android:id="@+id/fetched_tipees"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+
+        <!--<Button-->
+        <!--android:id="@+id/add_tipee"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="30dp"-->
+        <!--android:layout_marginEnd="8dp"-->
+        <!--android:layout_marginLeft="8dp"-->
+        <!--android:layout_marginRight="8dp"-->
+        <!--android:layout_marginStart="8dp"-->
+        <!--android:layout_marginTop="7dp"-->
+
+        <!--android:background="@drawable/button_corners"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="Add Tipee"-->
+        <!--android:textAllCaps="false"-->
+        <!--android:textSize="15dp"-->
+        <!--app:layout_constraintHorizontal_bias="0.0"-->
+        <!--app:layout_constraintLeft_toLeftOf="parent"-->
+        <!--app:layout_constraintRight_toRightOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@+id/tipeess" />-->
 
 
         <!--<LinearLayout-->

@@ -83,6 +83,21 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:key="tipee_data"
+        android:title="@string/tipee_title">
+
+        <Preference
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:key="edit_add_tipees"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/edit_show_tipee" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
         android:key="backup_data"
         android:title="@string/data_backup">
 

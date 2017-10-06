@@ -32,11 +32,13 @@
 
 
         <EditText
+            android:id="@+id/tipee_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.2"
             android:hint="Enter name"
-            android:id="@+id/tipee_name"
+            android:maxLines="1"
+            android:singleLine="true"
             android:textColor="#000000"
             android:textSize="15dp" />
     </LinearLayout>
@@ -59,12 +61,13 @@
 
 
         <EditText
+            android:id="@+id/tipee_out"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1.2"
             android:hint="Tip-Out % "
-            android:id="@+id/tipee_out"
             android:inputType="numberDecimal"
+            android:maxLength="4"
             android:textColor="#000000"
             android:textSize="15dp" />
     </LinearLayout>
@@ -77,8 +80,8 @@
         android:weightSum="2">
 
         <Button
-            android:layout_width="0dp"
             android:id="@+id/ok_button"
+            android:layout_width="0dp"
             android:layout_height="30dp"
             android:layout_marginRight="10dp"
             android:layout_weight="1"
@@ -89,10 +92,10 @@
 
 
         <Button
+            android:id="@+id/cancel_button"
             android:layout_width="0dp"
             android:layout_height="30dp"
             android:layout_weight="1"
-            android:id="@+id/cancel_button"
             android:background="@drawable/button_corners"
             android:text="Cancel"
             android:textAllCaps="false"

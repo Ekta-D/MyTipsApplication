@@ -2,6 +2,7 @@ package com.mytips;
 
 
 import android.annotation.TargetApi;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,6 +22,19 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+
+import com.mytips.Adapter.AddTipeeAdapter;
+import com.mytips.Model.TipeeInfo;
+import com.mytips.Preferences.Constants;
+import com.mytips.Preferences.Preferences;
+
+import java.util.ArrayList;
+
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
  * handset devices, settings are presented as a single list. On tablets,
@@ -37,7 +51,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-
+    String tipee_name_tipout;
     SharedPreferences sharedPreferences;
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
             new Preference.OnPreferenceChangeListener() {
@@ -129,6 +143,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         addPreferencesFromResource(R.xml.pref_general);
 //        setHasOptionsMenu(true);
         final EditTextPreference editTextPreference_name, editTextPreference_email;
+        Preference editTextPreference_show_add_tipee;
         final ListPreference date_list, time_list, currency_list, theme_list;
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences
         // to their values. When their values change, their summaries are
@@ -144,6 +159,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         bindPreferenceSummaryToValue(findPreference("backup_data"));
         bindPreferenceSummaryToValue(findPreference("backup_restore"));
         bindPreferenceSummaryToValue(findPreference("get_passcode"));
+        bindPreferenceSummaryToValue(findPreference("edit_add_tipees"));
 
         editTextPreference_name = (EditTextPreference) findPreference("example_text");
 
@@ -297,7 +313,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
             }
         });
-        theme_list=(ListPreference)findPreference("example_list");
+        theme_list = (ListPreference) findPreference("example_list");
         int selected_themeIndex = sharedPreferences.getInt("selected_theme", 2);
         if (selected_themeIndex < 2) {
             theme_list.setDefaultValue(selected_themeIndex);
@@ -335,6 +351,89 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
             }
         });
+        editTextPreference_show_add_tipee = (Preference) findPreference("edit_add_tipees");
+
+        editTextPreference_show_add_tipee.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                final Dialog tipees_dilog = new Dialog(SettingsActivity.this);
+                tipees_dilog.setContentView(R.layout.show_edit_tipee_dialog);
+                Button add_tipee_btn = (Button) tipees_dilog.findViewById(R.id.button);
+
+                final ListView tipees_list = (ListView) tipees_dilog.findViewById(R.id.tipee_name_list);
+                ArrayList<TipeeInfo> fetchInfo = new ArrayList<TipeeInfo>();
+                fetchInfo = Preferences.getInstance(SettingsActivity.this).getTipeeList(Constants.TipeeListKey);
+                if (fetchInfo == null ) {
+
+                } else {
+                    AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
+                            fetchInfo);
+
+                    tipees_list.setAdapter(adapter);
+                }
+
+
+                final ArrayList<TipeeInfo> tippess_infolist = new ArrayList<TipeeInfo>();
+
+                add_tipee_btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final Dialog dialog = new Dialog(SettingsActivity.this);
+                        dialog.setContentView(R.layout.add_tipee_dialog);
+
+                        Button button_ok, button_cancel;
+                        final EditText editText_tipeename, editText_tipee_out;
+
+                        editText_tipeename = (EditText) dialog.findViewById(R.id.tipee_name);
+                        editText_tipee_out = (EditText) dialog.findViewById(R.id.tipee_out);
+
+                        button_ok = (Button) dialog.findViewById(R.id.ok_button);
+                        button_cancel = (Button) dialog.findViewById(R.id.cancel_button);
+
+                        button_ok.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                final String name = editText_tipeename.getText().toString().trim();
+                                final String percent = editText_tipee_out.getText().toString().trim();
+
+                                if (!percent.equalsIgnoreCase("")) {
+                                    //    tipee_percent = Integer.parseInt(percent);
+                                }
+                                tipee_name_tipout = name + " " + percent + "%";
+
+
+                                TipeeInfo tipeeInfo = new TipeeInfo();
+                                tipeeInfo.setName(name);
+                                tipeeInfo.setPercentage(percent);
+                                tippess_infolist.add(tipeeInfo);
+                                if (tippess_infolist.size() > 0) {
+                                    AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
+                                            tippess_infolist);
+
+                                    Preferences.getInstance(SettingsActivity.this).save_list(Constants.TipeeListKey, tippess_infolist);
+                                    tipees_list.setAdapter(adapter);
+                                }
+                                dialog.dismiss();
+                            }
+                        });
+                        button_cancel.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog.dismiss();
+                            }
+                        });
+
+
+                        dialog.show();
+                    }
+                });
+
+                tipees_dilog.show();
+                return true;
+            }
+        });
+
     }
 
     /**
