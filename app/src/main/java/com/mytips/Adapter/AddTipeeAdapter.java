@@ -84,6 +84,7 @@ public class AddTipeeAdapter extends BaseAdapter {
             public void onClick(View v) {
                 final Dialog dialog = new Dialog(context);
                 dialog.setContentView(R.layout.add_tipee_dialog);
+                dialog.setTitle(R.string.add_tipee_title);
 
                 final TipeeInfo tI = arrayList.get(position);
 

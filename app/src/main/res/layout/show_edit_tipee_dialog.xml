@@ -2,46 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_marginLeft="10dp"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_margin="10dp"
-        android:weightSum="2">
+        android:orientation="horizontal">
 
         <TextView
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="10dp"
-            android:layout_weight="1"
-            android:gravity="center"
             android:text="Tipee"
+            android:layout_centerVertical="true"
             android:textColor="@color/colorBlack"
-            android:textSize="18dp" />
+            android:textSize="20sp" />
 
         <Button
             android:id="@+id/button"
-            android:layout_width="0dp"
-            android:layout_height="30dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:background="@drawable/button_corners"
-            android:padding="5dp"
-            android:text="Add Tipee"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:text=" + Add Tipee "
             android:textAllCaps="false"
-            android:textSize="15dp" />
-    </LinearLayout>
+            android:textSize="15sp" />
+    </RelativeLayout>
 
     <ListView
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-
-        android:id="@+id/tipee_name_list"
-
-     />
+        android:layout_height="220dp"
+        android:id="@+id/tipee_name_list" />
 
 </LinearLayout>

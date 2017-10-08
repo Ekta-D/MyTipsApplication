@@ -305,7 +305,9 @@ public class AddProfileActivity extends AppCompatActivity {
     public void getAllTipees() {
         ArrayList<TipeeInfo> tipeeInfos = Preferences.getInstance(AddProfileActivity.this).getTipeeList(Constants.TipeeListKey);
         listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
-        FetchedTipeeAdapter adapter = new FetchedTipeeAdapter(AddProfileActivity.this, tipeeInfos);
-        listView_fetched_tipees.setAdapter(adapter);
+        if(tipeeInfos!=null) {
+            FetchedTipeeAdapter adapter = new FetchedTipeeAdapter(AddProfileActivity.this, tipeeInfos);
+            listView_fetched_tipees.setAdapter(adapter);
+        }
     }
 }

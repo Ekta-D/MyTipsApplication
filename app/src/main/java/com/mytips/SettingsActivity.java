@@ -23,6 +23,7 @@ import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -362,14 +363,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 Button add_tipee_btn = (Button) tipees_dilog.findViewById(R.id.button);
 
                 final ListView tipees_list = (ListView) tipees_dilog.findViewById(R.id.tipee_name_list);
-                ArrayList<TipeeInfo> fetchInfo = new ArrayList<TipeeInfo>();
-                fetchInfo = Preferences.getInstance(SettingsActivity.this).getTipeeList(Constants.TipeeListKey);
-                if (fetchInfo == null ) {
-
-                } else {
+                ArrayList<TipeeInfo> fetchInfo = Preferences.getInstance(SettingsActivity.this).getTipeeList(Constants.TipeeListKey);
+                if (fetchInfo !=null){
                     AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
                             fetchInfo);
-
                     tipees_list.setAdapter(adapter);
                 }
 
