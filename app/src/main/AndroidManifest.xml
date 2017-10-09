@@ -3,8 +3,7 @@
     package="com.mytips">
 
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -44,6 +43,10 @@
         <activity
             android:name=".AddProfileActivity"
             android:label="@string/label_add_profile"
+            android:theme="@style/AppTheme" />
+        <activity
+            android:name=".ActiveProfiles"
+            android:label="@string/active_profile"
             android:theme="@style/AppTheme" />
     </application>
 

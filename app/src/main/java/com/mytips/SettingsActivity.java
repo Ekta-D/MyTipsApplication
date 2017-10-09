@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -30,11 +31,14 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.mytips.Adapter.AddTipeeAdapter;
+import com.mytips.Database.DatabaseOperations;
+import com.mytips.Database.DatabaseUtils;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Preferences.Constants;
 import com.mytips.Preferences.Preferences;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -52,6 +56,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
+    int tipee_percent;
+
     String tipee_name_tipout;
     SharedPreferences sharedPreferences;
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
@@ -364,15 +370,19 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 final ListView tipees_list = (ListView) tipees_dilog.findViewById(R.id.tipee_name_list);
                 ArrayList<TipeeInfo> fetchInfo = Preferences.getInstance(SettingsActivity.this).getTipeeList(Constants.TipeeListKey);
-                if (fetchInfo !=null){
+                if (fetchInfo != null) {
                     AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
                             fetchInfo);
                     tipees_list.setAdapter(adapter);
                 }
 
 
-                final ArrayList<TipeeInfo> tippess_infolist = new ArrayList<TipeeInfo>();
-
+                tippess_infolist = fetchTipeeList();
+                if (tippess_infolist.size() > 0) {
+                    AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
+                            tippess_infolist);
+                    tipees_list.setAdapter(adapter);
+                }
                 add_tipee_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -395,20 +405,24 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 final String percent = editText_tipee_out.getText().toString().trim();
 
                                 if (!percent.equalsIgnoreCase("")) {
-                                    //    tipee_percent = Integer.parseInt(percent);
+                                    tipee_percent = Integer.parseInt(percent);
                                 }
                                 tipee_name_tipout = name + " " + percent + "%";
 
+                                String tipee_id = UUID.randomUUID().toString();
 
                                 TipeeInfo tipeeInfo = new TipeeInfo();
                                 tipeeInfo.setName(name);
+                                tipeeInfo.setId(tipee_id);
                                 tipeeInfo.setPercentage(percent);
                                 tippess_infolist.add(tipeeInfo);
+
+                                new DatabaseOperations(SettingsActivity.this).insertTipeeInfo(tipee_id, name, tipee_percent);
                                 if (tippess_infolist.size() > 0) {
                                     AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
                                             tippess_infolist);
-
-                                    Preferences.getInstance(SettingsActivity.this).save_list(Constants.TipeeListKey, tippess_infolist);
+//
+//                                    Preferences.getInstance(SettingsActivity.this).save_list(Constants.TipeeListKey, tippess_infolist);
                                     tipees_list.setAdapter(adapter);
                                 }
                                 dialog.dismiss();
@@ -500,78 +514,38 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    /**
-     * This fragment shows notification preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-//    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-//    public static class NotificationPreferenceFragment extends PreferenceFragment {
-//        @Override
-//        public void onCreate(Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//            addPreferencesFromResource(R.xml.pref_notification);
-//            setHasOptionsMenu(true);
-//
-//            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-//            // to their values. When their values change, their summaries are
-//            // updated to reflect the new value, per the Android Design
-//            // guidelines.
-//            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
-//        }
-//
-//        @Override
-//        public boolean onOptionsItemSelected(MenuItem item) {
-//            int id = item.getItemId();
-//            if (id == android.R.id.home) {
-//                startActivity(new Intent(getActivity(), SettingsActivity.class));
-//                return true;
-//            }
-//            return super.onOptionsItemSelected(item);
-//        }
-//    }
+    ArrayList<TipeeInfo> tippess_infolist;
 
-    /**
-     * This fragment shows data and sync preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-//    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-//    public static class DataSyncPreferenceFragment extends PreferenceFragment {
-//        @Override
-//        public void onCreate(Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//            addPreferencesFromResource(R.xml.pref_data_sync);
-//            setHasOptionsMenu(true);
-//
-//            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-//            // to their values. When their values change, their summaries are
-//            // updated to reflect the new value, per the Android Design
-//            // guidelines.
-//            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-//        }
-//
-//        @Override
-//        public boolean onOptionsItemSelected(MenuItem item) {
-//            int id = item.getItemId();
-//            if (id == android.R.id.home) {
-//                startActivity(new Intent(getActivity(), SettingsActivity.class));
-//                return true;
-//            }
-//            return super.onOptionsItemSelected(item);
-//        }
-//    }
-/**************************************************************/
-//    public static class MainPreferenceFragment extends PreferenceFragment {
-//        @Override
-//        public void onCreate(@Nullable Bundle savedInstanceState) {
-//            super.onCreate(savedInstanceState);
-//            addPreferencesFromResource(R.xml.pref_data_sync);
-//            addPreferencesFromResource(R.xml.pref_general);
-//            addPreferencesFromResource(R.xml.pref_headers);
-//            addPreferencesFromResource(R.xml.pref_notification);
-//
-//
-//            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_header_notifications)));
-//
-//        }
-//    }
+    public ArrayList<TipeeInfo> fetchTipeeList() {
+        tippess_infolist = new ArrayList<>();
+        Cursor cursor = null;
+        String[] projections = new String[3];
+        projections[0] = DatabaseUtils.TipeeID;
+        projections[1] = DatabaseUtils.TipeeName;
+        projections[2] = DatabaseUtils.TipeeOut;
+        try {
+            cursor = new DatabaseOperations(SettingsActivity.this).dataFetch(DatabaseUtils.TIPEE_TABLE, projections,
+                    null, null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        int cursor_count = cursor.getCount();
+        if (cursor_count != 0) {
+            if (cursor.moveToFirst()) {
+                do {
+                    TipeeInfo tipeeInfo = new TipeeInfo();
+                    tipeeInfo.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeID)));
+                    tipeeInfo.setName(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeName)));
+                    tipeeInfo.setPercentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeOut)));
+
+                    tippess_infolist.add(tipeeInfo);
+                } while (cursor.moveToNext());
+            }
+        }
+
+        return tippess_infolist;
+
+
+    }
 }

@@ -212,7 +212,7 @@
         <EditText
             android:id="@+id/editText_houly_pay"
             android:layout_width="95dp"
-            android:layout_height="33dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
@@ -227,6 +227,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="12dp"
             android:text="Holiday Pay"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/spinner_holiday_pay"
@@ -234,13 +235,15 @@
 
         <Spinner
             android:id="@+id/spinner_holiday_pay"
-            android:layout_width="116dp"
-            android:layout_height="22dp"
+            android:layout_width="160dp"
+            android:layout_height="42dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:layout_marginTop="5dp"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/editText_houly_pay" />
+            app:layout_constraintTop_toBottomOf="@+id/editText_houly_pay"
+            tools:layout_editor_absoluteX="223dp" />
 
         <TextView
             android:id="@+id/textView20"

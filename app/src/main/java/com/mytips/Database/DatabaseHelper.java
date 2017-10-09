@@ -25,27 +25,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.ProfileID + " INTEGER,  "
                 + DatabaseUtils.ProfileName + " TEXT, "
                 + DatabaseUtils.IsSupervisor + " INTEGER,  "
+                + DatabaseUtils.IsActive + " INTEGER,  "
                 + DatabaseUtils.GetTournamentTip +
                 " INTEGER,  "
                 + DatabaseUtils.GetTips + " INTEGER,  "
                 + DatabaseUtils.PayPeriod + " TEXT, "
                 + DatabaseUtils.StartDayWeek + " TEXT, "
-                + DatabaseUtils.Wages + " INTEGER,  "
                 + DatabaseUtils.HourlyPay + " INTEGER,  "
                 + DatabaseUtils.HolidayPay + " TEXT, "
                 + DatabaseUtils.ProfilePic + " TEXT, "
                 + DatabaseUtils.Tipees + " TEXT );"
 
         );
+        db.execSQL(DatabaseUtils.CREATE_TABLE + DatabaseUtils.TIPEE_TABLE + " (id INTEGER PRIMARY KEY AUTOINCREMENT,  " +
+                DatabaseUtils.TipeeID + " INTEGER,  "
+                + DatabaseUtils.TipeeName + " TEXT, "
+                + DatabaseUtils.TipeeOut + " TEXT );");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         dropIfTableExist(DatabaseUtils.PROFILE_TABLE, db);
+        dropIfTableExist(DatabaseUtils.TIPEE_TABLE, db);
     }
 
     public void dropIfTableExist(String table_name, SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS '" + table_name + "'");
-
     }
 }

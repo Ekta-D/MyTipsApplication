@@ -11,7 +11,7 @@ public class DatabaseUtils {
     public static final String CREATE_TABLE = "CREATE TABLE ";
 
     public static final String PROFILE_TABLE = "profile";
-
+    public static final String TIPEE_TABLE = "tipees";
 
     // profile fields
     public static final String ProfileID = "profile_id";
@@ -21,10 +21,17 @@ public class DatabaseUtils {
     public static final String GetTips = "getTips";
     public static final String PayPeriod = "pay_period";
     public static final String StartDayWeek = "start_day_week";
-    public static final String Wages = "wages";
+
     public static final String HourlyPay = "hourly_pay";
     public static final String HolidayPay = "holiday_pay";
     public static final String Tipees = "tipees";
-    public static final String ProfilePic="profile_pic";
+    public static final String ProfilePic = "profile_pic";
+    public static final String IsActive = "is_active";
+
+
+    //tipees fields
+    public static final String TipeeID = "tipee_id";
+    public static final String TipeeName = "tipee_name";
+    public static final String TipeeOut = "tip_out";
 
 }

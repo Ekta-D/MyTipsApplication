@@ -221,7 +221,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(new Intent(getBaseContext(), AddDayActivity.class));
                 break;
             case R.id.profile:
-                startActivity(new Intent(getBaseContext(), AddProfileActivity.class));
+                startActivity(new Intent(getBaseContext(), ActiveProfiles.class));
                 break;
             case R.id.preferences:
                 startActivity(new Intent(getBaseContext(), SettingsActivity.class));

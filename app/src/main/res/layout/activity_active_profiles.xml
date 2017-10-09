@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mytips.ActiveProfiles">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="com.mytips.ActiveProfiles">
+
+        <TextView
+            android:id="@+id/active"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:text="@string/active"
+            android:textColor="@color/colorBlack"
+            android:textSize="18dp" />
+
+        <ListView
+            android:id="@+id/active_profile_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/active" />
+
+        <TextView
+            android:id="@+id/deactive"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/active_profile_list"
+            android:layout_margin="10dp"
+            android:text="@string/deactive"
+            android:textColor="@color/colorBlack"
+            android:textSize="18dp" />
+
+
+        <ListView
+            android:id="@+id/deactive_profile_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/deactive" />
+
+
+        <Button
+            android:id="@+id/add_new_profile"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:layout_alignParentBottom="true"
+            android:text=" + Add Profile"
+            android:textAllCaps="false"
+            android:textSize="18dp" />
+    </RelativeLayout>
+</RelativeLayout>

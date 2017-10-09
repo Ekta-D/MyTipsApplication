@@ -12,7 +12,7 @@
     <string name="menu_day_off">Day Off</string>
     <string name="title_add_day">Add Day</string>
     <string name="label_add_profile">Add Profile</string>
-<string name="add_tipee_title">Add Tipee Info</string>
+    <string name="add_tipee_title">Add Tipee Info</string>
     <string name="tipee_title">Tipee</string>
     <!-- Strings related to Settings -->
 
@@ -39,6 +39,9 @@
     <string name="pref_title_add_friends_to_messages">Theme</string>
     <string name="pref_currency_title">Currency</string>
     <string name="edit_show_tipee">Show/update Tipee</string>
+    <string name="active_profile">Profiles</string>
+    <string name="active">Active Profiles</string>
+    <string name="deactive">Deactive Profiles</string>
     <string-array name="currencies">
         <item>United States </item>
         <item>Uruguay</item>

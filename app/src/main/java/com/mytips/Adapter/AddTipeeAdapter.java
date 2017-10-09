@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Preferences.Constants;
 import com.mytips.Preferences.Preferences;
@@ -109,7 +110,8 @@ public class AddTipeeAdapter extends BaseAdapter {
                         tI.setName(updated_name);
                         tI.setPercentage(updated_per);
                         notifyDataSetChanged();
-                        Preferences.getInstance(context).save_list(Constants.TipeeListKey, arrayList);
+                        new DatabaseOperations(context).updateTipeeInfo(tI.getId(), tI.getName(), tI.getPercentage());
+                        //  Preferences.getInstance(context).save_list(Constants.TipeeListKey, arrayList);
                         dialog.dismiss();
                     }
                 });
@@ -134,6 +136,7 @@ public class AddTipeeAdapter extends BaseAdapter {
                     public void onClick(DialogInterface dialog, int which) {
                         arrayList.remove(position);
                         notifyDataSetChanged();
+                        new DatabaseOperations(context).deleteTipee(arrayList.get(position).getId());
                         dialog.dismiss();
                     }
                 });

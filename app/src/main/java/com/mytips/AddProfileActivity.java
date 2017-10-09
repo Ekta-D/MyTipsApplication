@@ -3,6 +3,8 @@ package com.mytips;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Dialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -38,6 +40,8 @@ import android.widget.Toast;
 
 import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
+import com.mytips.Database.DatabaseUtils;
+import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Preferences.Constants;
 import com.mytips.Preferences.Preferences;
@@ -46,8 +50,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.UUID;
 
 import static com.mytips.R.id.fetched_tipees;
+import static com.mytips.R.id.spinner_pay_period;
 import static com.mytips.R.id.tipeess;
 
 
@@ -56,7 +62,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
     ImageButton imageButton;
     String profile_name;
-    int  hourly_pay = 0;
+    int hourly_pay = 0;
     EditText editText_profilename, editText_hourly_pay;
     CheckBox checkBox_supervisor, checkBox_getTournament, checkBox_getTips;
     Spinner spinner_payperiod, spinner_startday, spinner_holiday_pay;
@@ -71,6 +77,9 @@ public class AddProfileActivity extends AppCompatActivity {
     public static final String ISFIRST_TIME = "Isfirst_time";
     SharedPreferences sharedPreferences;
     ListView listView_fetched_tipees;
+    ArrayAdapter<String> payAdapter, dayAdapter, holidayAdapter;
+    Bundle b;
+    Profiles profiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,6 +97,15 @@ public class AddProfileActivity extends AppCompatActivity {
 
         initView();
         getAllTipees();
+
+        Intent i = getIntent();
+        b = i.getExtras();
+        if (b != null) {
+            profiles = (Profiles) b.getSerializable(Constants.ProfileData);
+            fillAllFields(profiles);
+        }
+
+
     }
 
     public void initView() {
@@ -105,13 +123,9 @@ public class AddProfileActivity extends AppCompatActivity {
         spinner_holiday_pay = (Spinner) findViewById(R.id.spinner_holiday_pay);
         editText_hourly_pay = (EditText) findViewById(R.id.editText_houly_pay);
         //  addTipee = (Button) findViewById(R.id.add_tipee);
-        profile_name = editText_profilename.getText().toString().trim();
-        String hourPay = editText_hourly_pay.getText().toString().trim();
-        if (!hourPay.equalsIgnoreCase("")) {
-            hourly_pay = Integer.parseInt(hourPay);
-        }
 
-        ArrayAdapter<String> payAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, pay_period_array);
+
+        payAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, pay_period_array);
         spinner_payperiod.setAdapter(payAdapter);
 
         spinner_payperiod.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -127,7 +141,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
             }
         });
-        ArrayAdapter<String> dayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, start_days);
+        dayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, start_days);
         spinner_startday.setAdapter(dayAdapter);
 
         spinner_startday.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -142,7 +156,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
             }
         });
-        ArrayAdapter<String> holidayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, holiday_pays);
+        holidayAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, holiday_pays);
         spinner_holiday_pay.setAdapter(holidayAdapter);
         spinner_holiday_pay.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -241,16 +255,40 @@ public class AddProfileActivity extends AppCompatActivity {
                 this.finish();
                 break;
             case R.id.save_profile:
-                String joinedString = TextUtils.join(",", tipees_array);
-                try {
-                    dbOperations.insertProfileInfoIntoDatabase(profile_name, isSupervisor, isGettingTournament,
-                            isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                            joinedString);
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+                String id = UUID.randomUUID().toString();
+                profile_name = editText_profilename.getText().toString().trim();
+                String hourPay = editText_hourly_pay.getText().toString().trim();
+                if (!hourPay.equalsIgnoreCase("")) {
+                    hourly_pay = Integer.parseInt(hourPay);
                 }
-                Toast.makeText(this, "Thanks! your profile has been saved", Toast.LENGTH_SHORT).show();
-                emptyFields();
+
+                if (profile_name.equalsIgnoreCase("")) {
+                    Toast.makeText(this, "Please enter profile name!", Toast.LENGTH_SHORT).show();
+
+                } else {
+                    String joinedString = TextUtils.join(",", tipees_array);
+                    if (b != null) {
+                        dbOperations.updateProfileValues(profiles.getProfile_id(), profile_name, isSupervisor, isGettingTournament, isGetTips,
+                                payPeriod, startDay, hourly_pay, holidayPay, joinedString);
+                    } else {
+                        try {
+                            dbOperations.insertProfileInfoIntoDatabase(id, profile_name, isSupervisor, isGettingTournament,
+                                    isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
+                                    joinedString);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+
+                    Toast.makeText(this, "Thanks! your profile has been saved", Toast.LENGTH_SHORT).show();
+
+                    emptyFields();
+                    startActivity(new Intent(AddProfileActivity.this, ActiveProfiles.class));
+                    this.finish();
+                }
+
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -305,9 +343,34 @@ public class AddProfileActivity extends AppCompatActivity {
     public void getAllTipees() {
         ArrayList<TipeeInfo> tipeeInfos = Preferences.getInstance(AddProfileActivity.this).getTipeeList(Constants.TipeeListKey);
         listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
-        if(tipeeInfos!=null) {
+        if (tipeeInfos != null) {
             FetchedTipeeAdapter adapter = new FetchedTipeeAdapter(AddProfileActivity.this, tipeeInfos);
             listView_fetched_tipees.setAdapter(adapter);
         }
     }
+
+    public void fillAllFields(Profiles profiles) {
+        editText_profilename.setText(profiles.getProfile_name());
+        if (profiles.getIs_supervisor() == 1) {
+            checkBox_supervisor.setChecked(true);
+        }
+        if (profiles.getGet_tournamenttip() == 1) {
+            checkBox_getTournament.setChecked(true);
+        }
+        if (profiles.getGet_tips() == 1) {
+            checkBox_getTips.setChecked(true);
+        }
+        int payperiod = payAdapter.getPosition(profiles.getPay_period());
+        spinner_payperiod.setSelection(payperiod);
+
+        int startday = dayAdapter.getPosition(profiles.getStartday());
+        spinner_startday.setSelection(startday);
+        int holidayPay = holidayAdapter.getPosition(profiles.getHoliday_pay());
+        spinner_holiday_pay.setSelection(holidayPay);
+
+        editText_hourly_pay.setText(profiles.getHourly_pay());
+
+    }
+
+
 }
