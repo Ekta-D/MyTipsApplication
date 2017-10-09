@@ -58,35 +58,37 @@
 
         <EditText
             android:id="@+id/editText_start_shift"
-            android:layout_width="170dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="Start Shift"
             android:inputType="date"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView2"
+            app:layout_constraintRight_toLeftOf="@+id/editText_clock_in"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" />
 
         <EditText
             android:id="@+id/editText_clock_in"
-            android:layout_width="170dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="Clock-in"
             android:inputType="time"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView2" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView2"
+            app:layout_constraintLeft_toRightOf="@+id/editText_start_shift"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp" />
 
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginLeft="16dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="12dp"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -106,29 +108,31 @@
 
         <EditText
             android:id="@+id/editText_end_shift"
-            android:layout_width="170dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="End Shift"
             android:inputType="date"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView3"
+            app:layout_constraintRight_toLeftOf="@+id/editText_clock_out"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp" />
 
         <EditText
             android:id="@+id/editText_clock_out"
-            android:layout_width="170dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:hint="Clock-Out"
             android:inputType="time"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView3"
+            app:layout_constraintLeft_toRightOf="@+id/editText_end_shift"
+            android:layout_marginRight="8dp"
+            android:layout_marginEnd="8dp" />
 
         <TextView
             android:id="@+id/textView6"
@@ -171,10 +175,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:text="Total Tips"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/checkBox_holiday_pay" />
+            app:layout_constraintBottom_toBottomOf="@+id/editText_total_tips"
+            app:layout_constraintTop_toTopOf="@+id/editText_total_tips" />
 
         <EditText
             android:id="@+id/editText_total_tips"
@@ -185,7 +189,7 @@
             android:layout_marginTop="8dp"
             android:ems="10"
             android:inputType="numberDecimal"
-            android:textSize="12sp"
+            android:textSize="14sp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/checkBox_holiday_pay" />
 
@@ -220,10 +224,10 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
             android:text="Total Tip-Out %"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout_tipees" />
+            app:layout_constraintBottom_toBottomOf="@+id/textView_tip_out_percent"
+            app:layout_constraintTop_toTopOf="@+id/textView_tip_out_percent" />
 
         <TextView
             android:id="@+id/textView_tip_out_percent"
@@ -251,57 +255,58 @@
             android:id="@+id/editText_total_td_amount"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="16dp"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:inputType="number|numberDecimal"
             android:textSize="12sp"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView23" />
+            app:layout_constraintTop_toBottomOf="@+id/textView23"
+            app:layout_constraintLeft_toRightOf="@+id/textView25" />
 
         <TextView
             android:id="@+id/textView21"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="8dp"
             android:text="Count"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/textView14"
+            app:layout_constraintRight_toLeftOf="@+id/textView22"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView14" />
+            android:layout_marginEnd="64dp" />
 
         <TextView
             android:id="@+id/textView22"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="$ per TD"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView14" />
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/textView14"
+            app:layout_constraintRight_toLeftOf="@+id/textView23"
+            app:layout_constraintLeft_toRightOf="@+id/textView21"
+            android:layout_marginRight="64dp"
+            android:layout_marginEnd="64dp" />
 
         <TextView
             android:id="@+id/textView23"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="40dp"
-            android:layout_marginTop="7dp"
             android:text="Total"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/textView14"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView14" />
+            app:layout_constraintLeft_toRightOf="@+id/textView22" />
 
         <EditText
             android:id="@+id/editText_number_of_td"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:ems="10"
             android:inputType="number"
             android:textSize="12sp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView21" />
+            app:layout_constraintTop_toBottomOf="@+id/textView21"
+            app:layout_constraintRight_toLeftOf="@+id/textView24" />
 
         <EditText
             android:id="@+id/editText_amount_per_td"
@@ -311,9 +316,9 @@
             android:ems="10"
             android:inputType="numberDecimal"
             android:textSize="12sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView22" />
+            app:layout_constraintTop_toBottomOf="@+id/textView22"
+            app:layout_constraintRight_toLeftOf="@+id/textView25"
+            app:layout_constraintLeft_toRightOf="@+id/textView24" />
 
         <TextView
             android:id="@+id/textView24"
@@ -325,7 +330,9 @@
             android:text="x"
             app:layout_constraintLeft_toRightOf="@+id/textView21"
             app:layout_constraintRight_toLeftOf="@+id/textView22"
-            app:layout_constraintTop_toBottomOf="@+id/textView14" />
+            app:layout_constraintTop_toBottomOf="@+id/textView14"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
 
         <TextView
             android:id="@+id/textView25"
@@ -338,7 +345,9 @@
             app:layout_constraintHorizontal_bias="0.507"
             app:layout_constraintLeft_toRightOf="@+id/textView22"
             app:layout_constraintRight_toLeftOf="@+id/textView23"
-            app:layout_constraintTop_toBottomOf="@+id/textView14" />
+            app:layout_constraintTop_toBottomOf="@+id/textView14"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
