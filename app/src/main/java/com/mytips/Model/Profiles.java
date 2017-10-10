@@ -8,6 +8,15 @@ import java.io.Serializable;
 
 public class Profiles implements Serializable {
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    int id;
     String profile_id;
     String profile_name;
     int is_supervisor;

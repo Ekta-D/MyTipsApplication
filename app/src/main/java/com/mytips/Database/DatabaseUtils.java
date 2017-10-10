@@ -14,6 +14,7 @@ public class DatabaseUtils {
     public static final String TIPEE_TABLE = "tipees";
 
     // profile fields
+    public static final String Profile_ID = "id";
     public static final String ProfileID = "profile_id";
     public static final String ProfileName = "profile_name";
     public static final String IsSupervisor = "supervisor";

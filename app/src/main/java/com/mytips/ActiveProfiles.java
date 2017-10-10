@@ -68,7 +68,7 @@ public class ActiveProfiles extends AppCompatActivity {
                             activeProfileList.remove(position);
                             adapter.notifyDataSetChanged();
                         } else {
-                            setDeactiveProfileList(profile.getProfile_id());
+                            setDeactiveProfileList(String.valueOf(profile.getId()));
                             profileDeactiveList.add(profile);
                             activeProfileList.remove(position);
                             adapter.notifyDataSetChanged();
@@ -97,7 +97,7 @@ public class ActiveProfiles extends AppCompatActivity {
     public void deleteProfile(Profiles profiles) {
         try {
 
-            new DatabaseOperations(ActiveProfiles.this).delete_profile(profiles.getProfile_id());
+            new DatabaseOperations(ActiveProfiles.this).delete_profile(String.valueOf(profiles.getId()));
         } catch (Exception e) {
             e.printStackTrace();
         }

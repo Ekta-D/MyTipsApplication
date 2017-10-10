@@ -1,9 +1,13 @@
 package com.mytips.Adapter;
 
 import android.content.Context;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -23,19 +27,23 @@ import java.util.List;
  * Created by Beesolver on 06-10-2017.
  */
 
-public class FetchedTipeeAdapter extends BaseAdapter {
+public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements CompoundButton.OnCheckedChangeListener{
 
     ArrayList<TipeeInfo> tipeeInfoArrayList;
     Context context;
     LayoutInflater inflater;
+    public SparseBooleanArray checkedItems;
 
-    TipeeSelected tipeeSelectedCallback;
+    //TipeeSelected tipeeSelectedCallback;
     List<String> selected_tipeesIds;
 
-    public FetchedTipeeAdapter(Context context, List<String> selected_tipeesIds, ArrayList<TipeeInfo> tipeeInfoArrayList, TipeeSelected tipeeSelectedCallback) {
+    public  FetchedTipeeAdapter(Context context, List<String> selected_tipeesIds, ArrayList<TipeeInfo> tipeeInfoArrayList) {
+        super(context, 0);
+
         this.context = context;
         this.tipeeInfoArrayList = tipeeInfoArrayList;
-        this.tipeeSelectedCallback = tipeeSelectedCallback;
+        //this.tipeeSelectedCallback = tipeeSelectedCallback;
+        this.checkedItems = new SparseBooleanArray(tipeeInfoArrayList.size());
         this.selected_tipeesIds = selected_tipeesIds;
     }
 
@@ -45,16 +53,29 @@ public class FetchedTipeeAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
-        return position;
-    }
-
-    @Override
     public long getItemId(int position) {
         return position;
     }
 
-    class ViewHolder {
+    public boolean isChecked(int position) {
+        return checkedItems.get(position, false);
+    }
+
+    public void setChecked(int position, boolean isChecked) {
+        checkedItems.put(position, isChecked);
+
+    }
+
+    public void toggle(int position) {
+        setChecked(position, !isChecked(position));
+
+    }
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+        checkedItems.put((Integer) compoundButton.getTag(), b);
+    }
+
+    static class ViewHolder {
         TextView textView;
         CheckBox checkBox;
     }
@@ -74,9 +95,19 @@ public class FetchedTipeeAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.textView.setText(tipeeInfoArrayList.get(position).getName() + " " + tipeeInfoArrayList.get(position).getPercentage() + "%");
 
-        if (selected_tipeesIds == null) {
+
+        TipeeInfo tipeeInfo = tipeeInfoArrayList.get(position);
+        viewHolder.textView.setText(tipeeInfo.getName() + " " + tipeeInfo.getPercentage() + "%");
+
+        viewHolder.checkBox.setTag(position);
+        if(selected_tipeesIds.contains(tipeeInfo.getId()))
+            viewHolder.checkBox.setChecked(checkedItems.get(position, true));
+        else
+            viewHolder.checkBox.setChecked(checkedItems.get(position, false));
+        viewHolder.checkBox.setOnCheckedChangeListener(this);
+
+        /*if (selected_tipeesIds == null) {
 
         } else if (selected_tipeesIds.size() > 0) {
 
@@ -101,7 +132,7 @@ public class FetchedTipeeAdapter extends BaseAdapter {
                     tipeeSelectedCallback.TipeeCheckedList(position, false, tipeeInfo,selected_tipeesIds);
                 }
             }
-        });
+        });*/
         return convertView;
     }
 }

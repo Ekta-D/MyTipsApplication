@@ -46,7 +46,6 @@ public class DatabaseOperations {
             getTips = 1;
         }
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DatabaseUtils.ProfileID, profile_id);
         contentValues.put(DatabaseUtils.ProfileName, profile_name);
         contentValues.put(DatabaseUtils.IsSupervisor, supervisor);
         contentValues.put(DatabaseUtils.GetTournamentTip, tournamentTips);
@@ -79,7 +78,7 @@ public class DatabaseOperations {
         return cursor;
     }
 
-    public void updateProfileValues(String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
+    public void updateProfileValues(int id, String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
                                     boolean isGetTips, String payPeriod, String startDay, int hourPay, String holidayPay
             , String tipees) {
 
@@ -103,7 +102,8 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.HourlyPay, hourPay);
         contentValues.put(DatabaseUtils.Tipees, tipees);
         try {
-            db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.ProfileID + " =? ", new String[]{profile_id});
+            int changedRecord = db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.Profile_ID + " =? ", new String[]{String.valueOf(id)});
+            System.out.println("updated" + changedRecord);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -175,17 +175,19 @@ public class DatabaseOperations {
             e.printStackTrace();
         }
 
-        int cursor_count = cursor.getCount();
-        if (cursor_count != 0) {
-            if (cursor.moveToFirst()) {
-                do {
-                    TipeeInfo tipeeInfo = new TipeeInfo();
-                    tipeeInfo.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeID)));
-                    tipeeInfo.setName(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeName)));
-                    tipeeInfo.setPercentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeOut)));
+        if (cursor != null) {
+            int cursor_count = cursor.getCount();
+            if (cursor_count != 0) {
+                if (cursor.moveToFirst()) {
+                    do {
+                        TipeeInfo tipeeInfo = new TipeeInfo();
+                        tipeeInfo.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeID)));
+                        tipeeInfo.setName(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeName)));
+                        tipeeInfo.setPercentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeOut)));
 
-                    tippess_infolist.add(tipeeInfo);
-                } while (cursor.moveToNext());
+                        tippess_infolist.add(tipeeInfo);
+                    } while (cursor.moveToNext());
+                }
             }
         }
 
@@ -194,10 +196,10 @@ public class DatabaseOperations {
 
     }
 
-    public  ArrayList<Profiles> fetchAllProfile(Context context) {
+    public ArrayList<Profiles> fetchAllProfile(Context context) {
         ArrayList<Profiles> profilesList;
         Cursor cursor = null;
-        String[] projections = new String[11];
+        String[] projections = new String[12];
         projections[0] = DatabaseUtils.ProfileID;
         projections[1] = DatabaseUtils.ProfileName;
         projections[2] = DatabaseUtils.IsSupervisor;
@@ -209,6 +211,7 @@ public class DatabaseOperations {
         projections[8] = DatabaseUtils.HourlyPay;
         projections[9] = DatabaseUtils.HolidayPay;
         projections[10] = DatabaseUtils.Tipees;
+        projections[11] = DatabaseUtils.Profile_ID;
 
 //        String selection[] = new String[]{"1"};
         try {
