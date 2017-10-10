@@ -7,7 +7,7 @@ package com.mytips.Model;
 public class TipeeInfo {
     String name;
     String percentage;
-
+    String id;
     public String getId() {
         return id;
     }
@@ -16,7 +16,7 @@ public class TipeeInfo {
         this.id = id;
     }
 
-    String id;
+
 
     public String getName() {
         return name;

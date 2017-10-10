@@ -41,6 +41,7 @@ import android.widget.Toast;
 import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Database.DatabaseUtils;
+import com.mytips.Interface.TipeeSelected;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Preferences.Constants;
@@ -49,7 +50,9 @@ import com.mytips.Preferences.Preferences;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 import static com.mytips.R.id.fetched_tipees;
@@ -80,6 +83,7 @@ public class AddProfileActivity extends AppCompatActivity {
     ArrayAdapter<String> payAdapter, dayAdapter, holidayAdapter;
     Bundle b;
     Profiles profiles;
+    FetchedTipeeAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +101,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
         initView();
         getAllTipees();
+
 
         Intent i = getIntent();
         b = i.getExtras();
@@ -267,11 +272,12 @@ public class AddProfileActivity extends AppCompatActivity {
                     Toast.makeText(this, "Please enter profile name!", Toast.LENGTH_SHORT).show();
 
                 } else {
-                    String joinedString = TextUtils.join(",", tipees_array);
+
                     if (b != null) {
-                        dbOperations.updateProfileValues(profiles.getProfile_id(), profile_name, isSupervisor, isGettingTournament, isGetTips,
-                                payPeriod, startDay, hourly_pay, holidayPay, joinedString);
+//                        dbOperations.updateProfileValues(profiles.getProfile_id(), profile_name, isSupervisor, isGettingTournament, isGetTips,
+//                                payPeriod, startDay, hourly_pay, holidayPay, joinedString);
                     } else {
+                        String joinedString = convertArrayToString(selected_tipeesID);
                         try {
                             dbOperations.insertProfileInfoIntoDatabase(id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
@@ -310,16 +316,6 @@ public class AddProfileActivity extends AppCompatActivity {
 
     ArrayList<String> tipees_array = new ArrayList<>();
 
-    private TextView createNewTextView(String name, String tip_out) {
-        final ViewGroup.LayoutParams lparams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        final TextView textView = new TextView(this);
-        textView.setLayoutParams(lparams);
-        textView.setTextColor(getResources().getColor(R.color.colorBlack));
-        tipees_array.add(name + " " + tip_out + "%");
-        textView.setText(name + " " + tip_out + "%" + ", ");
-        return textView;
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -340,11 +336,39 @@ public class AddProfileActivity extends AppCompatActivity {
         }
     }
 
+    ArrayList<TipeeInfo> tipeeInfos;
+    List<String> selected_tipeesID;
+
+
     public void getAllTipees() {
-        ArrayList<TipeeInfo> tipeeInfos = Preferences.getInstance(AddProfileActivity.this).getTipeeList(Constants.TipeeListKey);
+        selected_tipeesID = new ArrayList<>();
+        tipeeInfos = new ArrayList<>();
+
+        tipeeInfos = new DatabaseOperations(AddProfileActivity.this).fetchTipeeList(AddProfileActivity.this);
+
+
         listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
         if (tipeeInfos != null) {
-            FetchedTipeeAdapter adapter = new FetchedTipeeAdapter(AddProfileActivity.this, tipeeInfos);
+            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos, new TipeeSelected() {
+                @Override
+                public TipeeInfo TipeeCheckedList(int position, boolean isChecked, TipeeInfo selected_tipee, List<String> selected_tipeeslist) {
+
+
+                    if (isChecked) {
+                        selected_tipeesID.add(selected_tipee.getId());
+                    } else if (!isChecked) {
+                        // for (int i = 0; i < selected_tipeesID.size(); i++) {
+                        if (selected_tipeeslist.contains(selected_tipee.getId())) {
+                            int index = selected_tipeeslist.indexOf(selected_tipee.getId());
+                            selected_tipeeslist.remove(index);
+                            selected_tipeesID = selected_tipeeslist;
+                        }
+                        //}
+
+                    }
+                    return selected_tipee;
+                }
+            });
             listView_fetched_tipees.setAdapter(adapter);
         }
     }
@@ -370,7 +394,49 @@ public class AddProfileActivity extends AppCompatActivity {
 
         editText_hourly_pay.setText(profiles.getHourly_pay());
 
+
+        final FetchedTipeeAdapter adapter = new FetchedTipeeAdapter(AddProfileActivity.this, convertStringToArray(profiles.getTipees_name()), tipeeInfos, new TipeeSelected() {
+            @Override
+            public TipeeInfo TipeeCheckedList(int position, boolean isChecked, TipeeInfo selected_tipee, List<String> seleceted_tipeeslist) {
+                if (isChecked) {
+                    selected_tipeesID.add(selected_tipee.getId());
+                } else if (!isChecked) {
+                    // for (int i = 0; i < selected_tipeesID.size(); i++) {
+                    if (seleceted_tipeeslist.contains(selected_tipee.getId())) {
+                        int index = seleceted_tipeeslist.indexOf(selected_tipee.getId());
+                        seleceted_tipeeslist.remove(index);
+                        selected_tipeesID = seleceted_tipeeslist;
+
+                    //}
+
+                }
+                    //}
+
+                }
+
+                return selected_tipee;
+            }
+        });
+        listView_fetched_tipees.setAdapter(adapter);
     }
 
+    public String convertArrayToString(List<String> selected_tipeesID) {
+        String result;
+        StringBuilder sb = new StringBuilder();
+        for (String tipeeInfo : selected_tipeesID) {
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+            sb.append(tipeeInfo);
+        }
+        result = sb.toString();
+        return result;
+    }
 
+    public List<String> convertStringToArray(String joinedString) {
+
+        List<String> sellItems = Arrays.asList(joinedString.split(","));
+        return sellItems;
+
+    }
 }

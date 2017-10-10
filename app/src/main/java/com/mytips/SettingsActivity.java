@@ -38,6 +38,7 @@ import com.mytips.Preferences.Constants;
 import com.mytips.Preferences.Preferences;
 
 import java.util.ArrayList;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -377,7 +378,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 }
 
 
-                tippess_infolist = fetchTipeeList();
+                tippess_infolist = new DatabaseOperations(SettingsActivity.this).fetchTipeeList(SettingsActivity.this);
                 if (tippess_infolist.size() > 0) {
                     AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
                             tippess_infolist);
@@ -514,38 +515,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    ArrayList<TipeeInfo> tippess_infolist;
-
-    public ArrayList<TipeeInfo> fetchTipeeList() {
-        tippess_infolist = new ArrayList<>();
-        Cursor cursor = null;
-        String[] projections = new String[3];
-        projections[0] = DatabaseUtils.TipeeID;
-        projections[1] = DatabaseUtils.TipeeName;
-        projections[2] = DatabaseUtils.TipeeOut;
-        try {
-            cursor = new DatabaseOperations(SettingsActivity.this).dataFetch(DatabaseUtils.TIPEE_TABLE, projections,
-                    null, null, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        int cursor_count = cursor.getCount();
-        if (cursor_count != 0) {
-            if (cursor.moveToFirst()) {
-                do {
-                    TipeeInfo tipeeInfo = new TipeeInfo();
-                    tipeeInfo.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeID)));
-                    tipeeInfo.setName(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeName)));
-                    tipeeInfo.setPercentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeOut)));
-
-                    tippess_infolist.add(tipeeInfo);
-                } while (cursor.moveToNext());
-            }
-        }
-
-        return tippess_infolist;
+    ArrayList<TipeeInfo> tippess_infolist = new ArrayList<>();
 
 
-    }
 }

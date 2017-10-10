@@ -112,66 +112,8 @@ public class ActiveProfiles extends AppCompatActivity {
     ArrayList<Profiles> activeProfileList = new ArrayList<>();
 
     public void fetchProfiles() {
-        Cursor cursor = null;
-        String[] projections = new String[10];
-        projections[0] = DatabaseUtils.ProfileID;
-        projections[1] = DatabaseUtils.ProfileName;
-        projections[2] = DatabaseUtils.IsSupervisor;
-        projections[3] = DatabaseUtils.IsActive;
-        projections[4] = DatabaseUtils.GetTournamentTip;
-        projections[5] = DatabaseUtils.GetTips;
-        projections[6] = DatabaseUtils.PayPeriod;
-        projections[7] = DatabaseUtils.StartDayWeek;
-        projections[8] = DatabaseUtils.HourlyPay;
-        projections[9] = DatabaseUtils.HolidayPay;
-
-//        String selection[] = new String[]{"1"};
-        try {
-            cursor = new DatabaseOperations(ActiveProfiles.this).dataFetch(DatabaseUtils.PROFILE_TABLE, projections,
-                    null, null, null);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        int cursor_count = 0;
-        try {
-            cursor_count = cursor.getCount();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         profilesArrayList = new ArrayList<>();
-        if (cursor_count != 0) {
-
-            if (cursor.moveToFirst()) {
-                do {
-                    Profiles profiles = new Profiles();
-                    String profileName = cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfileName));
-                    String payPeriod = cursor.getString(cursor.getColumnIndex(DatabaseUtils.PayPeriod));
-                    String hourlypay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HourlyPay));
-                    String profileId = cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfileID));
-                    int isActive = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsActive));
-                    int is_supervisor = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsSupervisor));
-                    int get_tournament = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GetTournamentTip));
-                    int get_tips = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GetTips));
-                    String startday = cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek));
-                    String holodayPay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay));
-
-                    profiles.setIs_supervisor(is_supervisor);
-                    profiles.setStartday(startday);
-                    profiles.setGet_tips(get_tips);
-                    profiles.setGet_tournamenttip(get_tournament);
-                    profiles.setHoliday_pay(holodayPay);
-                    profiles.setProfile_id(profileId);
-                    profiles.setProfile_name(profileName);
-                    profiles.setPay_period(payPeriod);
-                    profiles.setHourly_pay(hourlypay);
-                    profiles.setIs_active(isActive);
-                    profilesArrayList.add(profiles);
-                }
-                while (cursor.moveToNext());
-            }
-
-        }
-
+        profilesArrayList = new DatabaseOperations(ActiveProfiles.this).fetchAllProfile(ActiveProfiles.this);
         if (profilesArrayList.size() > 0) {
             for (int i = 0; i < profilesArrayList.size(); i++) {
                 Profiles profiles = profilesArrayList.get(i);

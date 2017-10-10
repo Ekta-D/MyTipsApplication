@@ -8,10 +8,10 @@
         android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
         android:layout_margin="10dp"
         android:scrollbars="horizontal"
         android:singleLine="true"
-        android:layout_centerVertical="true"
         android:text="Tipee name"
         android:textColor="@color/colorBlack"
         android:textSize="15dp" />
@@ -20,6 +20,9 @@
         android:id="@+id/checkBox_fetch_tipee"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_alignParentRight="true"
-        android:layout_margin="10dp" />
+        android:checked="false"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>

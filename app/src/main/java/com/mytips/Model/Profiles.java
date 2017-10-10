@@ -15,6 +15,19 @@ public class Profiles implements Serializable {
     int get_tips;
     String startday;
     String holiday_pay;
+    String tipees_name;
+    int is_active;
+    String pay_period;
+    String hourly_pay;
+
+    public String getTipees_name() {
+        return tipees_name;
+    }
+
+    public void setTipees_name(String tipees_name) {
+        this.tipees_name = tipees_name;
+    }
+
 
     public int getIs_supervisor() {
         return is_supervisor;
@@ -64,9 +77,7 @@ public class Profiles implements Serializable {
         this.is_active = is_active;
     }
 
-    int is_active;
-    String pay_period;
-    String hourly_pay;
+
 
 
     public String getProfile_id() {

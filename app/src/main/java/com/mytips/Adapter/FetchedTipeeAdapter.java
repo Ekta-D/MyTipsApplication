@@ -6,15 +6,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.mytips.Interface.TipeeSelected;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.R;
 
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Beesolver on 06-10-2017.
@@ -26,9 +29,14 @@ public class FetchedTipeeAdapter extends BaseAdapter {
     Context context;
     LayoutInflater inflater;
 
-    public FetchedTipeeAdapter(Context context, ArrayList<TipeeInfo> tipeeInfoArrayList) {
+    TipeeSelected tipeeSelectedCallback;
+    List<String> selected_tipeesIds;
+
+    public FetchedTipeeAdapter(Context context, List<String> selected_tipeesIds, ArrayList<TipeeInfo> tipeeInfoArrayList, TipeeSelected tipeeSelectedCallback) {
         this.context = context;
         this.tipeeInfoArrayList = tipeeInfoArrayList;
+        this.tipeeSelectedCallback = tipeeSelectedCallback;
+        this.selected_tipeesIds = selected_tipeesIds;
     }
 
     @Override
@@ -52,8 +60,9 @@ public class FetchedTipeeAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder viewHolder;
+    public View getView(final int position, View convertView, ViewGroup parent) {
+        final ViewHolder viewHolder;
+
         if (convertView == null) {
             viewHolder = new ViewHolder();
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -66,6 +75,33 @@ public class FetchedTipeeAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder.textView.setText(tipeeInfoArrayList.get(position).getName() + " " + tipeeInfoArrayList.get(position).getPercentage() + "%");
+
+        if (selected_tipeesIds == null) {
+
+        } else if (selected_tipeesIds.size() > 0) {
+
+
+            for (int i = 0; i < selected_tipeesIds.size(); i++) {
+
+                if (tipeeInfoArrayList.get(position).getId().equals(selected_tipeesIds.get(i))) {
+                    viewHolder.checkBox.setChecked(true);
+                    notifyDataSetChanged();
+                }
+            }
+        }
+        viewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                TipeeInfo tipeeInfo = tipeeInfoArrayList.get(position);
+                if (((CompoundButton) v).isChecked()) {
+                    viewHolder.checkBox.setEnabled(true);
+
+                    tipeeSelectedCallback.TipeeCheckedList(position, true, tipeeInfo,selected_tipeesIds);
+                } else {
+                    tipeeSelectedCallback.TipeeCheckedList(position, false, tipeeInfo,selected_tipeesIds);
+                }
+            }
+        });
         return convertView;
     }
 }
