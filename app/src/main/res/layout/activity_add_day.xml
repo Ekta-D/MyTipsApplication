@@ -4,13 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="2dp"
     tools:context="com.mytips.AddDayActivity">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="20dp"
         tools:context="com.mytips.AddDayActivity">
+
+        <include layout="@layout/toolbar_add_day" />
 
 
         <TextView
@@ -19,7 +21,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="?actionBarSize"
             android:text="Profile"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -65,6 +67,7 @@
             android:layout_marginTop="8dp"
             android:editable="false"
             android:ems="10"
+            android:focusableInTouchMode="false"
             android:hint="Start Shift"
             android:inputType="date"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -80,6 +83,7 @@
             android:layout_marginTop="8dp"
             android:editable="false"
             android:ems="10"
+            android:focusableInTouchMode="false"
             android:hint="Clock-in"
             android:inputType="time"
             app:layout_constraintLeft_toRightOf="@+id/editText_start_shift"
@@ -117,6 +121,7 @@
             android:layout_marginTop="8dp"
             android:editable="false"
             android:ems="10"
+            android:focusableInTouchMode="false"
             android:hint="End Shift"
             android:inputType="date"
             app:layout_constraintLeft_toLeftOf="parent"
@@ -132,6 +137,7 @@
             android:layout_marginTop="8dp"
             android:editable="false"
             android:ems="10"
+            android:focusableInTouchMode="false"
             android:hint="Clock-Out"
             android:inputType="time"
             app:layout_constraintLeft_toRightOf="@+id/editText_end_shift"
@@ -157,7 +163,7 @@
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="12dp"
-            android:text="10h 30m"
+            android:text=""
             android:textSize="18sp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editText_clock_out" />
@@ -189,8 +195,8 @@
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="0dp"
             android:ems="10"
             android:inputType="numberDecimal"
             android:textSize="14sp"
@@ -208,10 +214,10 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/editText_total_tips" />
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/linearLayout_tipees"
             android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_height="100dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
@@ -220,7 +226,24 @@
             android:orientation="horizontal"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView11"></LinearLayout>
+            app:layout_constraintTop_toBottomOf="@+id/textView11">
+
+            <ListView
+                android:id="@+id/list_view_tipees"
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
+
+            <TextView
+                android:id="@+id/no_data"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="No Data found"
+                android:textSize="20dp"
+                android:visibility="visible" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/textView12"
@@ -253,13 +276,14 @@
             android:layout_marginTop="8dp"
             android:text="Tournament Downs"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+            app:layout_constraintTop_toBottomOf="@+id/textView26" />
 
         <EditText
             android:id="@+id/editText_total_td_amount"
             android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:editable="false"
             android:ems="10"
             android:inputType="number|numberDecimal"
             android:textSize="12sp"
@@ -352,6 +376,26 @@
             app:layout_constraintLeft_toRightOf="@+id/textView22"
             app:layout_constraintRight_toLeftOf="@+id/textView23"
             app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
+        <TextView
+            android:id="@+id/textView26"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Total Tip-out"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView12" />
+
+        <TextView
+            android:id="@+id/textView27"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:text="--"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView_tip_out_percent" />
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

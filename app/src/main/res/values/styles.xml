@@ -22,4 +22,8 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
+    <style name="add_day" parent="Theme.AppCompat.Light.NoActionBar">
+
+    </style>
+
 </resources>

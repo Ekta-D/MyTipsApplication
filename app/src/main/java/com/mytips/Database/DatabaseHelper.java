@@ -11,7 +11,6 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static String dbname = DatabaseUtils.db_Name;
     private static int version = DatabaseUtils.dbVersion;
-    private Context context;
 
     public DatabaseHelper(Context context) {
         super(context, dbname, null, version);
@@ -41,12 +40,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 DatabaseUtils.TipeeID + " INTEGER,  "
                 + DatabaseUtils.TipeeName + " TEXT, "
                 + DatabaseUtils.TipeeOut + " TEXT );");
+
+
+        db.execSQL(DatabaseUtils.CREATE_TABLE + DatabaseUtils.ADD_DAY_TABLE + "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + DatabaseUtils.Profile + " TEXT, "
+                + DatabaseUtils.CalculatedHours + " TEXT, "
+                + DatabaseUtils.isHolidayPay + " TEXT, "
+                + DatabaseUtils.TotalTips + " TEXT, "
+                + DatabaseUtils.TipOutTipees + " TEXT, "
+                + DatabaseUtils.TipOutPercentage + " INTEGER, "
+                + DatabaseUtils.TotaTipOut + " TEXT, "
+                + DatabaseUtils.TounamentDowns + " INTEGER, "
+                + DatabaseUtils.StartShift + " TEXT, "
+                + DatabaseUtils.ClockIn + " TEXT, "
+                + DatabaseUtils.EndShift + " TEXT, "
+                + DatabaseUtils.ClockOut + " TEXT );");
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         dropIfTableExist(DatabaseUtils.PROFILE_TABLE, db);
         dropIfTableExist(DatabaseUtils.TIPEE_TABLE, db);
+        dropIfTableExist(DatabaseUtils.ADD_DAY_TABLE, db);
     }
 
     public void dropIfTableExist(String table_name, SQLiteDatabase db) {

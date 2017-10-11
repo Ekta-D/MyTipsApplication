@@ -27,22 +27,21 @@ import java.util.List;
  * Created by Beesolver on 06-10-2017.
  */
 
-public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements CompoundButton.OnCheckedChangeListener{
+public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements CompoundButton.OnCheckedChangeListener {
 
     ArrayList<TipeeInfo> tipeeInfoArrayList;
     Context context;
     LayoutInflater inflater;
     public SparseBooleanArray checkedItems;
-
-    //TipeeSelected tipeeSelectedCallback;
     List<String> selected_tipeesIds;
+    boolean fromAddDay;
 
-    public  FetchedTipeeAdapter(Context context, List<String> selected_tipeesIds, ArrayList<TipeeInfo> tipeeInfoArrayList) {
+    public FetchedTipeeAdapter(Context context, List<String> selected_tipeesIds, ArrayList<TipeeInfo> tipeeInfoArrayList, boolean fromAddDay) {
         super(context, 0);
 
+        this.fromAddDay = fromAddDay;
         this.context = context;
         this.tipeeInfoArrayList = tipeeInfoArrayList;
-        //this.tipeeSelectedCallback = tipeeSelectedCallback;
         this.checkedItems = new SparseBooleanArray(tipeeInfoArrayList.size());
         this.selected_tipeesIds = selected_tipeesIds;
     }
@@ -70,6 +69,7 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
         setChecked(position, !isChecked(position));
 
     }
+
     @Override
     public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
         checkedItems.put((Integer) compoundButton.getTag(), b);
@@ -101,38 +101,19 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
         viewHolder.textView.setText(tipeeInfo.getName() + " " + tipeeInfo.getPercentage() + "%");
 
         viewHolder.checkBox.setTag(position);
-        if(selected_tipeesIds.contains(tipeeInfo.getId()))
-            viewHolder.checkBox.setChecked(checkedItems.get(position, true));
-        else
+
+        if (fromAddDay) {
             viewHolder.checkBox.setChecked(checkedItems.get(position, false));
-        viewHolder.checkBox.setOnCheckedChangeListener(this);
-
-        /*if (selected_tipeesIds == null) {
-
-        } else if (selected_tipeesIds.size() > 0) {
-
-
-            for (int i = 0; i < selected_tipeesIds.size(); i++) {
-
-                if (tipeeInfoArrayList.get(position).getId().equals(selected_tipeesIds.get(i))) {
-                    viewHolder.checkBox.setChecked(true);
-                    notifyDataSetChanged();
-                }
-            }
+            viewHolder.checkBox.setOnCheckedChangeListener(this);
+        } else {
+            if (selected_tipeesIds.contains(tipeeInfo.getId()))
+                viewHolder.checkBox.setChecked(checkedItems.get(position, true));
+            else
+                viewHolder.checkBox.setChecked(checkedItems.get(position, false));
+            viewHolder.checkBox.setOnCheckedChangeListener(this);
         }
-        viewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                TipeeInfo tipeeInfo = tipeeInfoArrayList.get(position);
-                if (((CompoundButton) v).isChecked()) {
-                    viewHolder.checkBox.setEnabled(true);
 
-                    tipeeSelectedCallback.TipeeCheckedList(position, true, tipeeInfo,selected_tipeesIds);
-                } else {
-                    tipeeSelectedCallback.TipeeCheckedList(position, false, tipeeInfo,selected_tipeesIds);
-                }
-            }
-        });*/
+
         return convertView;
     }
 }

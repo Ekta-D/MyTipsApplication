@@ -263,7 +263,7 @@ public class AddProfileActivity extends AppCompatActivity {
                 break;
             case R.id.save_profile:
 
-                //String id = UUID.randomUUID().toString();
+
                 profile_name = editText_profilename.getText().toString().trim();
                 String hourPay = editText_hourly_pay.getText().toString().trim();
                 if (!hourPay.equalsIgnoreCase("")) {
@@ -373,7 +373,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
         listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
         if (tipeeInfos != null) {
-            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos);
+            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos,false);
             listView_fetched_tipees.setAdapter(adapter);
         }
     }
@@ -400,29 +400,6 @@ public class AddProfileActivity extends AppCompatActivity {
         editText_hourly_pay.setText(profiles.getHourly_pay());
 
 
-        /*final FetchedTipeeAdapter adapter = new FetchedTipeeAdapter(AddProfileActivity.this, convertStringToArray(profiles.getTipees_name()), tipeeInfos, null*//*new TipeeSelected() {
-            @Override
-            public TipeeInfo TipeeCheckedList(int position, boolean isChecked, TipeeInfo selected_tipee, List<String> seleceted_tipeeslist) {
-                if (isChecked) {
-                    selected_tipeesID.add(selected_tipee.getId());
-                } else if (!isChecked) {
-                    // for (int i = 0; i < selected_tipeesID.size(); i++) {
-                    if (seleceted_tipeeslist.contains(selected_tipee.getId())) {
-                        int index = seleceted_tipeeslist.indexOf(selected_tipee.getId());
-                        seleceted_tipeeslist.remove(index);
-                        selected_tipeesID = seleceted_tipeeslist;
-
-                        //}
-
-                    }
-                    //}
-
-                }
-
-                return selected_tipee;
-            })*//*
-        );
-        listView_fetched_tipees.setAdapter(adapter);*/
     }
 
     public String convertArrayToString(List<String> selected_tipeesID) {

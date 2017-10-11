@@ -4,15 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".AddDayActivity">
 
+
+    <item
+        android:id="@+id/save"
+        android:orderInCategory="2"
+        android:title="@string/menu_save"
+        app:showAsAction="always" />
     <item
         android:id="@+id/dayoff"
+
         android:actionLayout="@layout/menu_checkbox_dayoff"
+        android:checkable="true"
+        android:orderInCategory="1"
         android:title="@string/menu_day_off"
         android:titleCondensed="@string/menu_day_off"
+        android:visible="true"
         app:showAsAction="always" />
-
-    <item android:id="@+id/save"
-        app:showAsAction="always"
-        android:title="@string/menu_save" />
 
 </menu>

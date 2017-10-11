@@ -39,7 +39,7 @@
         <activity
             android:name=".AddDayActivity"
             android:label="@string/title_add_day"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/add_day" />
         <activity
             android:name=".AddProfileActivity"
             android:label="@string/label_add_profile"

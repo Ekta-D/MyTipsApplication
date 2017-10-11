@@ -232,6 +232,7 @@ public class DatabaseOperations {
             if (cursor.moveToFirst()) {
                 do {
                     Profiles profiles = new Profiles();
+                    String id = cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile_ID));
                     String profileName = cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfileName));
                     String payPeriod = cursor.getString(cursor.getColumnIndex(DatabaseUtils.PayPeriod));
                     String hourlypay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HourlyPay));
@@ -244,6 +245,7 @@ public class DatabaseOperations {
                     String holodayPay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay));
                     String tipees = cursor.getString(cursor.getColumnIndex(DatabaseUtils.Tipees));
 
+                    profiles.setId(Integer.parseInt(id));
                     profiles.setIs_supervisor(is_supervisor);
                     profiles.setStartday(startday);
                     profiles.setGet_tips(get_tips);

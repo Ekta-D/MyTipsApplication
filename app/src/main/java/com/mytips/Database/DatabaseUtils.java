@@ -12,6 +12,7 @@ public class DatabaseUtils {
 
     public static final String PROFILE_TABLE = "profile";
     public static final String TIPEE_TABLE = "tipees";
+    public static final String ADD_DAY_TABLE = "add_table";
 
     // profile fields
     public static final String Profile_ID = "id";
@@ -34,5 +35,23 @@ public class DatabaseUtils {
     public static final String TipeeID = "tipee_id";
     public static final String TipeeName = "tipee_name";
     public static final String TipeeOut = "tip_out";
+
+
+    //add day fields
+
+    public static final String Add_ID = "id";
+    public static final String Profile = "profile";
+    public static final String TounamentDowns = "tournament_down";
+    public static final String TotalTips = "total_tips";
+    public static final String TipOutPercentage = "tip_out_per";
+    public static final String TotaTipOut = "total_tipout";
+    public static final String TipOutTipees = "tip_out_tipees";
+    public static final String CalculatedHours = "calculated_hours";
+    public static final String isHolidayPay = "holiday_pay";
+    public static final String StartShift = "start_shift";
+    public static final String EndShift = "end_shift";
+    public static final String ClockIn = "clock_in";
+    public static final String ClockOut = "clock_out";
+
 
 }
