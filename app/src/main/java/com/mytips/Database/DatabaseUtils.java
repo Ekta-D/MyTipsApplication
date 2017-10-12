@@ -42,6 +42,8 @@ public class DatabaseUtils {
     public static final String Add_ID = "id";
     public static final String Profile = "profile";
     public static final String TounamentDowns = "tournament_down";
+    public static final String TournamentCount = "tournament_count";
+    public static final String TournamentPerDay = "tournament_perday";
     public static final String TotalTips = "total_tips";
     public static final String TipOutPercentage = "tip_out_per";
     public static final String TotaTipOut = "total_tipout";
@@ -52,6 +54,9 @@ public class DatabaseUtils {
     public static final String EndShift = "end_shift";
     public static final String ClockIn = "clock_in";
     public static final String ClockOut = "clock_out";
+    public static final String IsDayOff = "Is_day_off";
+    public static final String WagesPerHour = "wages_hour";
+    public static final String TotalEarnings = "total_earnings";
 
 
 }

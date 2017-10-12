@@ -14,6 +14,7 @@ import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.mytips.Interface.TipeeChecked;
 import com.mytips.Interface.TipeeSelected;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.R;
@@ -35,10 +36,13 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
     public SparseBooleanArray checkedItems;
     List<String> selected_tipeesIds;
     boolean fromAddDay;
+    TipeeChecked tipeeChecked;
 
-    public FetchedTipeeAdapter(Context context, List<String> selected_tipeesIds, ArrayList<TipeeInfo> tipeeInfoArrayList, boolean fromAddDay) {
+    public FetchedTipeeAdapter(Context context, List<String> selected_tipeesIds, ArrayList<TipeeInfo> tipeeInfoArrayList,
+                               boolean fromAddDay, TipeeChecked tipeeChecked) {
         super(context, 0);
 
+        this.tipeeChecked = tipeeChecked;
         this.fromAddDay = fromAddDay;
         this.context = context;
         this.tipeeInfoArrayList = tipeeInfoArrayList;
@@ -97,20 +101,35 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
         }
 
 
-        TipeeInfo tipeeInfo = tipeeInfoArrayList.get(position);
+        final TipeeInfo tipeeInfo = tipeeInfoArrayList.get(position);
         viewHolder.textView.setText(tipeeInfo.getName() + " " + tipeeInfo.getPercentage() + "%");
 
         viewHolder.checkBox.setTag(position);
 
         if (fromAddDay) {
             viewHolder.checkBox.setChecked(checkedItems.get(position, false));
-            viewHolder.checkBox.setOnCheckedChangeListener(this);
+            viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        tipeeChecked.OnTipeeChange(true, tipeeInfo);
+                    } else {
+                        tipeeChecked.OnTipeeChange(false, tipeeInfo);
+                    }
+
+
+                }
+            });
+
+
         } else {
-            if (selected_tipeesIds.contains(tipeeInfo.getId()))
+            if (selected_tipeesIds.contains(tipeeInfo.getId())) {
                 viewHolder.checkBox.setChecked(checkedItems.get(position, true));
-            else
+            } else {
                 viewHolder.checkBox.setChecked(checkedItems.get(position, false));
-            viewHolder.checkBox.setOnCheckedChangeListener(this);
+                viewHolder.checkBox.setOnCheckedChangeListener(this);
+            }
+
         }
 
 

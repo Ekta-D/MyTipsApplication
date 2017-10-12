@@ -70,6 +70,7 @@
                 android:layout_toRightOf="@id/time"
                 android:layout_marginLeft="2dp"
                 android:textSize="13dp"
+                android:id="@+id/working_hours"
                 android:text="Work Hours" />
         </RelativeLayout>
 

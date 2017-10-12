@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.mytips.ActiveProfiles;
+import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.SettingsActivity;
@@ -264,5 +265,103 @@ public class DatabaseOperations {
 
         }
         return profilesList;
+    }
+
+    public void insertAddDayInfo(String profile_name, String start_shift, String check_in,
+                                 String end_shift, String check_out, String auto_calculatedhour, int holiday_pay,
+                                 String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
+                                 String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
+                                 String wages_hourly, String earns) {
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseUtils.Profile, profile_name);
+        contentValues.put(DatabaseUtils.CalculatedHours, auto_calculatedhour);
+        contentValues.put(DatabaseUtils.isHolidayPay, holiday_pay);
+        contentValues.put(DatabaseUtils.IsDayOff, isDay_off);
+        contentValues.put(DatabaseUtils.TotalTips, total_tips);
+        contentValues.put(DatabaseUtils.TipOutTipees, tipees);
+        contentValues.put(DatabaseUtils.TournamentCount, tournament_count);
+        contentValues.put(DatabaseUtils.TournamentPerDay, tounament_perday);
+        contentValues.put(DatabaseUtils.TipOutPercentage, tip_out_percentage);
+        contentValues.put(DatabaseUtils.TotaTipOut, total_tip_out);
+        contentValues.put(DatabaseUtils.TounamentDowns, tournament_total);
+        contentValues.put(DatabaseUtils.StartShift, start_shift);
+        contentValues.put(DatabaseUtils.EndShift, end_shift);
+        contentValues.put(DatabaseUtils.ClockIn, check_in);
+        contentValues.put(DatabaseUtils.ClockOut, check_out);
+        contentValues.put(DatabaseUtils.WagesPerHour, wages_hourly);
+        contentValues.put(DatabaseUtils.TotalEarnings, earns);
+        try {
+            db.insert(DatabaseUtils.ADD_DAY_TABLE, null, contentValues);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<AddDay> fetchAddDayDetails(Context context) {
+        AddDay addDay;
+        Cursor cursor = null;
+        ArrayList<AddDay> addDayArrayList = new ArrayList<>();
+        String[] projections = new String[18];
+        projections[0] = DatabaseUtils.Profile;
+        projections[1] = DatabaseUtils.CalculatedHours;
+        projections[2] = DatabaseUtils.isHolidayPay;
+        projections[3] = DatabaseUtils.IsDayOff;
+        projections[4] = DatabaseUtils.TotalTips;
+        projections[5] = DatabaseUtils.TipOutTipees;
+        projections[6] = DatabaseUtils.TournamentCount;
+        projections[7] = DatabaseUtils.TournamentPerDay;
+        projections[8] = DatabaseUtils.TipOutPercentage;
+        projections[9] = DatabaseUtils.TotaTipOut;
+        projections[10] = DatabaseUtils.TounamentDowns;
+        projections[11] = DatabaseUtils.StartShift;
+        projections[12] = DatabaseUtils.ClockIn;
+        projections[13] = DatabaseUtils.EndShift;
+        projections[14] = DatabaseUtils.ClockOut;
+        projections[15] = DatabaseUtils.Add_ID;
+        projections[16] = DatabaseUtils.WagesPerHour;
+        projections[17] = DatabaseUtils.TotalEarnings;
+
+
+        try {
+            cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, projections,
+                    null, null, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int cursor_count = 0;
+        cursor_count = cursor.getCount();
+        if (cursor_count != 0) {
+            if (cursor.moveToFirst()) {
+                do {
+
+                    addDay = new AddDay();
+
+                    addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
+                    addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
+                    addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
+                    addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
+                    addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
+                    addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
+                    addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
+                    addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
+                    addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
+                    addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
+                    addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
+                    addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
+                    addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
+                    addDay.setCheck_in(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
+                    addDay.setCheck_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
+                    addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
+                    addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
+                    addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
+                    addDayArrayList.add(addDay);
+                }
+                while (cursor.moveToNext());
+            }
+        }
+
+
+        return addDayArrayList;
     }
 }

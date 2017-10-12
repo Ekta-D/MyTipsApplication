@@ -373,7 +373,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
         listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
         if (tipeeInfos != null) {
-            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos,false);
+            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos,false,null);
             listView_fetched_tipees.setAdapter(adapter);
         }
     }

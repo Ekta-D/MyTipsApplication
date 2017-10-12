@@ -45,15 +45,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(DatabaseUtils.CREATE_TABLE + DatabaseUtils.ADD_DAY_TABLE + "(id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + DatabaseUtils.Profile + " TEXT, "
                 + DatabaseUtils.CalculatedHours + " TEXT, "
-                + DatabaseUtils.isHolidayPay + " TEXT, "
+                + DatabaseUtils.isHolidayPay + " INTEGER, "
+                + DatabaseUtils.IsDayOff + " INTEGER, "
                 + DatabaseUtils.TotalTips + " TEXT, "
                 + DatabaseUtils.TipOutTipees + " TEXT, "
+                + DatabaseUtils.TournamentCount + " TEXT, "
+                + DatabaseUtils.TournamentPerDay + " TEXT, "
                 + DatabaseUtils.TipOutPercentage + " INTEGER, "
                 + DatabaseUtils.TotaTipOut + " TEXT, "
                 + DatabaseUtils.TounamentDowns + " INTEGER, "
                 + DatabaseUtils.StartShift + " TEXT, "
                 + DatabaseUtils.ClockIn + " TEXT, "
                 + DatabaseUtils.EndShift + " TEXT, "
+                + DatabaseUtils.WagesPerHour + " TEXT, "
+                + DatabaseUtils.TotalEarnings + " TEXT, "
                 + DatabaseUtils.ClockOut + " TEXT );");
 
     }
