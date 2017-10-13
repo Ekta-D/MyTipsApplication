@@ -304,14 +304,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
         if (selectedProfile.size() > 0) {
             mListView.setVisibility(View.VISIBLE);
-            dashboard_bottm.setVisibility(View.VISIBLE);
+       //     dashboard_bottm.setVisibility(View.VISIBLE);
             adapter = new SummaryAdapter(LandingActivity.this, selectedProfile);
             mListView.setAdapter(adapter);
 
             updateBottom(selectedProfile);
         } else {
             mListView.setVisibility(View.GONE);
-            dashboard_bottm.setVisibility(View.GONE);
+         //   dashboard_bottm.setVisibility(View.GONE);
         }
 
     }

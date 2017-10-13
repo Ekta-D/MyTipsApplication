@@ -52,14 +52,14 @@
                 android:id="@+id/summery_tips"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Live Tips: 3211 ,  " />
+                android:text="Live Tips: 0 ,  " />
 
             <TextView
                 android:id="@+id/summery_tds"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/summery_tips"
-                android:text="Tournament Downs: $54" />
+                android:text="Tournament Downs: $0" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -74,14 +74,14 @@
                 android:id="@+id/summery_tip_out"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Tip-out: 3211 ,  " />
+                android:text="Tip-out: 0 ,  " />
 
             <TextView
                 android:id="@+id/hour_wage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@id/summery_tip_out"
-                android:text="Hourly Wage: $54" />
+                android:text="Hourly Wage: $0" />
 
         </RelativeLayout>
     </RelativeLayout>
