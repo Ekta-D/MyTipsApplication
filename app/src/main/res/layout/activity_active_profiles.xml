@@ -18,8 +18,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:text="@string/active"
-            android:textColor="@color/colorBlack"
-            android:textSize="18dp" />
+            android:textColor="@color/colorAccent" />
 
         <ListView
             android:id="@+id/active_profile_list"
@@ -34,8 +33,7 @@
             android:layout_below="@+id/active_profile_list"
             android:layout_margin="10dp"
             android:text="@string/deactive"
-            android:textColor="@color/colorBlack"
-            android:textSize="18dp" />
+            android:textColor="@color/colorAccent"/>
 
 
         <ListView

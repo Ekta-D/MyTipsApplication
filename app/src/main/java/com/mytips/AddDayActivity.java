@@ -9,6 +9,7 @@ import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -20,6 +21,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -82,7 +84,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     TextView save_details, textview_autoCalLabel, label_to, total_tipslabel, tipout_tipees_label, total_tipoutPer, total_tipout,
             tournament_downlabel, cout_label, perTd_label, totalcount_label, text_tip_out_percent, total_tipoutlabel,
             from_label, multiply_label, equal_label, tipee_nodata;
-    ImageView image_to;
+    ImageView image_to, day_off_timer;
     ListView fetchedTipees;
     int dynamic_tip_out_percentage = 0;
     RelativeLayout tipee_layout;
@@ -104,7 +106,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_day);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+            window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
 
         findViewByIds();
 
@@ -310,6 +319,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         end_dateCalendar = Calendar.getInstance();
         holiday_pay = (CheckBox) findViewById(R.id.checkBox_holiday_pay);
         edit_total_tips = (EditText) findViewById(R.id.editText_total_tips);
+        if(edit_total_tips.isFocused())
+            edit_total_tips.clearFocus();
+
+        day_off_timer = (ImageView) findViewById(R.id.day_off_timer);
+
         total_tipslabel = (TextView) findViewById(R.id.textView9);
         tipout_tipees_label = (TextView) findViewById(R.id.textView11);
         total_tipoutPer = (TextView) findViewById(R.id.textView12);
@@ -712,7 +726,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
     public void save_add_day() {
         String joinedString = "";
-        if (b == null) {
+        if(!selected_profile.equals("") && !editText_startShift.getText().toString().trim().equals("") && ((day_off==0 && !texview_hours.getText().toString().trim().equals("")) || day_off==1)) {
+
+            if (b == null) {
             if (selected_tipeesIDs == null || selected_tipeesIDs.size() == 0) {
 
             } else {
@@ -749,8 +765,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         }
 
-        startActivity(new Intent(AddDayActivity.this, LandingActivity.class));
-        this.finish();
+            startActivity(new Intent(AddDayActivity.this, LandingActivity.class));
+            this.finish();
+        } else {
+            Snackbar.make(spinnerProfile,"Need more details to save the day!", Snackbar.LENGTH_LONG).show();
+        }
     }
 
     List<String> selectedTipeesID;
@@ -938,6 +957,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     public void setDayOffView() {
 
         from_label.setText("Select Day");
+
+        day_off_timer.setVisibility(View.VISIBLE);
+
         editText_startShift.setHint("Select Day");
         edittext_clockIn.setVisibility(View.GONE);
         editText_endShift.setVisibility(View.GONE);
@@ -980,6 +1002,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     public void updateDayOffView() {
 
         from_label.setText("From");
+
+        day_off_timer.setVisibility(View.GONE);
+
         editText_startShift.setHint("Start Shift");
         edittext_clockIn.setVisibility(View.VISIBLE);
         editText_endShift.setVisibility(View.VISIBLE);

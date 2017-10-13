@@ -7,12 +7,14 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -44,12 +46,43 @@ public class SplashActivity extends AppCompatActivity {
         findViewById(R.id.button_go).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getBaseContext(), LandingActivity.class));
+
+                EditText name = (EditText) findViewById(R.id.et_name);
+                EditText email = (EditText) findViewById(R.id.et_email);
+
+                if(!name.getText().toString().trim().equals("") && !email.getText().toString().trim().equals("")){
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("user_name", name.getText().toString().trim());
+                    editor.putString("user_email", email.getText().toString().trim());
+                    editor.commit();
+                    startActivity(new Intent(getBaseContext(), LandingActivity.class));
+                    finish();
+                } else if(name.getText().toString().trim().equals("")){
+                    name.setError("Name is required");
+                } else if(email.getText().toString().trim().equals("")){
+                    email.setError("Email is required");
+                }
             }
         });
-        if (!isFirstTime) {
+        if(!isFirstTime){
             checkPermissions();
         }
+        if (!sharedPreferences.getString("user_name","").equals("")) {
+            hideViews();
+            new Handler().postDelayed(new Runnable(){
+                @Override
+                public void run() {
+                    startActivity(new Intent(getBaseContext(), LandingActivity.class));
+                    finish();
+                }
+            }, 2000);
+        }
+    }
+
+    private void hideViews() {
+        findViewById(R.id.et_name).setVisibility(View.GONE);
+        findViewById(R.id.et_email).setVisibility(View.GONE);
+        findViewById(R.id.button_go).setVisibility(View.GONE);
     }
 
     public boolean checkPermissions() {
@@ -74,7 +107,6 @@ public class SplashActivity extends AppCompatActivity {
 
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this,
-
                     listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MY_PERMISSIONS_REQUEST_ACCOUNTS);
             return false;
         }
@@ -88,9 +120,9 @@ public class SplashActivity extends AppCompatActivity {
             case MY_PERMISSIONS_REQUEST_ACCOUNTS:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    Toast.makeText(SplashActivity.this, "permissions granted!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(SplashActivity.this, "permissions granted!", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(SplashActivity.this, "permissions not granted!", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(SplashActivity.this, "permissions not granted!", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }

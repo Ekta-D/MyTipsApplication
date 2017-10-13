@@ -5,6 +5,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.mytips.Model.AddDay;
@@ -51,6 +53,8 @@ public class SummaryAdapter extends BaseAdapter {
     class ViewHolder {
         TextView start_date, start_month, textView_tips, textView_tds, textView_tipout, textView_hourlywage, textView_total,
                 profileName, working_hours;
+        LinearLayout layoutEarningDetails;
+        ImageView time;
     }
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -69,11 +73,11 @@ public class SummaryAdapter extends BaseAdapter {
             holder.textView_hourlywage = (TextView) convertView.findViewById(R.id.tv_hourly);
             holder.textView_total = (TextView) convertView.findViewById(R.id.tv_total);
 
-
             holder.profileName = (TextView) convertView.findViewById(R.id.tv_profile_name);
             holder.working_hours = (TextView) convertView.findViewById(R.id.working_hours);
 
-
+            holder.time = (ImageView) convertView.findViewById(R.id.time);
+            holder.layoutEarningDetails = (LinearLayout) convertView.findViewById(R.id.layout_earning_details);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -95,9 +99,16 @@ public class SummaryAdapter extends BaseAdapter {
         holder.start_date.setText(date);
         holder.start_month.setText(month);
 
-
         holder.profileName.setText(addDayArrayList.get(position).getProfile());
         holder.working_hours.setText(addDayArrayList.get(position).getCalculated_hours());
+
+        int dayOff = addDayArrayList.get(position).getDay_off();
+        if(dayOff==1){
+            holder.working_hours.setText("Day off");
+            holder.time.setBackgroundResource(R.drawable.ic_timer_icon);
+            holder.layoutEarningDetails.setVisibility(View.GONE);
+        }
+
         String totaltips = "";
         totaltips = addDayArrayList.get(position).getTotal_tips();
         if (totaltips.equalsIgnoreCase("")) {

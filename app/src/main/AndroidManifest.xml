@@ -39,6 +39,7 @@
         <activity
             android:name=".AddDayActivity"
             android:label="@string/title_add_day"
+            android:windowSoftInputMode="adjustPan"
             android:theme="@style/add_day" />
         <activity
             android:name=".AddProfileActivity"

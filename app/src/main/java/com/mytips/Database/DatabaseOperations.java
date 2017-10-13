@@ -115,7 +115,7 @@ public class DatabaseOperations {
     public void delete_profile(String profile_id) {
 
         try {
-            db.delete(DatabaseUtils.PROFILE_TABLE, DatabaseUtils.ProfileID + "=?", new String[]{profile_id});
+            db.delete(DatabaseUtils.PROFILE_TABLE, DatabaseUtils.Profile_ID + "=?", new String[]{profile_id});
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -336,21 +336,22 @@ public class DatabaseOperations {
         projections[18] = DatabaseUtils.GettingTips;
         projections[19] = DatabaseUtils.GettingTournamentDown;
 
-
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, projections,
                     null, null, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         int cursor_count = 0;
+
+        if(cursor!=null)
         cursor_count = cursor.getCount();
+
         if (cursor_count != 0) {
             if (cursor.moveToFirst()) {
                 do {
-
                     addDay = new AddDay();
-
                     addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
                     addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
                     addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
@@ -376,8 +377,6 @@ public class DatabaseOperations {
                 while (cursor.moveToNext());
             }
         }
-
-
         return addDayArrayList;
     }
 

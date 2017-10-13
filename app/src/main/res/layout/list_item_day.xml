@@ -60,7 +60,7 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:layout_below="@id/tv_profile_name"
-                android:src="@drawable/ic_clock" />
+                android:background="@drawable/ic_clock" />
 
             <TextView
                 android:id="@+id/working_hours"
@@ -91,6 +91,7 @@
             android:layout_below="@id/layout_summery"
             android:background="@android:color/darker_gray"/>-->
     <LinearLayout
+        android:id="@+id/layout_earning_details"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/layout_summery"

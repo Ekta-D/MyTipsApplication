@@ -5,15 +5,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
@@ -28,7 +25,6 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.mytips.Adapter.ActiveProfileAdapter;
 import com.mytips.Adapter.SpinnerProfile;
@@ -38,10 +34,7 @@ import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
 import com.mytips.Preferences.Constants;
 
-import java.lang.reflect.Array;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -82,7 +75,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
             window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
         }
-
 
         mRevealView = (LinearLayout) findViewById(R.id.reveal_items);
         mRevealView.setVisibility(View.INVISIBLE);
@@ -339,7 +331,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         for (int i = 0; i < addDayArrayList.size(); i++) {
 
             total = addDayArrayList.get(i).getTotal_earnings();
-            if (!total.equalsIgnoreCase("")) {
+            if (!total.equalsIgnoreCase("") && !total.equalsIgnoreCase("--")) {
                 int t = Integer.parseInt(total);
                 totalEarnings = totalEarnings + t;
             }

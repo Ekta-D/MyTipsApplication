@@ -25,6 +25,8 @@ import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -146,6 +148,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
 
         setupActionBar();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+            window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
+
         sharedPreferences = getPreferences(MODE_PRIVATE);
 
         addPreferencesFromResource(R.xml.pref_general);
@@ -171,11 +181,20 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         editTextPreference_name = (EditTextPreference) findPreference("example_text");
 
-        String stored_name = sharedPreferences.getString("user_name", "");
-        String stored_email = sharedPreferences.getString("user_email", "");
+        String stored_name, stored_email;
+        if (sharedPreferences.getString("user_name", "").equals("") && sharedPreferences.getString("user_email", "").equals("")) {
+            SharedPreferences sharedPrefs = getSharedPreferences("Pref", MODE_PRIVATE);
+            stored_name = sharedPrefs.getString("user_name", "");
+            stored_email = sharedPrefs.getString("user_email", "");
+        } else {
+            stored_name = sharedPreferences.getString("user_name", "");
+            stored_email = sharedPreferences.getString("user_email", "");
+        }
+
 
         if (!stored_name.equalsIgnoreCase("")) {
             editTextPreference_name.setSummary(stored_name);
+            editTextPreference_name.setText(stored_name);
         }
 
         editTextPreference_name.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -196,6 +215,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         if (!stored_email.equalsIgnoreCase("")) {
             editTextPreference_email.setSummary(stored_email);
+            editTextPreference_email.setText(stored_email);
         }
         editTextPreference_email.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
@@ -457,6 +477,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

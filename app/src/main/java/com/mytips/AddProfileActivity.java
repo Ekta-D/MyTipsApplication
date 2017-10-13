@@ -25,6 +25,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -95,17 +97,24 @@ public class AddProfileActivity extends AppCompatActivity {
         editor.putBoolean(ISFIRST_TIME, true);
         editor.commit();
 
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+            window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
+        }
 
         initView();
-
-
 
         Intent i = getIntent();
         b = i.getExtras();
         if (b != null) {
+            getSupportActionBar().setTitle("Update Profile");
+
             profiles = (Profiles) b.getSerializable(Constants.ProfileData);
 
             selected_tipeesID = convertStringToArray(String.valueOf(profiles.getTipees_name()));
@@ -313,8 +322,11 @@ public class AddProfileActivity extends AppCompatActivity {
 
                     Toast.makeText(this, "Thanks! your profile has been saved", Toast.LENGTH_SHORT).show();
 
+
+                    Intent intentProfile = new Intent(AddProfileActivity.this, ActiveProfiles.class);
+                    intentProfile.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intentProfile);
                     emptyFields();
-                    startActivity(new Intent(AddProfileActivity.this, ActiveProfiles.class));
                     this.finish();
                 }
 
