@@ -311,6 +311,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             updateBottom(selectedProfile);
         } else {
             mListView.setVisibility(View.GONE);
+            updateBottom(selectedProfile);
          //   dashboard_bottm.setVisibility(View.GONE);
         }
 
