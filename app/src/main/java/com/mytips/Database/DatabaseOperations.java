@@ -11,7 +11,9 @@ import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.SettingsActivity;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 /**
  * Created by Beesolver on 05-10-2017.
@@ -114,6 +116,14 @@ public class DatabaseOperations {
 
         try {
             db.delete(DatabaseUtils.PROFILE_TABLE, DatabaseUtils.ProfileID + "=?", new String[]{profile_id});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete_add_day(String add_id) {
+        try {
+            db.delete(DatabaseUtils.ADD_DAY_TABLE, DatabaseUtils.Add_ID + "=?", new String[]{add_id});
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -271,7 +281,7 @@ public class DatabaseOperations {
                                  String end_shift, String check_out, String auto_calculatedhour, int holiday_pay,
                                  String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
-                                 String wages_hourly, String earns) {
+                                 String wages_hourly, String earns, int getting_tips, int getting_tournaments) {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
@@ -291,6 +301,8 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.ClockOut, check_out);
         contentValues.put(DatabaseUtils.WagesPerHour, wages_hourly);
         contentValues.put(DatabaseUtils.TotalEarnings, earns);
+        contentValues.put(DatabaseUtils.GettingTips, getting_tips);
+        contentValues.put(DatabaseUtils.GettingTournamentDown, getting_tournaments);
         try {
             db.insert(DatabaseUtils.ADD_DAY_TABLE, null, contentValues);
         } catch (Exception e) {
@@ -302,7 +314,7 @@ public class DatabaseOperations {
         AddDay addDay;
         Cursor cursor = null;
         ArrayList<AddDay> addDayArrayList = new ArrayList<>();
-        String[] projections = new String[18];
+        String[] projections = new String[20];
         projections[0] = DatabaseUtils.Profile;
         projections[1] = DatabaseUtils.CalculatedHours;
         projections[2] = DatabaseUtils.isHolidayPay;
@@ -321,6 +333,8 @@ public class DatabaseOperations {
         projections[15] = DatabaseUtils.Add_ID;
         projections[16] = DatabaseUtils.WagesPerHour;
         projections[17] = DatabaseUtils.TotalEarnings;
+        projections[18] = DatabaseUtils.GettingTips;
+        projections[19] = DatabaseUtils.GettingTournamentDown;
 
 
         try {
@@ -355,6 +369,8 @@ public class DatabaseOperations {
                     addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
                     addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
                     addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
+                    addDay.setGetting_tips(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTips)));
+                    addDay.setGettingg_tournamnts(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTournamentDown)));
                     addDayArrayList.add(addDay);
                 }
                 while (cursor.moveToNext());
@@ -363,5 +379,40 @@ public class DatabaseOperations {
 
 
         return addDayArrayList;
+    }
+
+    public void updateAddDayInfo(String id, String profile_name, String start_shift, String check_in,
+                                 String end_shift, String check_out, String auto_calculatedhour, int holiday_pay,
+                                 String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
+                                 String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
+                                 String wages_hourly, String earns, int getting_tips, int getting_tournaments) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DatabaseUtils.Profile, profile_name);
+        contentValues.put(DatabaseUtils.CalculatedHours, auto_calculatedhour);
+        contentValues.put(DatabaseUtils.isHolidayPay, holiday_pay);
+        contentValues.put(DatabaseUtils.IsDayOff, isDay_off);
+        contentValues.put(DatabaseUtils.TotalTips, total_tips);
+        contentValues.put(DatabaseUtils.TipOutTipees, tipees);
+        contentValues.put(DatabaseUtils.TournamentCount, tournament_count);
+        contentValues.put(DatabaseUtils.TournamentPerDay, tounament_perday);
+        contentValues.put(DatabaseUtils.TipOutPercentage, tip_out_percentage);
+        contentValues.put(DatabaseUtils.TotaTipOut, total_tip_out);
+        contentValues.put(DatabaseUtils.TounamentDowns, tournament_total);
+        contentValues.put(DatabaseUtils.StartShift, start_shift);
+        contentValues.put(DatabaseUtils.EndShift, end_shift);
+        contentValues.put(DatabaseUtils.ClockIn, check_in);
+        contentValues.put(DatabaseUtils.ClockOut, check_out);
+        contentValues.put(DatabaseUtils.WagesPerHour, wages_hourly);
+        contentValues.put(DatabaseUtils.TotalEarnings, earns);
+        contentValues.put(DatabaseUtils.GettingTips, getting_tips);
+        contentValues.put(DatabaseUtils.GettingTournamentDown, getting_tournaments);
+
+        try {
+            int changedRecord = db.update(DatabaseUtils.ADD_DAY_TABLE, contentValues, DatabaseUtils.Add_ID + " =? ", new String[]{String.valueOf(id)});
+            System.out.println("updated_add" + changedRecord);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

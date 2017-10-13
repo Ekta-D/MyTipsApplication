@@ -57,8 +57,8 @@ public class DatabaseUtils {
     public static final String IsDayOff = "Is_day_off";
     public static final String WagesPerHour = "wages_hour";
     public static final String TotalEarnings = "total_earnings";
-
-
+    public static final String GettingTips = "getting_tips";
+    public static final String GettingTournamentDown = "getting_tournament_down";
 
 
 }

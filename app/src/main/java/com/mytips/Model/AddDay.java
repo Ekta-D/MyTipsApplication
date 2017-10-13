@@ -22,6 +22,25 @@ public class AddDay implements Serializable {
     String tounament_count;
     String tournament_perday;
     String total_tournament_downs;
+    int getting_tips;
+
+    public int getGetting_tips() {
+        return getting_tips;
+    }
+
+    public void setGetting_tips(int getting_tips) {
+        this.getting_tips = getting_tips;
+    }
+
+    public int getGettingg_tournamnts() {
+        return gettingg_tournamnts;
+    }
+
+    public void setGettingg_tournamnts(int gettingg_tournamnts) {
+        this.gettingg_tournamnts = gettingg_tournamnts;
+    }
+
+    int gettingg_tournamnts;
 
 
     public String getTotal_earnings() {

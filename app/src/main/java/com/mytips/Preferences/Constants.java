@@ -8,4 +8,5 @@ public class Constants {
 
     public static final String TipeeListKey = "tipee_list";
     public static final String ProfileData = "profile_data";
+    public static final String AddDayProfile = "add_day_profile_data";
 }

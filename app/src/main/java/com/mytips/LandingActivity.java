@@ -3,10 +3,12 @@ package com.mytips;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -28,9 +30,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mytips.Adapter.ActiveProfileAdapter;
+import com.mytips.Adapter.SpinnerProfile;
 import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.AddDay;
+import com.mytips.Model.Profiles;
+import com.mytips.Preferences.Constants;
 
 import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
@@ -51,7 +57,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     Context context;
     TextView textView_total_earnings, textView_summaryTips, textView_summery_tds, textView_summery_tip_out, textView_hour_wage;
-    RelativeLayout  summery_tds_layout, summery_tip_outLayout;
+    RelativeLayout summery_tds_layout, summery_tip_outLayout, dashboard_bottm;
+
+    String selected_ProfileID;
+    ArrayList<AddDay> updated_spinner;
+    String selected_profileName;
+    ArrayList<Profiles> profiles;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +72,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         context = LandingActivity.this;
         databaseOperations = new DatabaseOperations(LandingActivity.this);
+        updated_spinner = new ArrayList<>();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -74,7 +86,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         mRevealView = (LinearLayout) findViewById(R.id.reveal_items);
         mRevealView.setVisibility(View.INVISIBLE);
-
+        dashboard_bottm = (RelativeLayout) findViewById(R.id.dashboard_total_earnings);
         add_day = (ImageButton) findViewById(R.id.add_day);
         profile = (ImageButton) findViewById(R.id.profile);
         share = (ImageButton) findViewById(R.id.share);
@@ -107,8 +119,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         addDayArrayList = new ArrayList<>();
         addDayArrayList = databaseOperations.fetchAddDayDetails(context);
 
-        updateView(addDayArrayList);
-        updateBottom(addDayArrayList);
+        profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
+
+
+        updateSpinner(profiles);
+
+
+
         //  Log.i("add_daylist", String.valueOf(addDayArrayList.size()));
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, reportTypeArray);
         spinnerReportType.setAdapter(typeAdapter);
@@ -116,7 +133,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         spinnerProfile.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (profiles.size() > 0) {
+//                    selected_ProfileID = addDayArrayList.get(position).getId();
+//                    selected_profileName = addDayArrayList.get(position).getProfile();
+                    selected_profileName = profiles.get(position).getProfile_name();
+                    updateView(addDayArrayList, selected_ProfileID, selected_profileName);
+                }
                 spinnerProfile.setSelection(position);
+
             }
 
             @Override
@@ -137,6 +161,39 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
+
+        mListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+
+                final AddDay addDay = selectedProfile.get(position);
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(LandingActivity.this);
+                alert.setTitle("Make your selection");
+                final String names[] = {"Edit", "Delete"};
+                alert.setItems(names, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            Intent intent = new Intent(LandingActivity.this, AddDayActivity.class);
+                            Bundle bundle = new Bundle();
+                            bundle.putSerializable(Constants.AddDayProfile, addDay);
+                            intent.putExtras(bundle);
+                            startActivity(intent);
+
+                        } else if (which == 1) {
+                            deleteProfile(addDay);
+                            selectedProfile.remove(position);
+                            adapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+
+                AlertDialog alertDialog = alert.create();
+                alertDialog.show();
+                return true;
+            }
+        });
 
     }
 
@@ -238,23 +295,32 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    SummaryAdapter adapter;
+    ArrayList<AddDay> selectedProfile;
 
-    public void updateView(ArrayList<AddDay> addDayArrayList) {
-        ArrayList<String> profileArray = new ArrayList<>();
+    public void updateView(ArrayList<AddDay> addDayArrayList, String selected_ProfileID, String selected_profileName) {
+//        for (int i = 0; i < addDayArrayList.size(); i++) {
+//            profileArray.add(addDayArrayList.get(i).getProfile());
+//        }
+        selectedProfile = new ArrayList<>();
         for (int i = 0; i < addDayArrayList.size(); i++) {
-            profileArray.add(addDayArrayList.get(i).getProfile());
-        }
-        if (profileArray.size() > 0) {
-            ArrayAdapter<String> profileAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, profileArray);
-            spinnerProfile.setAdapter(profileAdapter);
-        } else {
-            String[] profiles_empty = new String[]{"[none]"};
-            ArrayAdapter<String> profileAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, profiles_empty);
-            spinnerProfile.setAdapter(profileAdapter);
-        }
+            AddDay addDay = addDayArrayList.get(i);
+            if (addDay.getProfile().equalsIgnoreCase(selected_profileName)) {
+                selectedProfile.add(addDay);
+            }
 
-        SummaryAdapter adapter = new SummaryAdapter(LandingActivity.this, addDayArrayList);
-        mListView.setAdapter(adapter);
+        }
+        if (selectedProfile.size() > 0) {
+            mListView.setVisibility(View.VISIBLE);
+            dashboard_bottm.setVisibility(View.VISIBLE);
+            adapter = new SummaryAdapter(LandingActivity.this, selectedProfile);
+            mListView.setAdapter(adapter);
+
+            updateBottom(selectedProfile);
+        } else {
+            mListView.setVisibility(View.GONE);
+            dashboard_bottm.setVisibility(View.GONE);
+        }
 
     }
 
@@ -307,5 +373,27 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         textView_summery_tds.setText("Tournament Downs:$" + String.valueOf(tournament_totalTD) + ", ");
         textView_summery_tip_out.setText("Tip-out:$" + String.valueOf(totalOuts) + ", ");
         textView_hour_wage.setText("Hourly Wage:$" + String.valueOf(hrs));
+    }
+
+
+    public void deleteProfile(AddDay addDay) {
+        try {
+
+            new DatabaseOperations(LandingActivity.this).delete_add_day(String.valueOf(addDay.getId()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void updateSpinner(ArrayList<Profiles> profilesArrayList) {
+        if (addDayArrayList.size() > 0) {
+            SpinnerProfile profileAdapter = new SpinnerProfile(context, profilesArrayList);
+            spinnerProfile.setAdapter(profileAdapter);
+        } else {
+            String[] profiles_empty = new String[]{"[none]"};
+            ArrayAdapter<String> profileAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, profiles_empty);
+            spinnerProfile.setAdapter(profileAdapter);
+        }
     }
 }

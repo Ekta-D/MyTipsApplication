@@ -54,6 +54,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.TipOutPercentage + " INTEGER, "
                 + DatabaseUtils.TotaTipOut + " TEXT, "
                 + DatabaseUtils.TounamentDowns + " INTEGER, "
+
+                + DatabaseUtils.GettingTips + " INTEGER, "
+                + DatabaseUtils.GettingTournamentDown + " INTEGER, "
+
                 + DatabaseUtils.StartShift + " TEXT, "
                 + DatabaseUtils.ClockIn + " TEXT, "
                 + DatabaseUtils.EndShift + " TEXT, "
