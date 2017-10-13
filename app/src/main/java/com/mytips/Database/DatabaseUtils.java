@@ -59,4 +59,6 @@ public class DatabaseUtils {
     public static final String TotalEarnings = "total_earnings";
 
 
+
+
 }

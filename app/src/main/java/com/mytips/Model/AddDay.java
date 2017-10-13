@@ -23,6 +23,7 @@ public class AddDay implements Serializable {
     String tournament_perday;
     String total_tournament_downs;
 
+
     public String getTotal_earnings() {
         return total_earnings;
     }

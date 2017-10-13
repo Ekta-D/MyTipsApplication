@@ -23,7 +23,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mytips.Adapter.SummaryAdapter;
@@ -31,7 +33,9 @@ import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.AddDay;
 
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -46,11 +50,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     DatabaseOperations databaseOperations;
 
     Context context;
+    TextView textView_total_earnings, textView_summaryTips, textView_summery_tds, textView_summery_tip_out, textView_hour_wage;
+    RelativeLayout  summery_tds_layout, summery_tip_outLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
+
 
         context = LandingActivity.this;
         databaseOperations = new DatabaseOperations(LandingActivity.this);
@@ -75,6 +82,17 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         preferences = (ImageButton) findViewById(R.id.preferences);
         backup = (ImageButton) findViewById(R.id.backup);
 
+        textView_total_earnings = (TextView) findViewById(R.id.total_earnings);
+        textView_hour_wage = (TextView) findViewById(R.id.hour_wage);
+        textView_summaryTips = (TextView) findViewById(R.id.summery_tips);
+        textView_summery_tds = (TextView) findViewById(R.id.summery_tds);
+        textView_summery_tip_out = (TextView) findViewById(R.id.summery_tip_out);
+
+        summery_tds_layout = (RelativeLayout) findViewById(R.id.row_two);
+        summery_tip_outLayout = (RelativeLayout) findViewById(R.id.row_three);
+
+        summery_tds_layout.setVisibility(View.VISIBLE);
+        summery_tip_outLayout.setVisibility(View.VISIBLE);
         add_day.setOnClickListener(this);
         profile.setOnClickListener(this);
         share.setOnClickListener(this);
@@ -90,6 +108,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         addDayArrayList = databaseOperations.fetchAddDayDetails(context);
 
         updateView(addDayArrayList);
+        updateBottom(addDayArrayList);
         //  Log.i("add_daylist", String.valueOf(addDayArrayList.size()));
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, reportTypeArray);
         spinnerReportType.setAdapter(typeAdapter);
@@ -237,5 +256,56 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         SummaryAdapter adapter = new SummaryAdapter(LandingActivity.this, addDayArrayList);
         mListView.setAdapter(adapter);
 
+    }
+
+    public void updateBottom(ArrayList<AddDay> addDayArrayList) {
+
+        String total = "0";
+        int totalEarnings = 0;
+        int total_livetips = 0;
+        String liveTips = "0";
+        int tournament_totalTD = 0;
+        String tds = "0";
+        String tipOut = "0";
+        int totalOuts = 0;
+        String hr = "0";
+        int hrs = 0;
+        for (int i = 0; i < addDayArrayList.size(); i++) {
+
+            total = addDayArrayList.get(i).getTotal_earnings();
+            if (!total.equalsIgnoreCase("")) {
+                int t = Integer.parseInt(total);
+                totalEarnings = totalEarnings + t;
+            }
+            liveTips = addDayArrayList.get(i).getTotal_tips();
+            if (!liveTips.equalsIgnoreCase("")) {
+                int t = Integer.parseInt(liveTips);
+                total_livetips = total_livetips + t;
+            }
+            tds = addDayArrayList.get(i).getTotal_tournament_downs();
+            if (!tds.equalsIgnoreCase("")) {
+                int t = Integer.parseInt(tds);
+                tournament_totalTD = tournament_totalTD + t;
+            }
+
+            tipOut = addDayArrayList.get(i).getTip_out();
+            if (!tipOut.equalsIgnoreCase("")) {
+                int t = Integer.parseInt(tipOut);
+                totalOuts = totalOuts + t;
+            }
+
+            hr = addDayArrayList.get(i).getWages_hourly();
+            if (!hr.equalsIgnoreCase("")) {
+                int t = Integer.parseInt(hr);
+                hrs = hrs + t;
+            }
+        }
+        textView_total_earnings.setText(String.valueOf(totalEarnings));
+
+
+        textView_summaryTips.setText("Live Tips:$" + String.valueOf(total_livetips) + ", ");
+        textView_summery_tds.setText("Tournament Downs:$" + String.valueOf(tournament_totalTD) + ", ");
+        textView_summery_tip_out.setText("Tip-out:$" + String.valueOf(totalOuts) + ", ");
+        textView_hour_wage.setText("Hourly Wage:$" + String.valueOf(hrs));
     }
 }
