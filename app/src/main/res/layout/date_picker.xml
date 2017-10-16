@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#F66F4F"
+    android:gravity="center_horizontal"
     android:orientation="vertical" >
 
     <TextView
@@ -11,15 +11,13 @@
         android:layout_gravity="center_horizontal"
         android:text="Select Date" 
         android:padding="10dp"
-        android:background="#F66F4F"
         android:textStyle="bold"
         android:textSize="18sp"/>
 
     <CalendarView
         android:id="@+id/datePicker"
         android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center_horizontal"
+        android:layout_height="wrap_content"
         android:padding="10dp" />
 
     <Button

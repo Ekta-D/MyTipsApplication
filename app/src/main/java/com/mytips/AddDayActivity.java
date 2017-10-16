@@ -1,44 +1,32 @@
 package com.mytips;
 
-import android.app.DatePickerDialog;
 import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Adapter.SpinnerAdapter;
@@ -49,8 +37,6 @@ import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Preferences.Constants;
-
-import org.w3c.dom.Text;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -84,6 +70,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     TextView save_details, textview_autoCalLabel, label_to, total_tipslabel, tipout_tipees_label, total_tipoutPer, total_tipout,
             tournament_downlabel, cout_label, perTd_label, totalcount_label, text_tip_out_percent, total_tipoutlabel,
             from_label, multiply_label, equal_label, tipee_nodata;
+    View tipSeparator, tournamentSeparator;
     ImageView image_to, day_off_timer;
     ListView fetchedTipees;
     int dynamic_tip_out_percentage = 0;
@@ -106,6 +93,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_day);
+
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -355,6 +343,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         image_to = (ImageView) findViewById(R.id.imageView3);
 
         tipee_layout = (RelativeLayout) findViewById(R.id.linearLayout_tipees);
+
+        tipSeparator = (View) findViewById(R.id.tips_separator);
+        tournamentSeparator = (View) findViewById(R.id.tournament_separator);
     }
 
 
@@ -786,6 +777,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             multiply_label.setVisibility(View.GONE);
             edittext_total.setVisibility(View.GONE);
             equal_label.setVisibility(View.GONE);
+            tournamentSeparator.setVisibility(View.GONE);
         } else {
             tournament_downlabel.setVisibility(View.VISIBLE);
             cout_label.setVisibility(View.VISIBLE);
@@ -795,6 +787,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             edittext_perTD.setVisibility(View.VISIBLE);
             edittext_total.setVisibility(View.VISIBLE);
             equal_label.setVisibility(View.VISIBLE);
+            tournamentSeparator.setVisibility(View.VISIBLE);
             multiply_label.setVisibility(View.VISIBLE);
         }
 
@@ -809,8 +802,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             fetchedTipees.setVisibility(View.GONE);
             total_tipoutPer.setVisibility(View.GONE);
             tipee_layout.setVisibility(View.GONE);
+            tipSeparator.setVisibility(View.GONE);
 
         } else {
+            tipSeparator.setVisibility(View.VISIBLE);
             tipee_layout.setVisibility(View.VISIBLE);
             selectedTipeesID = convertStringToArray(String.valueOf(profile.getTipees_name()));
 
@@ -960,6 +955,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         day_off_timer.setVisibility(View.VISIBLE);
 
+        tipee_nodata.setVisibility(View.GONE);
+        tipSeparator.setVisibility(View.GONE);
+        tournamentSeparator.setVisibility(View.GONE);
+
         editText_startShift.setHint("Select Day");
         edittext_clockIn.setVisibility(View.GONE);
         editText_endShift.setVisibility(View.GONE);
@@ -1005,6 +1004,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         day_off_timer.setVisibility(View.GONE);
 
+        if(tipee_nodata.getText().toString().contains("Tipees not found"))
+            tipee_nodata.setVisibility(View.VISIBLE);
+
+        tipSeparator.setVisibility(View.VISIBLE);
+        tournamentSeparator.setVisibility(View.VISIBLE);
         editText_startShift.setHint("Start Shift");
         edittext_clockIn.setVisibility(View.VISIBLE);
         editText_endShift.setVisibility(View.VISIBLE);
@@ -1089,10 +1093,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     String addDayID;
-    List<String> fetched;
+    List<String> fetched = new ArrayList<>();
 
     public void fillAllFields(AddDay addDay) {
-        fetched = new ArrayList<>();
         addDayID = addDay.getId();
         editText_startShift.setText(addDay.getStart_shift());
         editText_endShift.setText(addDay.getEnd_shift());
