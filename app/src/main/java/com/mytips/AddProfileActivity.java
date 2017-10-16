@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -50,11 +51,13 @@ import com.mytips.Preferences.Constants;
 import com.mytips.Preferences.Preferences;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import static com.mytips.R.id.fetched_tipees;
@@ -86,6 +89,7 @@ public class AddProfileActivity extends AppCompatActivity {
     Bundle b;
     Profiles profiles;
     FetchedTipeeAdapter adapter;
+    TextView no_data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +133,8 @@ public class AddProfileActivity extends AppCompatActivity {
         dbOperations = new DatabaseOperations(AddProfileActivity.this);
 
         imageButton = (ImageButton) findViewById(R.id.imageButton);
-
+        no_data = (TextView) findViewById(R.id.no_data_profile);
+        no_data.setVisibility(View.GONE);
         editText_profilename = (EditText) findViewById(R.id.editText);
         checkBox_supervisor = (CheckBox) findViewById(R.id.checkBox_is_supervisor);
         checkBox_getTournament = (CheckBox) findViewById(R.id.checkBox_gets_tournament_tips);
@@ -250,8 +255,8 @@ public class AddProfileActivity extends AppCompatActivity {
     }
 
     public void openGallery() {
-        Intent i = new Intent(Intent.ACTION_PICK,
-                android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+        Intent i = new Intent(Intent.ACTION_PICK);
+        i.setType("image/*");
 
         startActivityForResult(i, REQUEST_GALLERY);
     }
@@ -284,7 +289,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
                 } else {
                     String profile_id = "";
-                    if(b==null) {
+                    if (b == null) {
 
                         StringBuilder joinedString = new StringBuilder();
                         for (int i = 0; i < adapter.checkedItems.size(); i++) {
@@ -296,7 +301,7 @@ public class AddProfileActivity extends AppCompatActivity {
                         try {
                             dbOperations.insertProfileInfoIntoDatabase(profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString());
+                                    joinedString.toString(), image_name);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -304,7 +309,7 @@ public class AddProfileActivity extends AppCompatActivity {
                         int id = profiles.getId();
                         StringBuilder joinedString = new StringBuilder();
                         for (int i = 0; i < adapter.checkedItems.size(); i++) {
-                            if (adapter.checkedItems.get(i,false) == true) {
+                            if (adapter.checkedItems.get(i, false) == true) {
                                 joinedString.append(tipeeInfos.get(i).getId());
                                 joinedString.append(",");
                             }
@@ -317,7 +322,6 @@ public class AddProfileActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     }
-
 
 
                     Toast.makeText(this, "Thanks! your profile has been saved", Toast.LENGTH_SHORT).show();
@@ -350,19 +354,36 @@ public class AddProfileActivity extends AppCompatActivity {
     }
 
     ArrayList<String> tipees_array = new ArrayList<>();
+    String image_name = "";
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CAMERA && resultCode == RESULT_OK) {
-            Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            //    Bitmap bitmap = (Bitmap) data.getExtras().get("data");
+            Bitmap bitmap = null;
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            image_name = saveImage(bitmap);
             imageButton.setImageBitmap(bitmap);
         }
         if (requestCode == REQUEST_GALLERY && resultCode == RESULT_OK) {
             if (data != null) {
                 try {
 
+                    String[] filePath = {MediaStore.Images.Media.DATA};
+                    Cursor c = getContentResolver().query(data.getData(), filePath, null, null, null);
+                    c.moveToFirst();
+                    int columnIndex = c.getColumnIndex(filePath[0]);
+                    String picturePath = c.getString(columnIndex);
+
+                    c.close();
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
+                    image_name = saveImage(bitmap);
+                    //    createDirectoryAndSaveFile(bitmap,"MyTips");
                     imageButton.setImageBitmap(bitmap);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -376,7 +397,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
 
     public void getAllTipees() {
-        if(selected_tipeesID==null)
+        if (selected_tipeesID == null)
             selected_tipeesID = new ArrayList<>();
         tipeeInfos = new ArrayList<>();
 
@@ -385,8 +406,10 @@ public class AddProfileActivity extends AppCompatActivity {
 
         listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
         if (tipeeInfos != null) {
-            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos,false,null);
+            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos, false, null);
             listView_fetched_tipees.setAdapter(adapter);
+        } else {
+            no_data.setVisibility(View.VISIBLE);
         }
     }
 
@@ -411,7 +434,15 @@ public class AddProfileActivity extends AppCompatActivity {
 
         editText_hourly_pay.setText(profiles.getHourly_pay());
 
+        if (!profiles.getProfile_pic().equalsIgnoreCase("")) {
+            File image = new File(Environment.getExternalStorageDirectory()
+                    .toString() + "/MYSAmpleTipeeImages/" + profiles.getProfile_pic());
+            Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
+            if (bitmap != null) {
+                imageButton.setImageBitmap(bitmap);
+            }
 
+        }
     }
 
     public String convertArrayToString(List<String> selected_tipeesID) {
@@ -432,5 +463,48 @@ public class AddProfileActivity extends AppCompatActivity {
         List<String> sellItems = Arrays.asList(joinedString.split(","));
         return sellItems;
 
+    }
+
+
+    public String saveImage(Bitmap bitmap) {
+        String file_name;
+        String root = Environment.getExternalStorageDirectory()
+                .toString();
+
+        File myDir = new File(root + "/MYSAmpleTipeeImages/");
+        if (!myDir.exists()) {
+
+            myDir.mkdirs();
+
+        }
+        Random generator = new Random();
+        int n = 10000;
+
+        n = generator.nextInt(n);
+
+        String iname = "Image-" + n + ".jpg";
+        file_name = iname;
+        File file = new File(myDir, iname);
+
+        if (file.exists())
+
+            file.delete();
+
+        try {
+
+            FileOutputStream out = new FileOutputStream(file);
+
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
+
+            out.flush();
+
+            out.close();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+        return file_name;
     }
 }

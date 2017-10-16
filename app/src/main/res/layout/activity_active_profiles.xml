@@ -39,7 +39,7 @@
         <ListView
             android:id="@+id/deactive_profile_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="120dp"
             android:layout_below="@+id/deactive" />
 
 

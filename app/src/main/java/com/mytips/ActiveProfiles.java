@@ -90,7 +90,6 @@ public class ActiveProfiles extends AppCompatActivity {
                                 adapter.notifyDataSetChanged();
                             }
 
-
                         }
                     }
                 });

@@ -56,6 +56,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     ArrayList<AddDay> updated_spinner;
     String selected_profileName;
     ArrayList<Profiles> profiles;
+    TextView no_data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         updated_spinner = new ArrayList<>();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
+        no_data = (TextView) findViewById(R.id.no_data_landing);
         setSupportActionBar(toolbar);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Window window = getWindow();
@@ -115,7 +117,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
         updateSpinner(profiles);
-
 
 
         //  Log.i("add_daylist", String.valueOf(addDayArrayList.size()));
@@ -304,15 +305,16 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
         if (selectedProfile.size() > 0) {
             mListView.setVisibility(View.VISIBLE);
-       //     dashboard_bottm.setVisibility(View.VISIBLE);
+            //     dashboard_bottm.setVisibility(View.VISIBLE);
             adapter = new SummaryAdapter(LandingActivity.this, selectedProfile);
             mListView.setAdapter(adapter);
-
+            no_data.setVisibility(View.GONE);
             updateBottom(selectedProfile);
         } else {
+            no_data.setVisibility(View.VISIBLE);
             mListView.setVisibility(View.GONE);
             updateBottom(selectedProfile);
-         //   dashboard_bottm.setVisibility(View.GONE);
+            //   dashboard_bottm.setVisibility(View.GONE);
         }
 
     }

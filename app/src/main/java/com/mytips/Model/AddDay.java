@@ -31,7 +31,6 @@ public class AddDay implements Serializable {
     public void setGetting_tips(int getting_tips) {
         this.getting_tips = getting_tips;
     }
-
     public int getGettingg_tournamnts() {
         return gettingg_tournamnts;
     }

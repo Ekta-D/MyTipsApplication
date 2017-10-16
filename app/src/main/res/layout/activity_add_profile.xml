@@ -55,8 +55,8 @@
 
         <ImageButton
             android:id="@+id/imageButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_marginEnd="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginTop="8dp"
@@ -257,10 +257,10 @@
             app:layout_constraintTop_toBottomOf="@+id/spinner_holiday_pay" />
 
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/tipeess"
             android:layout_width="0dp"
-            android:layout_height="50dp"
+            android:layout_height="100dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
@@ -274,11 +274,21 @@
 
 
             <ListView
-                android:layout_width="match_parent"
                 android:id="@+id/fetched_tipees"
-                android:layout_height="wrap_content"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/no_data_profile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="No Data found"
+                android:textSize="20dp"
+                android:visibility="visible" />
+
+        </RelativeLayout>
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

@@ -29,6 +29,16 @@ public class Profiles implements Serializable {
     String pay_period;
     String hourly_pay;
 
+    public String getProfile_pic() {
+        return profile_pic;
+    }
+
+    public void setProfile_pic(String profile_pic) {
+        this.profile_pic = profile_pic;
+    }
+
+    String profile_pic;
+
     public String getTipees_name() {
         return tipees_name;
     }
@@ -85,8 +95,6 @@ public class Profiles implements Serializable {
     public void setIs_active(int is_active) {
         this.is_active = is_active;
     }
-
-
 
 
     public String getProfile_id() {

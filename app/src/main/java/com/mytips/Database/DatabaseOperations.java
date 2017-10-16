@@ -35,7 +35,7 @@ public class DatabaseOperations {
 
     public void insertProfileInfoIntoDatabase(String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
                                               boolean isGetTips, String payPeriod, String startDay, int hourPay, String holidayPay
-            , String tipees
+            , String tipees, String profile_pic
     ) {
 
         int supervisor = 0, tournamentTips = 0, getTips = 0;
@@ -59,7 +59,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.HolidayPay, holidayPay);
         contentValues.put(DatabaseUtils.Tipees, tipees);
         contentValues.put(DatabaseUtils.IsActive, 1);
-
+        contentValues.put(DatabaseUtils.ProfilePic, profile_pic);
         try {
             db.insert(DatabaseUtils.PROFILE_TABLE, null, contentValues);
         } catch (Exception e) {
@@ -104,6 +104,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.StartDayWeek, startDay);
         contentValues.put(DatabaseUtils.HourlyPay, hourPay);
         contentValues.put(DatabaseUtils.Tipees, tipees);
+        contentValues.put(DatabaseUtils.HolidayPay, holidayPay);
         try {
             int changedRecord = db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.Profile_ID + " =? ", new String[]{String.valueOf(id)});
             System.out.println("updated" + changedRecord);
@@ -210,7 +211,7 @@ public class DatabaseOperations {
     public ArrayList<Profiles> fetchAllProfile(Context context) {
         ArrayList<Profiles> profilesList;
         Cursor cursor = null;
-        String[] projections = new String[12];
+        String[] projections = new String[13];
         projections[0] = DatabaseUtils.ProfileID;
         projections[1] = DatabaseUtils.ProfileName;
         projections[2] = DatabaseUtils.IsSupervisor;
@@ -223,6 +224,7 @@ public class DatabaseOperations {
         projections[9] = DatabaseUtils.HolidayPay;
         projections[10] = DatabaseUtils.Tipees;
         projections[11] = DatabaseUtils.Profile_ID;
+        projections[12] = DatabaseUtils.ProfilePic;
 
 //        String selection[] = new String[]{"1"};
         try {
@@ -268,6 +270,7 @@ public class DatabaseOperations {
                     profiles.setHourly_pay(hourlypay);
                     profiles.setIs_active(isActive);
                     profiles.setTipees_name(tipees);
+                    profiles.setProfile_pic(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfilePic)));
                     profilesList.add(profiles);
                 }
                 while (cursor.moveToNext());
@@ -345,8 +348,8 @@ public class DatabaseOperations {
 
         int cursor_count = 0;
 
-        if(cursor!=null)
-        cursor_count = cursor.getCount();
+        if (cursor != null)
+            cursor_count = cursor.getCount();
 
         if (cursor_count != 0) {
             if (cursor.moveToFirst()) {
@@ -363,7 +366,7 @@ public class DatabaseOperations {
                     addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
                     addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
                     addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
-                    addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
+                    addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
                     addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
                     addDay.setCheck_in(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
                     addDay.setCheck_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
