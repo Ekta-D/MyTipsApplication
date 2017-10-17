@@ -110,24 +110,24 @@ public class SummaryAdapter extends BaseAdapter {
         }
 
         String totaltips = "";
-        totaltips = addDayArrayList.get(position).getTotal_tips();
+        totaltips = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_tips()));
         if (totaltips.equalsIgnoreCase("")) {
             totaltips = "0";
         }
         String total_TDs = "";
-        total_TDs = addDayArrayList.get(position).getTotal_tournament_downs();
+        total_TDs = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_tournament_downs()));
         if (total_TDs.equalsIgnoreCase("")) {
             total_TDs = "0";
         }
-        String tipO = addDayArrayList.get(position).getTip_out();
+        String tipO = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTip_out()));
         if (tipO.equalsIgnoreCase("")) {
             tipO = "0";
         }
-        String wH = addDayArrayList.get(position).getWages_hourly();
+        String wH = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getWages_hourly()));
         if (wH.equalsIgnoreCase("")) {
             wH = "0";
         }
-        String totalE = addDayArrayList.get(position).getTotal_earnings();
+        String totalE = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_earnings()));
         if (totalE.equalsIgnoreCase("")) {
             totalE = "0";
         }
@@ -136,7 +136,6 @@ public class SummaryAdapter extends BaseAdapter {
         holder.textView_hourlywage.setText(wH);
         holder.textView_tds.setText(total_TDs);
         holder.textView_total.setText(totalE);
-
 
         return convertView;
     }

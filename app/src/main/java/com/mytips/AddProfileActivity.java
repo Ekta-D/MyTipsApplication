@@ -1,10 +1,5 @@
 package com.mytips;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.app.Dialog;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,24 +13,18 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutCompat;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -43,12 +32,9 @@ import android.widget.Toast;
 
 import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
-import com.mytips.Database.DatabaseUtils;
-import com.mytips.Interface.TipeeSelected;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Preferences.Constants;
-import com.mytips.Preferences.Preferences;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -58,11 +44,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
-
-import static com.mytips.R.id.fetched_tipees;
-import static com.mytips.R.id.spinner_pay_period;
-import static com.mytips.R.id.tipeess;
 
 
 public class AddProfileActivity extends AppCompatActivity {
@@ -70,7 +51,8 @@ public class AddProfileActivity extends AppCompatActivity {
 
     ImageButton imageButton;
     String profile_name;
-    int hourly_pay = 0;
+    //    int hourly_pay = 0;
+    double hourly_pay = 0;
     EditText editText_profilename, editText_hourly_pay;
     CheckBox checkBox_supervisor, checkBox_getTournament, checkBox_getTips;
     Spinner spinner_payperiod, spinner_startday, spinner_holiday_pay;
@@ -281,7 +263,7 @@ public class AddProfileActivity extends AppCompatActivity {
                 profile_name = editText_profilename.getText().toString().trim();
                 String hourPay = editText_hourly_pay.getText().toString().trim();
                 if (!hourPay.equalsIgnoreCase("")) {
-                    hourly_pay = Integer.parseInt(hourPay);
+                    hourly_pay = Double.parseDouble(hourPay);
                 }
 
                 if (profile_name.equalsIgnoreCase("")) {
@@ -298,6 +280,7 @@ public class AddProfileActivity extends AppCompatActivity {
                                 joinedString.append(",");
                             }
                         }
+                        Log.i("insert_joinedString", joinedString.toString());
                         try {
                             dbOperations.insertProfileInfoIntoDatabase(profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
@@ -309,11 +292,14 @@ public class AddProfileActivity extends AppCompatActivity {
                         int id = profiles.getId();
                         StringBuilder joinedString = new StringBuilder();
                         for (int i = 0; i < adapter.checkedItems.size(); i++) {
-                            if (adapter.checkedItems.get(i, false) == true) {
+//                            if (adapter.checkedItems.get(i, false) == true) {
+                            if (adapter.checkedItems.get(i) == true) {
                                 joinedString.append(tipeeInfos.get(i).getId());
                                 joinedString.append(",");
                             }
                         }
+                        Log.i("update_joinedString", joinedString.toString());
+
                         try {
                             dbOperations.updateProfileValues(id, profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,

@@ -1,25 +1,18 @@
 package com.mytips.Adapter;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.mytips.Interface.TipeeChecked;
-import com.mytips.Interface.TipeeSelected;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.R;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,11 +109,8 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
                     } else {
                         tipeeChecked.OnTipeeChange(false, tipeeInfo);
                     }
-
-
                 }
             });
-
 
         } else {
             if (selected_tipeesIds.contains(tipeeInfo.getId())) {

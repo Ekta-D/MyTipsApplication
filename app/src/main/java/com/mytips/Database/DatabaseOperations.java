@@ -34,7 +34,7 @@ public class DatabaseOperations {
     }
 
     public void insertProfileInfoIntoDatabase(String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
-                                              boolean isGetTips, String payPeriod, String startDay, int hourPay, String holidayPay
+                                              boolean isGetTips, String payPeriod, String startDay, double hourPay, String holidayPay
             , String tipees, String profile_pic
     ) {
 
@@ -82,7 +82,7 @@ public class DatabaseOperations {
     }
 
     public void updateProfileValues(int id, String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
-                                    boolean isGetTips, String payPeriod, String startDay, int hourPay, String holidayPay
+                                    boolean isGetTips, String payPeriod, String startDay, double hourPay, String holidayPay
             , String tipees) {
 
         int supervisor = 0, tournamentTips = 0, getTips = 0;
@@ -140,7 +140,7 @@ public class DatabaseOperations {
         }
     }
 
-    public void insertTipeeInfo(String tipee_id, String tipee_name, int tipee_out) {
+    public void insertTipeeInfo(String tipee_id, String tipee_name, double tipee_out) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.TipeeID, tipee_id);
         contentValues.put(DatabaseUtils.TipeeName, tipee_name);

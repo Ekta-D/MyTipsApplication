@@ -322,42 +322,42 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public void updateBottom(ArrayList<AddDay> addDayArrayList) {
 
         String total = "0";
-        int totalEarnings = 0;
-        int total_livetips = 0;
+        double totalEarnings = 0;
+        double total_livetips = 0;
         String liveTips = "0";
-        int tournament_totalTD = 0;
+        double tournament_totalTD = 0;
         String tds = "0";
         String tipOut = "0";
-        int totalOuts = 0;
+        double totalOuts = 0;
         String hr = "0";
-        int hrs = 0;
+        double hrs = 0;
         for (int i = 0; i < addDayArrayList.size(); i++) {
 
             total = addDayArrayList.get(i).getTotal_earnings();
             if (!total.equalsIgnoreCase("") && !total.equalsIgnoreCase("--")) {
-                int t = Integer.parseInt(total);
+                double t = Double.parseDouble(total);
                 totalEarnings = totalEarnings + t;
             }
             liveTips = addDayArrayList.get(i).getTotal_tips();
             if (!liveTips.equalsIgnoreCase("")) {
-                int t = Integer.parseInt(liveTips);
+                double t =Double.parseDouble(liveTips);
                 total_livetips = total_livetips + t;
             }
             tds = addDayArrayList.get(i).getTotal_tournament_downs();
             if (!tds.equalsIgnoreCase("")) {
-                int t = Integer.parseInt(tds);
+                double t =Double.parseDouble(tds);
                 tournament_totalTD = tournament_totalTD + t;
             }
 
             tipOut = addDayArrayList.get(i).getTip_out();
             if (!tipOut.equalsIgnoreCase("")) {
-                int t = Integer.parseInt(tipOut);
+                double t =Double.parseDouble(tipOut);
                 totalOuts = totalOuts + t;
             }
 
             hr = addDayArrayList.get(i).getWages_hourly();
             if (!hr.equalsIgnoreCase("")) {
-                int t = Integer.parseInt(hr);
+                double t = Double.parseDouble(hr);
                 hrs = hrs + t;
             }
         }

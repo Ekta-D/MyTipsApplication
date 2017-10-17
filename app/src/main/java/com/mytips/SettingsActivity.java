@@ -59,7 +59,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    int tipee_percent;
+    double tipee_percent;
 
     String tipee_name_tipout;
     SharedPreferences sharedPreferences;
@@ -426,7 +426,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                                 final String percent = editText_tipee_out.getText().toString().trim();
 
                                 if (!percent.equalsIgnoreCase("")) {
-                                    tipee_percent = Integer.parseInt(percent);
+                                    tipee_percent = Double.parseDouble(percent);
                                 }
                                 tipee_name_tipout = name + " " + percent + "%";
 
