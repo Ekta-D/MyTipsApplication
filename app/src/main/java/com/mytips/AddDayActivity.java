@@ -991,7 +991,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             fetchedTipees.setAdapter(adapter);
             fetchedTipees.setDivider(null);
         }
-
     }
 
     public void setDayOffView() {
