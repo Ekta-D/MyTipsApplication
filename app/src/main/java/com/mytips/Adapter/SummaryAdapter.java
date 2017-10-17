@@ -56,6 +56,7 @@ public class SummaryAdapter extends BaseAdapter {
         LinearLayout layoutEarningDetails;
         ImageView time;
     }
+
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder holder;
@@ -103,7 +104,7 @@ public class SummaryAdapter extends BaseAdapter {
         holder.working_hours.setText(addDayArrayList.get(position).getCalculated_hours());
 
         int dayOff = addDayArrayList.get(position).getDay_off();
-        if(dayOff==1){
+        if (dayOff == 1) {
             holder.working_hours.setText("Day off");
             holder.time.setBackgroundResource(R.drawable.ic_timer_icon);
             holder.layoutEarningDetails.setVisibility(View.GONE);
@@ -115,22 +116,33 @@ public class SummaryAdapter extends BaseAdapter {
             totaltips = "0";
         }
         String total_TDs = "";
-        total_TDs = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_tournament_downs()));
-        if (total_TDs.equalsIgnoreCase("")) {
+        if (addDayArrayList.get(position).getTotal_tournament_downs() != null && !addDayArrayList.get(position).getTotal_tournament_downs().equalsIgnoreCase("")) {
+            total_TDs = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_tournament_downs()));
+        } else if (total_TDs.equalsIgnoreCase("")) {
             total_TDs = "0";
         }
-        String tipO = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTip_out()));
-        if (tipO.equalsIgnoreCase("")) {
+
+        String tipO = "";
+        if (!addDayArrayList.get(position).getTip_out().equalsIgnoreCase("") && addDayArrayList.get(position).getTip_out() != null) {
+            tipO = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTip_out()));
+        } else if (tipO.equalsIgnoreCase("")) {
             tipO = "0";
         }
-        String wH = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getWages_hourly()));
-        if (wH.equalsIgnoreCase("")) {
+        String wH = "";
+
+        if (addDayArrayList.get(position).getWages_hourly() != null && !addDayArrayList.get(position).getWages_hourly().equalsIgnoreCase("")) {
+            wH = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getWages_hourly()));
+        } else if (wH.equalsIgnoreCase("")) {
             wH = "0";
         }
-        String totalE = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_earnings()));
-        if (totalE.equalsIgnoreCase("")) {
+        String totalE = "";
+
+        if (addDayArrayList.get(position).getTotal_earnings() != null && !addDayArrayList.get(position).getTotal_earnings().equalsIgnoreCase("")) {
+            totalE = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_earnings()));
+        } else if (totalE.equalsIgnoreCase("")) {
             totalE = "0";
         }
+
         holder.textView_tips.setText(totaltips);
         holder.textView_tipout.setText(tipO);
         holder.textView_hourlywage.setText(wH);
