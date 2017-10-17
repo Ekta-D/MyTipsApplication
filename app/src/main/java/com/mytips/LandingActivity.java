@@ -127,6 +127,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (profiles.size() > 0) {
+//                    selected_ProfileID = addDayArrayList.get(position).getId();
+//                    selected_profileName = addDayArrayList.get(position).getProfile();
                     selected_profileName = profiles.get(position).getProfile_name();
                     updateView(addDayArrayList, selected_ProfileID, selected_profileName);
                 }

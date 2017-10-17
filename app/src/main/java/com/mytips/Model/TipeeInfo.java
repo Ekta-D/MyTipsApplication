@@ -16,8 +16,6 @@ public class TipeeInfo {
         this.id = id;
     }
 
-
-
     public String getName() {
         return name;
     }

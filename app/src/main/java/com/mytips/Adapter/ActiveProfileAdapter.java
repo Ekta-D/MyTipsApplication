@@ -72,7 +72,7 @@ public class ActiveProfileAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        if (!profiles.get(position).getProfile_pic().equalsIgnoreCase("")) {
+        if ( profiles.get(position).getProfile_pic()!=null && !profiles.get(position).getProfile_pic().equalsIgnoreCase("")) {
             File image = new File(Environment.getExternalStorageDirectory()
                     .toString() + "/MYSAmpleTipeeImages/" + profiles.get(position).getProfile_pic());
             Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
