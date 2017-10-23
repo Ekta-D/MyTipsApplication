@@ -97,6 +97,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     long start_shift_long, end_shift_long;
     int selected_timeformatIndex = 0;
     SharedPreferences sharedPreferences;
+    int default_date_format = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -110,7 +111,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         findViewByIds();
 
-        selected_timeformatIndex = sharedPreferences.getInt("selected_time", 0);
+        selected_timeformatIndex = sharedPreferences.getInt("selected_time", 1);
+        default_date_format = sharedPreferences.getInt("selected_date", 2);
 
         profilesArrayList = new ArrayList<>();
         profile_names = new ArrayList<>();
@@ -124,13 +126,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         editText_startShift.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getDatePicker(R.id.editText_start_shift);
+                getDatePicker(default_date_format, R.id.editText_start_shift);
             }
         });
         editText_endShift.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getDatePicker(R.id.editText_end_shift);
+                getDatePicker(default_date_format, R.id.editText_end_shift);
             }
         });
 
@@ -341,7 +343,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
     public void findViewByIds() {
 
-        sharedPreferences = AddDayActivity.this.getSharedPreferences("Pref", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
+
         fetchedTipees = (ListView) findViewById(R.id.list_view_tipees);
         equal_label = (TextView) findViewById(R.id.textView25);
         multiply_label = (TextView) findViewById(R.id.textView24);
@@ -402,7 +405,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.editText_clock_in:
-                getTimePicker(R.id.editText_clock_in, new TimeChangeListener() {
+                getTimePicker(selected_timeformatIndex, R.id.editText_clock_in, new TimeChangeListener() {
                     @Override
                     public void OnTimeChange(String start_time, String end_time, Calendar start_date1, Calendar end_date1) {
 
@@ -424,7 +427,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 break;
             case R.id.editText_clock_out:
 
-                getTimePicker(R.id.editText_clock_out, new TimeChangeListener() {
+                getTimePicker(selected_timeformatIndex, R.id.editText_clock_out, new TimeChangeListener() {
                     @Override
                     public void OnTimeChange(String start_time, String end_time, Calendar start_date1, Calendar end_date1) {
 //
@@ -475,7 +478,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    public String getTimePicker(final int viewId, final TimeChangeListener onTimeChange) {
+    public String getTimePicker(int time_format_index, final int viewId, final TimeChangeListener onTimeChange) {
         final Dialog timePicker = new Dialog(AddDayActivity.this);
 
         timePicker.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -484,6 +487,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         timePicker.setContentView(viewTimePicker);
         final TimePicker timePick = (TimePicker) viewTimePicker
                 .findViewById(R.id.timePicker);
+        if (time_format_index == 1) {
+            timePick.setIs24HourView(true);
+        }
+
         // Selecting time from Time Picker
         Button selectTime = (Button) viewTimePicker
                 .findViewById(R.id.timeSelect);
@@ -534,7 +541,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         return time;
     }
 
-    public String getDatePicker(final int viewId) {
+    public String getDatePicker(int format_index, final int viewId) {
 
         // Infalating Dialog for Date Picker
         final Dialog datePicker = new Dialog(AddDayActivity.this);
@@ -574,6 +581,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         + String.valueOf(dayOfMonth) + "/"
                         + String.valueOf(year);
                 System.out.println("Selected date: " + selectedDate);
+
                 date = new SimpleDateFormat("MMMM d, yyyy").format(new Date(
                         selectedDate));
 
@@ -1284,6 +1292,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     }
+
+
 }
 
 

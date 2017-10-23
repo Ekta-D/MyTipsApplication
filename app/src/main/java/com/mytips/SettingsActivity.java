@@ -177,8 +177,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             stored_name = sharedPrefs.getString("user_name", "");
             stored_email = sharedPrefs.getString("user_email", "");
         } else {*/
-            stored_name = sharedPreferences.getString("user_name", "");
-            stored_email = sharedPreferences.getString("user_email", "");
+        stored_name = sharedPreferences.getString("user_name", "");
+        stored_email = sharedPreferences.getString("user_email", "");
         //}
 
 
@@ -235,8 +235,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     index = Integer.parseInt(selected_value);
                 }
 
-                editor.putInt("selected_date", index);
-                editor.commit();
+
                 ListPreference listPreference = (ListPreference) preference;
 
 
@@ -251,6 +250,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 } else {
                     tempIndex = 0;
                 }
+                editor.putInt("selected_date", tempIndex);
+                editor.commit();
                 preference.setSummary(entries[tempIndex]);
 
                 return true;
@@ -272,8 +273,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 if (!selected_value.equalsIgnoreCase("")) {
                     index = Integer.parseInt(selected_value);
                 }
-                editor.putInt("selected_time", index);
-                editor.commit();
+
                 ListPreference listPreference = (ListPreference) preference;
 
 
@@ -285,6 +285,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     tempIndex = 0;
 
                 }
+                editor.putInt("selected_time", tempIndex);
+                editor.commit();
                 preference.setSummary(entries[tempIndex]);
                 return true;
             }
@@ -363,7 +365,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     tempIndex = 0;
                 }
                 preference.setSummary(entries[tempIndex]);
-
+                CommonMethods.setTheme(getSupportActionBar(), SettingsActivity.this);
                 return true;
             }
         });
