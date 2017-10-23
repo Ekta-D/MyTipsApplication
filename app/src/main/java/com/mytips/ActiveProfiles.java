@@ -18,6 +18,7 @@ import android.widget.ListView;
 import com.mytips.Adapter.ActiveProfileAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.Profiles;
+import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
 import java.util.ArrayList;
@@ -37,12 +38,7 @@ public class ActiveProfiles extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-            window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        }
+        CommonMethods.setTheme(getSupportActionBar(), ActiveProfiles.this);
 
         btn_add_profile = (Button) findViewById(R.id.add_new_profile);
         btn_add_profile.setOnClickListener(new View.OnClickListener() {

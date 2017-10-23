@@ -38,6 +38,7 @@ import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Preferences.Preferences;
+import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
 import java.text.ParseException;
@@ -105,12 +106,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-            window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        }
+        CommonMethods.setTheme(getSupportActionBar(), AddDayActivity.this);
 
         findViewByIds();
 

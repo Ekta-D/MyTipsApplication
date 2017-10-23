@@ -32,6 +32,7 @@ import android.widget.ListView;
 import com.mytips.Adapter.AddTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.TipeeInfo;
+import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 import com.mytips.Preferences.Preferences;
 
@@ -141,17 +142,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         setupActionBar();
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-            window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        }
+        CommonMethods.setTheme(getSupportActionBar(), SettingsActivity.this);
 
-        sharedPreferences = getPreferences(MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
 
         addPreferencesFromResource(R.xml.pref_general);
 //        setHasOptionsMenu(true);
@@ -177,14 +172,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         editTextPreference_name = (EditTextPreference) findPreference("example_text");
 
         String stored_name, stored_email;
-        if (sharedPreferences.getString("user_name", "").equals("") && sharedPreferences.getString("user_email", "").equals("")) {
+        /*if (sharedPreferences.getString("user_name", "").equals("") && sharedPreferences.getString("user_email", "").equals("")) {
             SharedPreferences sharedPrefs = getSharedPreferences("Pref", MODE_PRIVATE);
             stored_name = sharedPrefs.getString("user_name", "");
             stored_email = sharedPrefs.getString("user_email", "");
-        } else {
+        } else {*/
             stored_name = sharedPreferences.getString("user_name", "");
             stored_email = sharedPreferences.getString("user_email", "");
-        }
+        //}
 
 
         if (!stored_name.equalsIgnoreCase("")) {
@@ -220,8 +215,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putString("user_email", edited_text);
                 editor.commit();
-
-
                 return true;
             }
         });

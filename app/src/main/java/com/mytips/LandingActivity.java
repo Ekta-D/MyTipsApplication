@@ -5,6 +5,9 @@ import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -32,6 +35,7 @@ import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
+import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 import com.mytips.Utils.DateUtils;
 
@@ -72,7 +76,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
 
-
         context = LandingActivity.this;
         databaseOperations = new DatabaseOperations(LandingActivity.this);
         updated_spinner = new ArrayList<>();
@@ -80,12 +83,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         no_data = (TextView) findViewById(R.id.no_data_landing);
         setSupportActionBar(toolbar);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-            window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        }
+
+        CommonMethods.setTheme(getSupportActionBar(), LandingActivity.this);
 
         mRevealView = (LinearLayout) findViewById(R.id.reveal_items);
         mRevealView.setVisibility(View.INVISIBLE);
@@ -202,6 +201,17 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         });
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
+        updateSpinner(profiles);
+
+        CommonMethods.setTheme(getSupportActionBar(), LandingActivity.this);
+    }
+
 
 
     @Override
@@ -510,12 +520,4 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 Math.abs(end.getTimeInMillis() - start.getTimeInMillis()));
     }
 
-
-    @Override
-    protected void onResume() {
-
-        profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
-        updateSpinner(profiles);
-        super.onResume();
-    }
 }

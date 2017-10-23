@@ -34,6 +34,7 @@ import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
+import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
 import java.io.File;
@@ -87,12 +88,7 @@ public class AddProfileActivity extends AppCompatActivity {
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
-            window.setNavigationBarColor(getResources().getColor(R.color.colorPrimaryDark));
-        }
+        CommonMethods.setTheme(getSupportActionBar(), AddProfileActivity.this);
 
         initView();
 
@@ -231,7 +227,10 @@ public class AddProfileActivity extends AppCompatActivity {
         }
 
         File imagePath = new File(pictureFileDir, "profile" + Calendar.getInstance().getTime() + ".jpg");
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent intent = /*(Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT)
+                ? new Intent(MediaStore.ACTION_IMAGE_CAPTURE_SECURE)
+                :*/ new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
         intent.putExtra("image", Uri.parse(String.valueOf(imagePath)));
         startActivityForResult(intent, REQUEST_CAMERA);
     }
@@ -422,7 +421,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
         if (!profiles.getProfile_pic().equalsIgnoreCase("")) {
             File image = new File(Environment.getExternalStorageDirectory()
-                    .toString() + "/MYSAmpleTipeeImages/" + profiles.getProfile_pic());
+                    .toString() + "/MyTipsAppImages/" + profiles.getProfile_pic());
             Bitmap bitmap = BitmapFactory.decodeFile(image.getAbsolutePath());
             if (bitmap != null) {
                 imageButton.setImageBitmap(bitmap);
@@ -457,7 +456,7 @@ public class AddProfileActivity extends AppCompatActivity {
         String root = Environment.getExternalStorageDirectory()
                 .toString();
 
-        File myDir = new File(root + "/MYSAmpleTipeeImages/");
+        File myDir = new File(root + "/MyTipsAppImages/");
         if (!myDir.exists()) {
 
             myDir.mkdirs();

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,7 +16,8 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import com.mytips.Utils.CommonMethods;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +34,12 @@ public class SplashActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        sharedPreferences = getSharedPreferences("Pref", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
         if(sharedPreferences!=null)
             isFirstTime = sharedPreferences.getBoolean(ISFIRST_TIME, false);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Window window = getWindow();
-            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-            window.setStatusBarColor(Color.argb(77, 20, 20, 20));
-            window.setNavigationBarColor(Color.argb(77, 20, 20, 20));
-        }
+        CommonMethods.setTheme(getSupportActionBar(), SplashActivity.this);
+
 
         findViewById(R.id.button_go).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,6 +76,7 @@ public class SplashActivity extends AppCompatActivity {
             }, 2000);
         }
     }
+
 
     private void hideViews() {
         findViewById(R.id.et_name).setVisibility(View.GONE);
