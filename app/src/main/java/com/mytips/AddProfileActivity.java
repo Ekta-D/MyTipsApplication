@@ -34,7 +34,7 @@ import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
-import com.mytips.Preferences.Constants;
+import com.mytips.Utils.Constants;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -125,7 +125,7 @@ public class AddProfileActivity extends AppCompatActivity {
         spinner_startday = (Spinner) findViewById(R.id.spinner_start_day_of_week);
         spinner_holiday_pay = (Spinner) findViewById(R.id.spinner_holiday_pay);
         editText_hourly_pay = (EditText) findViewById(R.id.editText_houly_pay);
-        //  addTipee = (Button) findViewById(R.id.add_tipee);
+
 
 
         payAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, pay_period_array);

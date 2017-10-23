@@ -26,6 +26,7 @@ public class Preferences {
                 Context.MODE_PRIVATE);
         editor = prefs.edit();
     }
+
     public static synchronized Preferences getInstance(Context context) {
         if (instance == null) {
             instance = new Preferences(context);
@@ -38,6 +39,11 @@ public class Preferences {
         String all_users = gson.toJson(user_value);
         editor.putString(key, all_users);
 
+        editor.commit();
+    }
+
+    private void save_string(String key, String value) {
+        editor.putString(key, value);
         editor.commit();
     }
 

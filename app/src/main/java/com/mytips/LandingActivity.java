@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,15 +27,21 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.mytips.Adapter.ActiveProfileAdapter;
 import com.mytips.Adapter.SpinnerProfile;
 import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
-import com.mytips.Preferences.Constants;
+import com.mytips.Utils.Constants;
+import com.mytips.Utils.DateUtils;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -57,6 +64,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     String selected_profileName;
     ArrayList<Profiles> profiles;
     TextView no_data;
+    String start_week;
+    String start_shift = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,10 +122,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         addDayArrayList = new ArrayList<>();
         addDayArrayList = databaseOperations.fetchAddDayDetails(context);
 
-        profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
 
-
-        updateSpinner(profiles);
 
 
         //  Log.i("add_daylist", String.valueOf(addDayArrayList.size()));
@@ -127,9 +133,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (profiles.size() > 0) {
+
 //                    selected_ProfileID = addDayArrayList.get(position).getId();
 //                    selected_profileName = addDayArrayList.get(position).getProfile();
                     selected_profileName = profiles.get(position).getProfile_name();
+                    start_week = profiles.get(position).getStartday();
+                    if (addDayArrayList.size() > 0) {
+                        start_shift = addDayArrayList.get(position).getStart_shift();
+                    }
                     updateView(addDayArrayList, selected_ProfileID, selected_profileName);
                 }
                 spinnerProfile.setSelection(position);
@@ -146,6 +157,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 spinnerReportType.setSelection(position);
+                changeData(parent.getSelectedItem().toString(), start_week, start_shift);
+
             }
 
             @Override
@@ -340,18 +353,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
             liveTips = addDayArrayList.get(i).getTotal_tips();
             if (!liveTips.equalsIgnoreCase("")) {
-                double t =Double.parseDouble(liveTips);
+                double t = Double.parseDouble(liveTips);
                 total_livetips = total_livetips + t;
             }
             tds = addDayArrayList.get(i).getTotal_tournament_downs();
             if (!tds.equalsIgnoreCase("")) {
-                double t =Double.parseDouble(tds);
+                double t = Double.parseDouble(tds);
                 tournament_totalTD = tournament_totalTD + t;
             }
 
             tipOut = addDayArrayList.get(i).getTip_out();
             if (!tipOut.equalsIgnoreCase("")) {
-                double t =Double.parseDouble(tipOut);
+                double t = Double.parseDouble(tipOut);
                 totalOuts = totalOuts + t;
             }
 
@@ -382,7 +395,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
     public void updateSpinner(ArrayList<Profiles> profilesArrayList) {
-        if (addDayArrayList.size() > 0) {
+        if (profilesArrayList.size() > 0) {
             SpinnerProfile profileAdapter = new SpinnerProfile(context, profilesArrayList);
             spinnerProfile.setAdapter(profileAdapter);
         } else {
@@ -390,5 +403,119 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             ArrayAdapter<String> profileAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, profiles_empty);
             spinnerProfile.setAdapter(profileAdapter);
         }
+    }
+
+    public void changeData(String spinner_selected, String start_week, String start_shift) {
+
+        ArrayList<AddDay> fetched_list;
+        String weekday_name = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(System.currentTimeMillis());
+
+        Log.i("weekday", weekday_name + " " + start_week);
+        if (spinner_selected.equalsIgnoreCase("Daily")) {
+
+        } else if (spinner_selected.equalsIgnoreCase("Weekly")) {
+
+            fetched_list = new ArrayList<>();
+
+//            int day = getDay(start_week);
+//            int day2 = getDay(weekday_name);
+//
+//            int days_diff = day2 - day;
+//            Date date = null;
+//            String pattern = "MMMM d, yyyy";
+//            if (!start_shift.equalsIgnoreCase("")) {
+//                try {
+//                    date = new SimpleDateFormat(pattern).parse(start_shift);
+//                } catch (ParseException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+
+            Date resetLastweek = DateUtils.resetLastweek(Constants.globaldate);
+            Date currentWeek = DateUtils.resetFromDate(Constants.globaldate);
+
+            long reset_week = resetLastweek.getTime();
+            long reset_current = currentWeek.getTime();
+
+            fetched_list = new DatabaseOperations(LandingActivity.this).fetchWeeklyData(reset_week, reset_current);
+            Log.i("fetched_list", fetched_list.toString());
+
+
+        } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
+
+        } else if (spinner_selected.equalsIgnoreCase("Monthly")) {
+
+        } else {
+
+        }
+    }
+
+    public int getDay(String start_week) {
+        int day = 0;
+
+        switch (start_week) {
+
+            case "Sunday":
+                day = 1;
+                break;
+            case "Monday":
+                day = 2;
+                break;
+            case "Tuesday":
+                day = 3;
+                break;
+            case "Wednesday":
+                day = 4;
+                break;
+            case "Thursday":
+                day = 5;
+                break;
+            case "Friday":
+                day = 6;
+                break;
+            case "Saturday":
+                day = 7;
+                break;
+
+        }
+        return day;
+    }
+
+    public static long daysBetween(Calendar startDate, Calendar endDate) {
+        Calendar start = Calendar.getInstance();
+        start.setTimeZone(startDate.getTimeZone());
+        start.setTimeInMillis(startDate.getTimeInMillis());
+
+        Calendar end = Calendar.getInstance();
+        end.setTimeZone(endDate.getTimeZone());
+        end.setTimeInMillis(endDate.getTimeInMillis());
+
+        // Set the copies to be at midnight, but keep the day information.
+
+        start.set(Calendar.HOUR_OF_DAY, 0);
+        start.set(Calendar.MINUTE, 0);
+        start.set(Calendar.SECOND, 0);
+        start.set(Calendar.MILLISECOND, 0);
+
+        end.set(Calendar.HOUR_OF_DAY, 0);
+        end.set(Calendar.MINUTE, 0);
+        end.set(Calendar.SECOND, 0);
+        end.set(Calendar.MILLISECOND, 0);
+
+        // At this point, each calendar is set to midnight on
+        // their respective days. Now use TimeUnit.MILLISECONDS to
+        // compute the number of full days between the two of them.
+
+        return TimeUnit.MILLISECONDS.toDays(
+                Math.abs(end.getTimeInMillis() - start.getTimeInMillis()));
+    }
+
+
+    @Override
+    protected void onResume() {
+
+        profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
+        updateSpinner(profiles);
+        super.onResume();
     }
 }

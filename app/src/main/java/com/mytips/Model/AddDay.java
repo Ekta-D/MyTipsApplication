@@ -8,6 +8,8 @@ import java.io.Serializable;
 
 public class AddDay implements Serializable {
 
+
+    String start_day_week;
     String profile;
     String start_shift;
     String check_in;
@@ -23,6 +25,25 @@ public class AddDay implements Serializable {
     String tournament_perday;
     String total_tournament_downs;
     int getting_tips;
+    long start_long;
+
+    public long getStart_long() {
+        return start_long;
+    }
+
+    public void setStart_long(long start_long) {
+        this.start_long = start_long;
+    }
+
+    public long getEnd_long() {
+        return end_long;
+    }
+
+    public void setEnd_long(long end_long) {
+        this.end_long = end_long;
+    }
+
+    long end_long;
 
     public int getGetting_tips() {
         return getting_tips;
@@ -31,12 +52,21 @@ public class AddDay implements Serializable {
     public void setGetting_tips(int getting_tips) {
         this.getting_tips = getting_tips;
     }
+
     public int getGettingg_tournamnts() {
         return gettingg_tournamnts;
     }
 
     public void setGettingg_tournamnts(int gettingg_tournamnts) {
         this.gettingg_tournamnts = gettingg_tournamnts;
+    }
+
+    public String getStart_day_week() {
+        return start_day_week;
+    }
+
+    public void setStart_day_week(String start_day_week) {
+        this.start_day_week = start_day_week;
     }
 
     int gettingg_tournamnts;

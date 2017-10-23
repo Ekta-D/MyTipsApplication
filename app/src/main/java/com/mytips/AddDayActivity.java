@@ -3,6 +3,7 @@ package com.mytips;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -36,7 +37,8 @@ import com.mytips.Interface.TipeeChecked;
 import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
-import com.mytips.Preferences.Constants;
+import com.mytips.Preferences.Preferences;
+import com.mytips.Utils.Constants;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -90,6 +92,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     AddDay addDay;
     String holiday_off_value = "";
     String calculated_wages_hourly = "";
+    String start_week;
+    long start_shift_long, end_shift_long;
+    int selected_timeformatIndex = 0;
+    SharedPreferences sharedPreferences;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -108,6 +114,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         findViewByIds();
 
+        selected_timeformatIndex = sharedPreferences.getInt("selected_time", 0);
 
         profilesArrayList = new ArrayList<>();
         profile_names = new ArrayList<>();
@@ -314,7 +321,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Profiles profile = profilesArrayList.get(position);
                 holiday_off_value = profile.getHoliday_pay();
-
+                start_week = profile.getStartday();
                 String wage = profile.getHourly_pay();
                 if (!wage.equalsIgnoreCase("")) {
 //                    wage_hourly = Integer.parseInt(wage);
@@ -337,6 +344,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void findViewByIds() {
+
+        sharedPreferences = AddDayActivity.this.getSharedPreferences("Pref", MODE_PRIVATE);
         fetchedTipees = (ListView) findViewById(R.id.list_view_tipees);
         equal_label = (TextView) findViewById(R.id.textView25);
         multiply_label = (TextView) findViewById(R.id.textView24);
@@ -407,6 +416,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             Date date = start_date1.getTime();
                             Date date1 = end_date1.getTime();
 
+                            start_shift_long = date.getTime();
+                            end_shift_long = date1.getTime();
 
                             result = datesDifference(date, date1);
 
@@ -428,6 +439,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         Date date = start_date1.getTime();
                         Date date1 = end_date1.getTime();
 
+                        start_shift_long = date.getTime();
+                        end_shift_long = date1.getTime();
 
                         result = datesDifference(date, date1);
 
@@ -775,7 +788,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             edittext_clockIn.getText().toString().trim(), editText_endShift.getText().toString().trim(), edittext_clockOut.getText().toString().trim(),
                             texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                             total_tipout.getText().toString().trim(), edittext_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
-                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament);
+                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, start_shift_long, end_shift_long);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -792,7 +805,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             edittext_clockIn.getText().toString().trim(), editText_endShift.getText().toString().trim(), edittext_clockOut.getText().toString().trim(),
                             texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                             total_tipout.getText().toString().trim(), edittext_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
-                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament);
+                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, start_shift_long, end_shift_long);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1135,7 +1148,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         calculated_wages_hourly = String.valueOf(finalEarning);
         if (holidayPay == 1) {
             if (holiday_payoff_data.equalsIgnoreCase("Time and a Half")) {
-                double val = earnings / 2;
+                double val = finalEarning / 2;
                 if (holidayPay == 1) {
                     finalEarning = finalEarning + val;
                 } else {
@@ -1145,7 +1158,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
             } else if (holiday_payoff_data.equalsIgnoreCase("Double Pay")) {
 
-                double val = earnings * 2;
+                double val = finalEarning;
 
                 if (holidayPay == 1) {
                     finalEarning = finalEarning + val;

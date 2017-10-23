@@ -15,10 +15,7 @@ import android.widget.TextView;
 
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.TipeeInfo;
-import com.mytips.Preferences.Constants;
-import com.mytips.Preferences.Preferences;
 import com.mytips.R;
-import com.mytips.SettingsActivity;
 
 import java.util.ArrayList;
 

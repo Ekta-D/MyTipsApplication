@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -24,23 +23,19 @@ import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 
 import com.mytips.Adapter.AddTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
-import com.mytips.Database.DatabaseUtils;
 import com.mytips.Model.TipeeInfo;
-import com.mytips.Preferences.Constants;
+import com.mytips.Utils.Constants;
 import com.mytips.Preferences.Preferences;
 
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
 
 /**

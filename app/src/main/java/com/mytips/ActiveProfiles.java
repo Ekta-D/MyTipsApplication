@@ -2,7 +2,6 @@ package com.mytips;
 
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -14,14 +13,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.CursorAdapter;
 import android.widget.ListView;
 
 import com.mytips.Adapter.ActiveProfileAdapter;
 import com.mytips.Database.DatabaseOperations;
-import com.mytips.Database.DatabaseUtils;
 import com.mytips.Model.Profiles;
-import com.mytips.Preferences.Constants;
+import com.mytips.Utils.Constants;
 
 import java.util.ArrayList;
 
