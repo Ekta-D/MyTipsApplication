@@ -360,7 +360,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     tempIndex = 2;
                 } else if (index == 0) {
                     tempIndex = 1;
-
                 } else {
                     tempIndex = 0;
                 }
@@ -463,8 +462,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                Intent intent = new Intent(SettingsActivity.this, SetPasscode.class);
-                startActivity(intent);
+                /*Intent intent = new Intent(SettingsActivity.this, SetPasscode.class);
+                startActivity(intent);*/
                 return true;
             }
         });

@@ -67,7 +67,7 @@
 
     <RelativeLayout
         android:layout_width="0dp"
-
+        android:id="@+id/no_data_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="0dp"
         android:layout_marginEnd="2dp"
@@ -88,10 +88,11 @@
 
         <TextView
             android:id="@+id/no_data_landing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
+            android:gravity="center"
             android:text="No Data found"
             android:textSize="20dp"
             android:visibility="visible" />

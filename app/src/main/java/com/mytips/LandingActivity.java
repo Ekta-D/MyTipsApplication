@@ -10,12 +10,15 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.Window;
@@ -89,6 +92,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         no_data = (TextView) findViewById(R.id.no_data_landing);
+        no_data.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                hideRevealView();
+                return false;
+            }
+        });
         setSupportActionBar(toolbar);
 
         CommonMethods.setTheme(getSupportActionBar(), LandingActivity.this);
@@ -128,11 +138,27 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         addDayArrayList = new ArrayList<>();
         addDayArrayList = databaseOperations.fetchAddDayDetails(context);
 
-
         //  Log.i("add_daylist", String.valueOf(addDayArrayList.size()));
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, reportTypeArray);
         spinnerReportType.setAdapter(typeAdapter);
 
+        spinnerProfile.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(hidden){
+                    spinnerProfile.setEnabled(true);
+                    spinnerReportType.setEnabled(true);
+                    spinnerProfile.setClickable(true);
+                    spinnerReportType.setClickable(true);
+                } else {
+                    spinnerProfile.setEnabled(false);
+                    spinnerReportType.setEnabled(false);
+                    spinnerProfile.setClickable(false);
+                    spinnerReportType.setClickable(false);
+                }
+                return false;
+            }
+        });
         spinnerProfile.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -154,6 +180,24 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
+
+        spinnerReportType.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if(hidden){
+                    spinnerProfile.setEnabled(true);
+                    spinnerReportType.setEnabled(true);
+                    spinnerProfile.setClickable(true);
+                    spinnerReportType.setClickable(true);
+                } else {
+                    spinnerProfile.setEnabled(false);
+                    spinnerReportType.setEnabled(false);
+                    spinnerProfile.setClickable(false);
+                    spinnerReportType.setClickable(false);
+                }
+                return false;
             }
         });
 
@@ -228,6 +272,11 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (mRevealView.getVisibility() == View.VISIBLE) {
             mRevealView.setVisibility(View.GONE);
             hidden = true;
+
+            spinnerProfile.setEnabled(true);
+            spinnerReportType.setEnabled(true);
+            spinnerProfile.setClickable(true);
+            spinnerReportType.setClickable(true);
         }
     }
 
@@ -524,4 +573,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 Math.abs(end.getTimeInMillis() - start.getTimeInMillis()));
     }
 
+    @Override
+    public void onBackPressed() {
+
+        if(mRevealView.getVisibility()==View.VISIBLE){
+            hideRevealView();
+        } else
+            super.onBackPressed();
+    }
 }
