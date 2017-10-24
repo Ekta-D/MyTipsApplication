@@ -70,11 +70,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     TextView no_data;
     String start_week;
     String start_shift = "";
+    SharedPreferences sharedPreferences;
+
+    int default_date_format = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
+
+
+        sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
+        default_date_format = sharedPreferences.getInt("selected_date", 2);
 
         context = LandingActivity.this;
         databaseOperations = new DatabaseOperations(LandingActivity.this);
@@ -120,8 +127,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         addDayArrayList = new ArrayList<>();
         addDayArrayList = databaseOperations.fetchAddDayDetails(context);
-
-
 
 
         //  Log.i("add_daylist", String.valueOf(addDayArrayList.size()));
@@ -211,7 +216,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         CommonMethods.setTheme(getSupportActionBar(), LandingActivity.this);
     }
-
 
 
     @Override
@@ -329,7 +333,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (selectedProfile.size() > 0) {
             mListView.setVisibility(View.VISIBLE);
             //     dashboard_bottm.setVisibility(View.VISIBLE);
-            adapter = new SummaryAdapter(LandingActivity.this, selectedProfile);
+            adapter = new SummaryAdapter(default_date_format,LandingActivity.this, selectedProfile);
             mListView.setAdapter(adapter);
             no_data.setVisibility(View.GONE);
             updateBottom(selectedProfile);

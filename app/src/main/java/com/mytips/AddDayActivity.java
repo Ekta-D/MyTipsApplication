@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -98,6 +99,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     int selected_timeformatIndex = 0;
     SharedPreferences sharedPreferences;
     int default_date_format = 0;
+    Toolbar toolbar;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -345,6 +347,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
 
+        toolbar = (Toolbar) findViewById(R.id.day_toolbar);
+        this.setSupportActionBar(toolbar);
+
         fetchedTipees = (ListView) findViewById(R.id.list_view_tipees);
         equal_label = (TextView) findViewById(R.id.textView25);
         multiply_label = (TextView) findViewById(R.id.textView24);
@@ -541,7 +546,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         return time;
     }
 
-    public String getDatePicker(int format_index, final int viewId) {
+    String date_format = "MMMM d, yyyy";
+
+    public String getDatePicker(final int format_index, final int viewId) {
 
         // Infalating Dialog for Date Picker
         final Dialog datePicker = new Dialog(AddDayActivity.this);
@@ -549,6 +556,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View viewDatePicker = inflater.inflate(R.layout.date_picker, null);
         datePicker.setContentView(viewDatePicker);
+
+        if (format_index == 2) {
+            date_format = "MM/dd/yyyy";
+        } else if (format_index == 1) {
+            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+        } else {
+            date_format = "MMM dd,yyyy";
+        }
 
         // Getting date from Calendar View
         final CalendarView calendar = (CalendarView) viewDatePicker
@@ -582,17 +597,18 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         + String.valueOf(year);
                 System.out.println("Selected date: " + selectedDate);
 
-                date = new SimpleDateFormat("MMMM d, yyyy").format(new Date(
+
+                date = new SimpleDateFormat(date_format).format(new Date(
                         selectedDate));
 
 
-                SimpleDateFormat sdfDate = new SimpleDateFormat("MMMM d, yyyy");
+                SimpleDateFormat sdfDate = new SimpleDateFormat(date_format);
                 String currentDateString = sdfDate.format(new Date());
                 Date currentDate = null;
                 Date parsedStartDate = null;
 
                 start_date = selectedDate;
-                String date1 = new SimpleDateFormat("MM/dd/yyyy").format(new Date(selectedDate));
+                String date1 = new SimpleDateFormat(date_format).format(new Date(selectedDate));
                 end_date = date1;
                 try {
                     currentDate = sdfDate.parse(currentDateString);
@@ -618,13 +634,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 //                        editText_endShift.setText("Set End Date");
 //                    }
 //                } else {
-                date = new SimpleDateFormat("MMMM d, yyyy")
+                date = new SimpleDateFormat(date_format)
                         .format(new Date(date));
                 if (viewId == R.id.editText_start_shift) {
                     start_date = selectedDate;
                     editText_startShift.setText(selectedDate);
                 } else if (viewId == R.id.editText_end_shift) {
-                    date1 = new SimpleDateFormat("MM/dd/yyyy").format(new Date(date));
+                    date1 = new SimpleDateFormat(date_format).format(new Date(date));
                     end_date = date1;
 //                        end_date = date;
                     editText_endShift.setText(date);
@@ -653,7 +669,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     String currentDate = String.valueOf(startMonth) + "/"
                             + String.valueOf(startDay) + "/"
                             + String.valueOf(startYear);
-                    date = new SimpleDateFormat("MMMM d, yyyy")
+                    date = new SimpleDateFormat(date_format)
                             .format(new Date(currentDate));
                     editText_startShift.setText(date);
 
@@ -668,7 +684,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     String currentDate = String.valueOf(endMonth) + "/"
                             + String.valueOf(endDay) + "/"
                             + String.valueOf(endYear);
-                    date = new SimpleDateFormat("MMMM d, yyyy")
+                    date = new SimpleDateFormat(date_format)
                             .format(new Date(currentDate));
 
                     editText_endShift.setText(date);
@@ -683,7 +699,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         }
                     } else {
                         try {
-                            date = new SimpleDateFormat("MMMM d, yyyy")
+                            date = new SimpleDateFormat(date_format)
                                     .format(new Date(selectedDate));
                         } catch (IllegalArgumentException ex) {
                             ex.printStackTrace();
@@ -1293,7 +1309,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        CommonMethods.setTheme(getSupportActionBar(), AddDayActivity.this);
+
+    }
 }
 
 

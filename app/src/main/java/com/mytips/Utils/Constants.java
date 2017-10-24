@@ -12,4 +12,6 @@ public class Constants {
     public static final String ProfileData = "profile_data";
     public static final String AddDayProfile = "add_day_profile_data";
     public static final String TimeFormat = "time_format";
+    public static final String PasswordKey = "password_key";
+
 }

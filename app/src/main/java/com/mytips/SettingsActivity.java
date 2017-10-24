@@ -56,7 +56,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
      * to reflect its new value.
      */
     double tipee_percent;
-
     String tipee_name_tipout;
     SharedPreferences sharedPreferences;
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
@@ -152,6 +151,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 //        setHasOptionsMenu(true);
         final EditTextPreference editTextPreference_name, editTextPreference_email;
         Preference editTextPreference_show_add_tipee;
+        final Preference preference_set_passcode;
         final ListPreference date_list, time_list, currency_list, theme_list;
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences
         // to their values. When their values change, their summaries are
@@ -456,6 +456,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
         });
 
+
+        preference_set_passcode = (Preference) findPreference("get_passcode");
+
+        preference_set_passcode.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+
+                Intent intent = new Intent(SettingsActivity.this, SetPasscode.class);
+                startActivity(intent);
+                return true;
+            }
+        });
     }
 
     /**

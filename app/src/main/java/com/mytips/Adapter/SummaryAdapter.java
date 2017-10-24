@@ -28,11 +28,12 @@ public class SummaryAdapter extends BaseAdapter {
     Context context;
     ArrayList<AddDay> addDayArrayList;
     LayoutInflater inflater;
+    int index;
 
-    public SummaryAdapter(Context context, ArrayList<AddDay> addDayArrayList) {
+    public SummaryAdapter(int index, Context context, ArrayList<AddDay> addDayArrayList) {
         this.context = context;
         this.addDayArrayList = addDayArrayList;
-
+        this.index = index;
     }
 
     @Override
@@ -153,7 +154,15 @@ public class SummaryAdapter extends BaseAdapter {
     }
 
     public String getDate(String date) throws ParseException {
-        Date d = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH).parse(date);
+        String date_format = "MMMM dd, yyyy";
+        if (index == 2) {
+            date_format = "MM/dd/yyyy";
+        } else if (index == 1) {
+            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+        } else {
+            date_format = "MMM dd,yyyy";
+        }
+        Date d = new SimpleDateFormat(date_format, Locale.ENGLISH).parse(date);
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);
         String monthName = new SimpleDateFormat("dd").format(cal.getTime());
@@ -161,7 +170,15 @@ public class SummaryAdapter extends BaseAdapter {
     }
 
     public String getMonth(String date) throws ParseException {
-        Date d = new SimpleDateFormat("MMMM dd, yyyy", Locale.ENGLISH).parse(date);
+        String date_format = "MMMM dd, yyyy";
+        if (index == 2) {
+            date_format = "MM/dd/yyyy";
+        } else if (index == 1) {
+            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+        } else {
+            date_format = "MMM dd,yyyy";
+        }
+        Date d = new SimpleDateFormat(date_format, Locale.ENGLISH).parse(date);
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);
         String monthName = new SimpleDateFormat("MMM").format(cal.getTime());

@@ -35,7 +35,7 @@ public class SplashActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash);
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
-        if(sharedPreferences!=null)
+        if (sharedPreferences != null)
             isFirstTime = sharedPreferences.getBoolean(ISFIRST_TIME, false);
 
         CommonMethods.setTheme(getSupportActionBar(), SplashActivity.this);
@@ -48,26 +48,26 @@ public class SplashActivity extends AppCompatActivity {
                 EditText name = (EditText) findViewById(R.id.et_name);
                 EditText email = (EditText) findViewById(R.id.et_email);
 
-                if(!name.getText().toString().trim().equals("") && !email.getText().toString().trim().equals("")){
+                if (!name.getText().toString().trim().equals("") && !email.getText().toString().trim().equals("")) {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("user_name", name.getText().toString().trim());
                     editor.putString("user_email", email.getText().toString().trim());
                     editor.commit();
                     startActivity(new Intent(getBaseContext(), LandingActivity.class));
                     finish();
-                } else if(name.getText().toString().trim().equals("")){
+                } else if (name.getText().toString().trim().equals("")) {
                     name.setError("Name is required");
-                } else if(email.getText().toString().trim().equals("")){
+                } else if (email.getText().toString().trim().equals("")) {
                     email.setError("Email is required");
                 }
             }
         });
-        if(!isFirstTime){
+        if (!isFirstTime) {
             checkPermissions();
         }
-        if (!sharedPreferences.getString("user_name","").equals("")) {
+        if (!sharedPreferences.getString("user_name", "").equals("")) {
             hideViews();
-            new Handler().postDelayed(new Runnable(){
+            new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     startActivity(new Intent(getBaseContext(), LandingActivity.class));
@@ -90,7 +90,7 @@ public class SplashActivity extends AppCompatActivity {
         int storagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
         int camera_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-
+        int finger_print=ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
         List<String> listPermissionsNeeded = new ArrayList<>();
 
         if (storagePermission != PackageManager.PERMISSION_GRANTED) {
@@ -103,6 +103,10 @@ public class SplashActivity extends AppCompatActivity {
             listPermissionsNeeded.add(Manifest.permission.CAMERA);
         }
 
+        if (finger_print!=PackageManager.PERMISSION_GRANTED)
+        {
+            listPermissionsNeeded.add(Manifest.permission.USE_FINGERPRINT);
+        }
 
         if (!listPermissionsNeeded.isEmpty()) {
             ActivityCompat.requestPermissions(this,

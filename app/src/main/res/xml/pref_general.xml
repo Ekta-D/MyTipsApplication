@@ -102,7 +102,7 @@
         android:title="@string/data_backup">
 
 
-        <EditTextPreference
+        <Preference
             android:capitalize="words"
             android:inputType="textCapWords"
             android:key="backup_restore"
@@ -111,7 +111,7 @@
             android:singleLine="true"
             android:title="@string/backup_restore" />
 
-        <EditTextPreference
+        <Preference
             android:capitalize="words"
             android:inputType="textCapWords"
             android:key="get_passcode"
