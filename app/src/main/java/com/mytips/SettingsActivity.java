@@ -1,12 +1,16 @@
 package com.mytips;
 
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.hardware.fingerprint.FingerprintManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -16,10 +20,12 @@ import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,6 +34,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.mytips.Adapter.AddTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
@@ -142,7 +149,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         super.onCreate(savedInstanceState);
 
         setupActionBar();
-
         CommonMethods.setTheme(getSupportActionBar(), SettingsActivity.this);
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
@@ -462,8 +468,96 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
-                /*Intent intent = new Intent(SettingsActivity.this, SetPasscode.class);
-                startActivity(intent);*/
+//               Intent intent = new Intent(SettingsActivity.this, SetPasscode.class);
+//                startActivity(intent);
+                final Dialog dialog1 = new Dialog(SettingsActivity.this);
+                dialog1.setContentView(R.layout.activity_set_passcode);
+
+                Button btn_setpasscode, btn_setfingerprint, btn_resetpasscode, btn_removepasscode;
+
+                String stored_password = sharedPreferences.getString(Constants.ConfirmKey, "");
+
+                btn_setpasscode = (Button) dialog1.findViewById(R.id.btn_set_passcode);
+                btn_setfingerprint = (Button) dialog1.findViewById(R.id.btn_fingerprint);
+                btn_resetpasscode = (Button) dialog1.findViewById(R.id.btn_reset_passcode);
+                btn_removepasscode = (Button) dialog1.findViewById(R.id.btn_remove_passcode);
+
+                if (stored_password.equalsIgnoreCase("")) {
+                    btn_resetpasscode.setVisibility(View.GONE);
+                    btn_removepasscode.setVisibility(View.GONE);
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    //Fingerprint API only available on from Android 6.0 (M)
+                    FingerprintManager fingerprintManager = (FingerprintManager) SettingsActivity.this.getSystemService(Context.FINGERPRINT_SERVICE);
+                    if (ActivityCompat.checkSelfPermission(SettingsActivity.this, Manifest.permission.USE_FINGERPRINT) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+
+                    }
+                    if (!fingerprintManager.isHardwareDetected()) {
+                        // Device doesn't support fingerprint authentication
+                        Toast.makeText(SettingsActivity.this, "Sorry! Device doesn't support fingerprint authentication", Toast.LENGTH_SHORT).show();
+                        btn_setfingerprint.setVisibility(View.GONE);
+
+                    } else if (!fingerprintManager.hasEnrolledFingerprints()) {
+                        // User hasn't enrolled any fingerprints to authenticate with
+                        Toast.makeText(SettingsActivity.this, "Please provide authentication for fingerprints", Toast.LENGTH_SHORT).show();
+                        btn_setfingerprint.setVisibility(View.GONE);
+
+                    } else {
+                        // Everything is ready for fingerprint authentication
+                    }
+                }
+                btn_setpasscode.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(SettingsActivity.this, SetPassword.class));
+                        dialog1.dismiss();
+                    }
+                });
+
+
+                btn_resetpasscode.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        startActivity(new Intent(SettingsActivity.this, SetPassword.class));
+                        dialog1.dismiss();
+                    }
+                });
+                btn_removepasscode.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        final SharedPreferences.Editor editor = sharedPreferences.edit();
+                        AlertDialog.Builder al = new AlertDialog.Builder(SettingsActivity.this);
+                        al.setTitle("Please confirm!");
+                        al.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                editor.remove(Constants.ConfirmKey);
+                                editor.remove(Constants.PasswordKey);
+                                editor.commit();
+                                dialog1.dismiss();
+
+                            }
+                        });
+                        al.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                dialog1.dismiss();
+                            }
+                        });
+
+                        AlertDialog alertDialog = al.create();
+                        alertDialog.show();
+                    }
+                });
+                dialog1.show();
                 return true;
             }
         });

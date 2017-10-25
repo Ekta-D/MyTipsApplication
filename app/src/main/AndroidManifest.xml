@@ -58,7 +58,13 @@
         <activity
             android:name=".SetPassword"
             android:label="Security"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ConfirmPassword"
+            android:label="Confirm Password"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize"/>
     </application>
 
 </manifest>

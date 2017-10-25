@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -7,21 +7,40 @@
     tools:context="com.mytips.SetPasscode">
 
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+      android:layout_margin="20dp"
+        android:layout_height="wrap_content">
     <Button
         android:id="@+id/btn_set_passcode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
-        android:text="Set a Passcode"
-        app:layout_constraintLeft_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_editor_absoluteX="30dp" />
+        android:text="Set a Passcode" />
 
     <Button
         android:id="@+id/btn_fingerprint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set Fingerprint"
-        app:layout_constraintTop_toBottomOf="@+id/btn_set_passcode"
-        android:layout_marginTop="8dp" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_below="@+id/btn_set_passcode"
+        android:layout_marginTop="20dp"
+        android:text="Set Fingerprint" />
+
+    <Button
+        android:id="@+id/btn_reset_passcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_fingerprint"
+        android:layout_marginTop="20dp"
+        android:text="Reset Passcode"
+        />
+
+    <Button
+        android:id="@+id/btn_remove_passcode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_reset_passcode"
+        android:layout_marginTop="20dp"
+        android:text="Remove Passcode"
+       />
+    </RelativeLayout>
+</RelativeLayout>

@@ -119,4 +119,5 @@
 
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="textview_setpasscode">Set your Password</string>
+    <string name="confirm_pass">Confirm Password</string>
 </resources>
