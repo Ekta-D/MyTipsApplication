@@ -383,8 +383,8 @@ public class DatabaseOperations {
                     addDay.setGetting_tips(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTips)));
                     addDay.setGettingg_tournamnts(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTournamentDown)));
                     addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
-                    addDay.setStart_long(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
-                    addDay.setEnd_long(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
+                    addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
+                    addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
                     addDayArrayList.add(addDay);
                 }
                 while (cursor.moveToNext());
@@ -431,12 +431,12 @@ public class DatabaseOperations {
 
     }
 
-    public ArrayList<AddDay> fetchWeeklyData(long resetfrom, long resetTo) {
+    public ArrayList<AddDay> fetchDataBetweenDates(long resetfrom, long resetTo) {
         ArrayList<AddDay> fetched_data = new ArrayList<>();
 
         AddDay addDay = null;
         Cursor cursor = null;
-        String query = "select * from  add_table where start_shift_long >= '" + resetfrom + "' AND   start_shift_long<='" + resetTo + "'";
+        String query = "select * from  add_table where start_shift_long >= '" + resetfrom + "' AND   start_shift_long<='" + resetTo + "' Order By start_shift_long";
         try {
             cursor = db.rawQuery(query, null);
         } catch (Exception e) {
@@ -473,8 +473,9 @@ public class DatabaseOperations {
                         addDay.setGetting_tips(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTips)));
                         addDay.setGettingg_tournamnts(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTournamentDown)));
                         addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
+                        addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
+                        addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
                         fetched_data.add(addDay);
-
                     }
                     while (cursor.moveToNext());
                 }
@@ -484,9 +485,109 @@ public class DatabaseOperations {
 
         return fetched_data;
 
-
     }
 
+    public ArrayList<AddDay> fetchDailyData(String date) {
+        ArrayList<AddDay> daily_data = new ArrayList<>();
+        AddDay addDay = null;
+        Cursor cursor = null;
+        String query = "select * from  add_table where start_shift = '" + date + "'";
+        try {
+            cursor = db.rawQuery(query, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int cursor_count = 0;
 
+        if (cursor != null) {
+            cursor_count = cursor.getCount();
 
+            if (cursor_count != 0) {
+                if (cursor.moveToFirst()) {
+                    do {
+
+                        addDay = new AddDay();
+                        addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
+                        addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
+                        addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
+                        addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
+                        addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
+                        addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
+                        addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
+                        addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
+                        addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
+                        addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
+                        addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
+                        addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
+                        addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
+                        addDay.setCheck_in(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
+                        addDay.setCheck_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
+                        addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
+                        addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
+                        addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
+                        addDay.setGetting_tips(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTips)));
+                        addDay.setGettingg_tournamnts(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTournamentDown)));
+                        addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
+                        addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
+                        addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
+                        daily_data.add(addDay);
+                    }
+                    while (cursor.moveToNext());
+                }
+            }
+        }
+        return daily_data;
+    }
+
+    public ArrayList<AddDay> yearlyData(String year) {
+        ArrayList<AddDay> fetched_data = new ArrayList<>();
+        AddDay addDay = null;
+        Cursor cursor = null;
+        String query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%'  Order By start_shift_long";
+        try {
+            cursor = db.rawQuery(query, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int cursor_count = 0;
+
+        if (cursor != null) {
+            cursor_count = cursor.getCount();
+
+            if (cursor_count != 0) {
+                if (cursor.moveToFirst()) {
+                    do {
+
+                        addDay = new AddDay();
+                        addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
+                        addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
+                        addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
+                        addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
+                        addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
+                        addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
+                        addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
+                        addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
+                        addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
+                        addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
+                        addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
+                        addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
+                        addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
+                        addDay.setCheck_in(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
+                        addDay.setCheck_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
+                        addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
+                        addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
+                        addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
+                        addDay.setGetting_tips(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTips)));
+                        addDay.setGettingg_tournamnts(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTournamentDown)));
+                        addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
+                        addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
+                        addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
+                        fetched_data.add(addDay);
+                    }
+                    while (cursor.moveToNext());
+                }
+            }
+        }
+        return fetched_data;
+    }
 }

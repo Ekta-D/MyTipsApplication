@@ -87,13 +87,13 @@ public class SummaryAdapter extends BaseAdapter {
 
         String date = "";
         try {
-            date = getDate(addDayArrayList.get(position).getStart_shift());
+            date = getDate(addDayArrayList.get(position).getStart_long());
         } catch (ParseException e) {
             e.printStackTrace();
         }
         String month = "";
         try {
-            month = getMonth(addDayArrayList.get(position).getStart_shift());
+            month = getMonth(addDayArrayList.get(position).getEnd_long());
         } catch (ParseException e) {
             e.printStackTrace();
         }
@@ -153,7 +153,7 @@ public class SummaryAdapter extends BaseAdapter {
         return convertView;
     }
 
-    public String getDate(String date) throws ParseException {
+    public String getDate(long date) throws ParseException {
         String date_format = "MMMM dd, yyyy";
         if (index == 2) {
             date_format = "MM/dd/yyyy";
@@ -162,14 +162,16 @@ public class SummaryAdapter extends BaseAdapter {
         } else {
             date_format = "MMM dd,yyyy";
         }
-        Date d = new SimpleDateFormat(date_format, Locale.ENGLISH).parse(date);
+        Date d = new Date(date);
+        //  Date d = new SimpleDateFormat(date_format, Locale.ENGLISH).parse(date);
+
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);
         String monthName = new SimpleDateFormat("dd").format(cal.getTime());
         return monthName;
     }
 
-    public String getMonth(String date) throws ParseException {
+    public String getMonth(long date) throws ParseException {
         String date_format = "MMMM dd, yyyy";
         if (index == 2) {
             date_format = "MM/dd/yyyy";
@@ -178,7 +180,8 @@ public class SummaryAdapter extends BaseAdapter {
         } else {
             date_format = "MMM dd,yyyy";
         }
-        Date d = new SimpleDateFormat(date_format, Locale.ENGLISH).parse(date);
+        Date d = new Date(date);
+        // Date d = new SimpleDateFormat(date_format, Locale.ENGLISH).parse(date);
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);
         String monthName = new SimpleDateFormat("MMM").format(cal.getTime());

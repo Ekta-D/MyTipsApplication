@@ -6,12 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,8 +16,6 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
-import android.view.Window;
-import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -40,15 +33,14 @@ import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
-import com.mytips.Utils.DateUtils;
 
-import java.text.ParseException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -76,6 +68,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     SharedPreferences sharedPreferences;
 
     int default_date_format = 0;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +138,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         spinnerProfile.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(hidden){
+                if (hidden) {
                     spinnerProfile.setEnabled(true);
                     spinnerReportType.setEnabled(true);
                     spinnerProfile.setClickable(true);
@@ -186,7 +179,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         spinnerReportType.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                if(hidden){
+                if (hidden) {
                     spinnerProfile.setEnabled(true);
                     spinnerReportType.setEnabled(true);
                     spinnerProfile.setClickable(true);
@@ -382,7 +375,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (selectedProfile.size() > 0) {
             mListView.setVisibility(View.VISIBLE);
             //     dashboard_bottm.setVisibility(View.VISIBLE);
-            adapter = new SummaryAdapter(default_date_format,LandingActivity.this, selectedProfile);
+            adapter = new SummaryAdapter(default_date_format, LandingActivity.this, selectedProfile);
             mListView.setAdapter(adapter);
             no_data.setVisibility(View.GONE);
             updateBottom(selectedProfile);
@@ -469,6 +462,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void changeData(String spinner_selected, String start_week, String start_shift) {
+        String date_format = "";
+        if (default_date_format == 2) {
+            date_format = "MM/dd/yyyy";
+        } else if (default_date_format == 1) {
+            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+        } else {
+            date_format = "MMM dd,yyyy";
+        }
 
         ArrayList<AddDay> fetched_list;
         String weekday_name = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(System.currentTimeMillis());
@@ -476,40 +477,147 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         Log.i("weekday", weekday_name + " " + start_week);
         if (spinner_selected.equalsIgnoreCase("Daily")) {
 
-        } else if (spinner_selected.equalsIgnoreCase("Weekly")) {
+            Calendar cal = Calendar.getInstance();
+            Date date = cal.getTime();
 
+            String current_date = new SimpleDateFormat(date_format).format(date);
             fetched_list = new ArrayList<>();
+            fetched_list = new DatabaseOperations(LandingActivity.this).fetchDailyData(current_date);
+            if (fetched_list.size() > 0) {
+                setAdapter(fetched_list);
+            }
 
-//            int day = getDay(start_week);
-//            int day2 = getDay(weekday_name);
-//
-//            int days_diff = day2 - day;
-//            Date date = null;
-//            String pattern = "MMMM d, yyyy";
-//            if (!start_shift.equalsIgnoreCase("")) {
-//                try {
-//                    date = new SimpleDateFormat(pattern).parse(start_shift);
-//                } catch (ParseException e) {
-//                    e.printStackTrace();
-//                }
-//            }
 
-            Date resetLastweek = DateUtils.resetLastweek(Constants.globaldate);
-            Date currentWeek = DateUtils.resetFromDate(Constants.globaldate);
+        } else if (spinner_selected.equalsIgnoreCase("Weekly")) {
+            fetched_list = new ArrayList<>();
+            int start_day = getDay(start_week);
 
-            long reset_week = resetLastweek.getTime();
-            long reset_current = currentWeek.getTime();
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.set(Calendar.DAY_OF_WEEK, start_day);
 
-            fetched_list = new DatabaseOperations(LandingActivity.this).fetchWeeklyData(reset_week, reset_current);
-            Log.i("fetched_list", fetched_list.toString());
+            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+            ArrayList<String> string_dates = new ArrayList<>();
+            ArrayList<Long> dates = new ArrayList<>();
+            for (int i = 0; i < 7; i++) {
+
+                String str_date = dateFormat.format(calendar1.getTime().getTime());
+
+                Date date = calendar1.getTime();
+                long lon = date.getTime();
+
+                calendar1.add(Calendar.DATE, 1);
+
+                string_dates.add(str_date);
+
+
+                dates.add(lon);
+            }
+            long reset_next_week = 0;
+            long reset_current = 0;
+            if (dates.size() > 0) {
+
+                reset_current = dates.get(0);
+                reset_next_week = dates.get(6);
+                fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week);
+
+                if (fetched_list.size() > 0) {
+                    setAdapter(fetched_list);
+                }
+            }
 
 
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
 
+            fetched_list = new ArrayList<>();
+            int start_day = getDay(start_week);
+
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.set(Calendar.DAY_OF_WEEK, start_day);
+
+            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+            ArrayList<String> string_dates = new ArrayList<>();
+            ArrayList<Long> dates = new ArrayList<>();
+            for (int i = 0; i < 15; i++) {
+
+                String str_date = dateFormat.format(calendar1.getTime().getTime());
+
+                Date date = calendar1.getTime();
+                long lon = date.getTime();
+
+                calendar1.add(Calendar.DATE, 1);
+
+                string_dates.add(str_date);
+
+
+                dates.add(lon);
+            }
+            Log.i("string_dates", string_dates.toString());
+
+            long reset_next_week = 0;
+            long reset_current = 0;
+            if (dates.size() > 0) {
+
+                reset_current = dates.get(0);
+                reset_next_week = dates.get(14);
+                fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week);
+
+                if (fetched_list.size() > 0) {
+                    setAdapter(fetched_list);
+                }
+            }
+
         } else if (spinner_selected.equalsIgnoreCase("Monthly")) {
+            Calendar cal = Calendar.getInstance();
+            int month = cal.get(Calendar.MONTH);
+
+            Calendar cal1 = Calendar.getInstance();
+
+            cal1.set(Calendar.MONTH, month);
+
+            int start_month = cal1.get(Calendar.MONTH); // 0 for jan and 11 for Dec
+            int year = cal1.get(Calendar.YEAR);
+            int days = numDays(start_month, year);
+
+
+            Calendar start_calendar = Calendar.getInstance();
+            start_calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+
+            Calendar end_calendar = Calendar.getInstance();
+            if (days == 28) {
+                end_calendar.set(Calendar.DAY_OF_MONTH, 28);
+            } else if (days == 29) {
+                end_calendar.set(Calendar.DAY_OF_MONTH, 29);
+            } else if (days == 30) {
+                end_calendar.set(Calendar.DAY_OF_MONTH, 30);
+            } else {
+                end_calendar.set(Calendar.DAY_OF_MONTH, 31);
+            }
+
+
+            Date start_date = start_calendar.getTime();
+            long start_date_long = start_date.getTime();
+
+            Date end_date = end_calendar.getTime();
+            long end_date_long = end_date.getTime();
+
+
+            fetched_list = new ArrayList<>();
+            fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long);
+            if (fetched_list.size() > 0) {
+                setAdapter(fetched_list);
+            }
 
         } else {
+            fetched_list = new ArrayList<>();
+            Calendar cal = Calendar.getInstance();
+            int year = cal.get(Calendar.YEAR);
+            String years = String.valueOf(year);
 
+            fetched_list = new DatabaseOperations(LandingActivity.this).yearlyData(years);
+            if (fetched_list.size() > 0) {
+                setAdapter(fetched_list);
+            }
         }
     }
 
@@ -544,41 +652,24 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         return day;
     }
 
-    public static long daysBetween(Calendar startDate, Calendar endDate) {
-        Calendar start = Calendar.getInstance();
-        start.setTimeZone(startDate.getTimeZone());
-        start.setTimeInMillis(startDate.getTimeInMillis());
-
-        Calendar end = Calendar.getInstance();
-        end.setTimeZone(endDate.getTimeZone());
-        end.setTimeInMillis(endDate.getTimeInMillis());
-
-        // Set the copies to be at midnight, but keep the day information.
-
-        start.set(Calendar.HOUR_OF_DAY, 0);
-        start.set(Calendar.MINUTE, 0);
-        start.set(Calendar.SECOND, 0);
-        start.set(Calendar.MILLISECOND, 0);
-
-        end.set(Calendar.HOUR_OF_DAY, 0);
-        end.set(Calendar.MINUTE, 0);
-        end.set(Calendar.SECOND, 0);
-        end.set(Calendar.MILLISECOND, 0);
-
-        // At this point, each calendar is set to midnight on
-        // their respective days. Now use TimeUnit.MILLISECONDS to
-        // compute the number of full days between the two of them.
-
-        return TimeUnit.MILLISECONDS.toDays(
-                Math.abs(end.getTimeInMillis() - start.getTimeInMillis()));
-    }
-
     @Override
     public void onBackPressed() {
 
-        if(mRevealView.getVisibility()==View.VISIBLE){
+        if (mRevealView.getVisibility() == View.VISIBLE) {
             hideRevealView();
         } else
             super.onBackPressed();
+    }
+
+
+    public void setAdapter(ArrayList<AddDay> array) {
+        adapter = new SummaryAdapter(default_date_format, LandingActivity.this, array);
+        adapter.notifyDataSetChanged();
+        mListView.setAdapter(adapter);
+    }
+
+    public int numDays(int month, int year) {
+        Calendar monthStart = new GregorianCalendar(year, month, 1);
+        return monthStart.getActualMaximum(Calendar.DAY_OF_MONTH);
     }
 }

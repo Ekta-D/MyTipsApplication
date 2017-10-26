@@ -62,8 +62,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.ClockIn + " TEXT, "
                 + DatabaseUtils.EndShift + " TEXT, "
 
-                + DatabaseUtils.StartShiftLong + " INTEGER, "
-                + DatabaseUtils.EndShiftLong + " INTEGER, "
+                + DatabaseUtils.StartShiftLong + " REAL, "
+                + DatabaseUtils.EndShiftLong + " REAL, "
 
                 + DatabaseUtils.StartDayWeek + " TEXT, "
 
