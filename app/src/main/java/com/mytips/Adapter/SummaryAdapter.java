@@ -116,10 +116,11 @@ public class SummaryAdapter extends BaseAdapter {
         if (totaltips.equalsIgnoreCase("")) {
             totaltips = "0";
         }
-        String total_TDs = "";
-        if (addDayArrayList.get(position).getTotal_tournament_downs() != null && !addDayArrayList.get(position).getTotal_tournament_downs().equalsIgnoreCase("")) {
-            total_TDs = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_tournament_downs()));
-        } else if (total_TDs.equalsIgnoreCase("")) {
+        String total_TDs = "0";
+        if (addDayArrayList.get(position).getTounament_count() != null && !addDayArrayList.get(position).getTounament_count().equalsIgnoreCase("")) {
+            total_TDs = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTounament_count()));
+        }
+        if (total_TDs.equalsIgnoreCase("")) {
             total_TDs = "0";
         }
 

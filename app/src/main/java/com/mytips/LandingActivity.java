@@ -66,7 +66,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     String start_week;
     String start_shift = "";
     SharedPreferences sharedPreferences;
-
+    String selected_summary_type = "";
     int default_date_format = 0;
 
 
@@ -161,10 +161,15 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 //                    selected_profileName = addDayArrayList.get(position).getProfile();
                     selected_profileName = profiles.get(position).getProfile_name();
                     start_week = profiles.get(position).getStartday();
+
                     if (addDayArrayList.size() > 0) {
-                        start_shift = addDayArrayList.get(position).getStart_shift();
+                        // start_shift = addDayArrayList.get(position).getStart_shift();
+                        updateView(addDayArrayList, selected_profileName);
+                        if (reportTypeArray.length > 0) {
+                            selected_summary_type = reportTypeArray[position];
+                        }
+                        changeData(selected_summary_type, start_week, selected_profileName);
                     }
-                    updateView(addDayArrayList, selected_ProfileID, selected_profileName);
                 }
                 spinnerProfile.setSelection(position);
 
@@ -198,7 +203,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 spinnerReportType.setSelection(position);
-                changeData(parent.getSelectedItem().toString(), start_week, start_shift);
+                selected_summary_type = parent.getSelectedItem().toString();
+                changeData(selected_summary_type, start_week, selected_profileName);
 
             }
 
@@ -360,10 +366,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     SummaryAdapter adapter;
     ArrayList<AddDay> selectedProfile;
 
-    public void updateView(ArrayList<AddDay> addDayArrayList, String selected_ProfileID, String selected_profileName) {
-//        for (int i = 0; i < addDayArrayList.size(); i++) {
-//            profileArray.add(addDayArrayList.get(i).getProfile());
-//        }
+    public void updateView(ArrayList<AddDay> addDayArrayList, String selected_profileName) {
         selectedProfile = new ArrayList<>();
         for (int i = 0; i < addDayArrayList.size(); i++) {
             AddDay addDay = addDayArrayList.get(i);
@@ -461,7 +464,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    public void changeData(String spinner_selected, String start_week, String start_shift) {
+    public void changeData(String spinner_selected, String start_week, String selected_profileName) {
         String date_format = "";
         if (default_date_format == 2) {
             date_format = "MM/dd/yyyy";
@@ -482,7 +485,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             String current_date = new SimpleDateFormat(date_format).format(date);
             fetched_list = new ArrayList<>();
-            fetched_list = new DatabaseOperations(LandingActivity.this).fetchDailyData(current_date);
+            fetched_list = new DatabaseOperations(LandingActivity.this).fetchDailyData(current_date, selected_profileName);
             if (fetched_list.size() > 0) {
                 setAdapter(fetched_list);
             }
@@ -490,7 +493,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         } else if (spinner_selected.equalsIgnoreCase("Weekly")) {
             fetched_list = new ArrayList<>();
-            int start_day = getDay(start_week);
+            int start_day = CommonMethods.getDay(start_week);
 
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(Calendar.DAY_OF_WEEK, start_day);
@@ -518,7 +521,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 reset_current = dates.get(0);
                 reset_next_week = dates.get(6);
-                fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week);
+                fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
 
                 if (fetched_list.size() > 0) {
                     setAdapter(fetched_list);
@@ -529,7 +532,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
 
             fetched_list = new ArrayList<>();
-            int start_day = getDay(start_week);
+            int start_day = CommonMethods.getDay(start_week);
 
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(Calendar.DAY_OF_WEEK, start_day);
@@ -559,7 +562,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 reset_current = dates.get(0);
                 reset_next_week = dates.get(14);
-                fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week);
+                fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
 
                 if (fetched_list.size() > 0) {
                     setAdapter(fetched_list);
@@ -576,7 +579,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             int start_month = cal1.get(Calendar.MONTH); // 0 for jan and 11 for Dec
             int year = cal1.get(Calendar.YEAR);
-            int days = numDays(start_month, year);
+            int days = CommonMethods.numDays(start_month, year);
 
 
             Calendar start_calendar = Calendar.getInstance();
@@ -603,7 +606,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
             fetched_list = new ArrayList<>();
-            fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long);
+            fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
             if (fetched_list.size() > 0) {
                 setAdapter(fetched_list);
             }
@@ -614,43 +617,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             int year = cal.get(Calendar.YEAR);
             String years = String.valueOf(year);
 
-            fetched_list = new DatabaseOperations(LandingActivity.this).yearlyData(years);
+            fetched_list = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName);
             if (fetched_list.size() > 0) {
                 setAdapter(fetched_list);
             }
         }
     }
 
-    public int getDay(String start_week) {
-        int day = 0;
-
-        switch (start_week) {
-
-            case "Sunday":
-                day = 1;
-                break;
-            case "Monday":
-                day = 2;
-                break;
-            case "Tuesday":
-                day = 3;
-                break;
-            case "Wednesday":
-                day = 4;
-                break;
-            case "Thursday":
-                day = 5;
-                break;
-            case "Friday":
-                day = 6;
-                break;
-            case "Saturday":
-                day = 7;
-                break;
-
-        }
-        return day;
-    }
 
     @Override
     public void onBackPressed() {
@@ -668,8 +641,5 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         mListView.setAdapter(adapter);
     }
 
-    public int numDays(int month, int year) {
-        Calendar monthStart = new GregorianCalendar(year, month, 1);
-        return monthStart.getActualMaximum(Calendar.DAY_OF_MONTH);
-    }
+
 }

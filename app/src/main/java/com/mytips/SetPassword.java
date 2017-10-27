@@ -70,8 +70,6 @@ public class SetPassword extends AppCompatActivity {
                     btn_continue.setEnabled(false);
 
                 }
-
-
             }
 
             @Override

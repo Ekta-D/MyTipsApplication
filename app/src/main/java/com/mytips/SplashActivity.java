@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.mytips.Utils.CommonMethods;
+import com.mytips.Utils.Constants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +71,13 @@ public class SplashActivity extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+//                    if (!sharedPreferences.getString(Constants.ConfirmKey, "").equals("")) {
+//                        startActivity(new Intent(getBaseContext(), LockScreen.class));
+//                    }
+//                    else{
                     startActivity(new Intent(getBaseContext(), LandingActivity.class));
+//                    }
+
                     finish();
                 }
             }, 2000);
@@ -90,7 +97,7 @@ public class SplashActivity extends AppCompatActivity {
         int storagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
         int camera_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        int finger_print=ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
+        int finger_print = ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
         List<String> listPermissionsNeeded = new ArrayList<>();
 
         if (storagePermission != PackageManager.PERMISSION_GRANTED) {
@@ -103,8 +110,7 @@ public class SplashActivity extends AppCompatActivity {
             listPermissionsNeeded.add(Manifest.permission.CAMERA);
         }
 
-        if (finger_print!=PackageManager.PERMISSION_GRANTED)
-        {
+        if (finger_print != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.USE_FINGERPRINT);
         }
 

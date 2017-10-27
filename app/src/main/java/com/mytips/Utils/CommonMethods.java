@@ -13,6 +13,7 @@ import com.mytips.R;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -29,19 +30,22 @@ public class CommonMethods {
         return d;
     }
 
-    public static void setTheme(ActionBar actionBar, Activity context){
+    public static void setTheme(ActionBar actionBar, Activity context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
-        if(sharedPreferences.getInt("selected_theme",0)==1){
+        if (sharedPreferences.getInt("selected_theme", 0) == 1) {
             //default Black and white
-            if(actionBar!=null) actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.colorPrimary)));
+            if (actionBar != null)
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.colorPrimary)));
             setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.colorPrimaryDark), context.getResources().getColor(R.color.colorPrimary));
-        } else if (sharedPreferences.getInt("selected_theme",0)==0){
+        } else if (sharedPreferences.getInt("selected_theme", 0) == 0) {
             //Navy Blue and white
-            if(actionBar!=null) actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.blue_primary)));
+            if (actionBar != null)
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.blue_primary)));
             setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.blue_primary_dark), context.getResources().getColor(R.color.blue_primary));
-        } else if (sharedPreferences.getInt("selected_theme",0)==-1){
+        } else if (sharedPreferences.getInt("selected_theme", 0) == -1) {
             //Orange and white
-            if(actionBar!=null) actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.orange_primary)));
+            if (actionBar != null)
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.orange_primary)));
             setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.orange_primary_dark), context.getResources().getColor(R.color.orange_primary));
         }
     }
@@ -55,4 +59,39 @@ public class CommonMethods {
         }
     }
 
+    public static int getDay(String start_week) {
+        int day = 0;
+
+        switch (start_week) {
+
+            case "Sunday":
+                day = 1;
+                break;
+            case "Monday":
+                day = 2;
+                break;
+            case "Tuesday":
+                day = 3;
+                break;
+            case "Wednesday":
+                day = 4;
+                break;
+            case "Thursday":
+                day = 5;
+                break;
+            case "Friday":
+                day = 6;
+                break;
+            case "Saturday":
+                day = 7;
+                break;
+
+        }
+        return day;
+    }
+
+    public static int numDays(int month, int year) {
+        Calendar monthStart = new GregorianCalendar(year, month, 1);
+        return monthStart.getActualMaximum(Calendar.DAY_OF_MONTH);
+    }
 }
