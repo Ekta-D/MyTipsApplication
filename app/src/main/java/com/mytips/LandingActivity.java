@@ -66,7 +66,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     String start_week;
     String start_shift = "";
     SharedPreferences sharedPreferences;
-    String selected_summary_type = "";
+    String selected_summary_type="Daily";
     int default_date_format = 0;
 
 
@@ -75,9 +75,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
 
-
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
+
         default_date_format = sharedPreferences.getInt("selected_date", 2);
+
 
         context = LandingActivity.this;
         databaseOperations = new DatabaseOperations(LandingActivity.this);
@@ -130,6 +131,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         addDayArrayList = new ArrayList<>();
         addDayArrayList = databaseOperations.fetchAddDayDetails(context);
+        if(addDayArrayList!=null && addDayArrayList.size()>0)
+            no_data.setVisibility(View.GONE);
 
         //  Log.i("add_daylist", String.valueOf(addDayArrayList.size()));
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, reportTypeArray);
@@ -162,14 +165,15 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     selected_profileName = profiles.get(position).getProfile_name();
                     start_week = profiles.get(position).getStartday();
 
-                    if (addDayArrayList.size() > 0) {
+                    //if (addDayArrayList.size() > 0) {
                         // start_shift = addDayArrayList.get(position).getStart_shift();
-                        updateView(addDayArrayList, selected_profileName);
-                        if (reportTypeArray.length > 0) {
-                            selected_summary_type = reportTypeArray[position];
-                        }
+                      //  no_data.setVisibility(View.GONE);
+                        //updateView(addDayArrayList, selected_profileName);
+                       /* if (reportTypeArray.length > 0) {
+                            selected_summary_type = spinnerReportType.getSelectedItem().;
+                        }*/
                         changeData(selected_summary_type, start_week, selected_profileName);
-                    }
+                    //}
                 }
                 spinnerProfile.setSelection(position);
 
@@ -219,7 +223,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                final AddDay addDay = selectedProfile.get(position);
+                final AddDay addDay = addDayArrayList.get(position);
 
                 AlertDialog.Builder alert = new AlertDialog.Builder(LandingActivity.this);
                 alert.setTitle("Make your selection");
@@ -236,7 +240,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                         } else if (which == 1) {
                             deleteProfile(addDay);
-                            selectedProfile.remove(position);
+                            addDayArrayList.remove(position);
+                            setAdapter(addDayArrayList);
                             adapter.notifyDataSetChanged();
                         }
                     }
@@ -248,16 +253,53 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
+        mListView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                hideRevealView();
+                return false;
+            }
+        });
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
+        // TODO: 29/10/2017 update profile spinner, list data and total earnings card.
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
         updateSpinner(profiles);
 
+        changeData(selected_summary_type,start_week,selected_profileName);
+
         CommonMethods.setTheme(getSupportActionBar(), LandingActivity.this);
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
+        updateSpinner(profiles);
+
+        changeData(selected_summary_type,start_week,selected_profileName);
+    }
+
+    private int getProfileSelection(String selection){
+        for (Profiles s : profiles) {
+            if( s.getProfile_name()==selection) {
+                int i = profiles.indexOf(s);
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    private int getReportTypeSelection(String selection){
+        for (String s : reportTypeArray) {
+            int i = s.indexOf(selection);
+            return i;
+        }
+        return 0;
     }
 
 
@@ -457,11 +499,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (profilesArrayList.size() > 0) {
             SpinnerProfile profileAdapter = new SpinnerProfile(context, profilesArrayList);
             spinnerProfile.setAdapter(profileAdapter);
+            selected_profileName = profilesArrayList.get(0).getProfile_name();
         } else {
             String[] profiles_empty = new String[]{"[none]"};
             ArrayAdapter<String> profileAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, profiles_empty);
             spinnerProfile.setAdapter(profileAdapter);
+            selected_profileName = profiles_empty[0];
         }
+
     }
 
     public void changeData(String spinner_selected, String start_week, String selected_profileName) {
@@ -474,25 +519,23 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             date_format = "MMM dd,yyyy";
         }
 
-        ArrayList<AddDay> fetched_list;
         String weekday_name = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(System.currentTimeMillis());
 
         Log.i("weekday", weekday_name + " " + start_week);
         if (spinner_selected.equalsIgnoreCase("Daily")) {
 
             Calendar cal = Calendar.getInstance();
-            Date date = cal.getTime();
 
-            String current_date = new SimpleDateFormat(date_format).format(date);
-            fetched_list = new ArrayList<>();
-            fetched_list = new DatabaseOperations(LandingActivity.this).fetchDailyData(current_date, selected_profileName);
-            if (fetched_list.size() > 0) {
-                setAdapter(fetched_list);
-            }
+            String currentDate = (cal.get(Calendar.MONTH)+1) + "/"
+                    + cal.get(Calendar.DAY_OF_MONTH) + "/"
+                    + cal.get(Calendar.YEAR);
 
+            //String current_date = String.valueOf(cal.getTimeInMillis());
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(currentDate, selected_profileName);
+            setAdapter(addDayArrayList);
+            updateBottom(addDayArrayList);
 
         } else if (spinner_selected.equalsIgnoreCase("Weekly")) {
-            fetched_list = new ArrayList<>();
             int start_day = CommonMethods.getDay(start_week);
 
             Calendar calendar1 = Calendar.getInstance();
@@ -521,17 +564,15 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 reset_current = dates.get(0);
                 reset_next_week = dates.get(6);
-                fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
 
-                if (fetched_list.size() > 0) {
-                    setAdapter(fetched_list);
-                }
+                setAdapter(addDayArrayList);
+                updateBottom(addDayArrayList);
             }
 
 
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
 
-            fetched_list = new ArrayList<>();
             int start_day = CommonMethods.getDay(start_week);
 
             Calendar calendar1 = Calendar.getInstance();
@@ -562,11 +603,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 reset_current = dates.get(0);
                 reset_next_week = dates.get(14);
-                fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
 
-                if (fetched_list.size() > 0) {
-                    setAdapter(fetched_list);
-                }
+                setAdapter(addDayArrayList);
+                updateBottom(addDayArrayList);
             }
 
         } else if (spinner_selected.equalsIgnoreCase("Monthly")) {
@@ -604,23 +644,23 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             Date end_date = end_calendar.getTime();
             long end_date_long = end_date.getTime();
 
-
-            fetched_list = new ArrayList<>();
-            fetched_list = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
-            if (fetched_list.size() > 0) {
-                setAdapter(fetched_list);
-            }
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
+            setAdapter(addDayArrayList);
+            updateBottom(addDayArrayList);
 
         } else {
-            fetched_list = new ArrayList<>();
             Calendar cal = Calendar.getInstance();
             int year = cal.get(Calendar.YEAR);
             String years = String.valueOf(year);
 
-            fetched_list = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName);
-            if (fetched_list.size() > 0) {
-                setAdapter(fetched_list);
-            }
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName);
+            setAdapter(addDayArrayList);
+            updateBottom(addDayArrayList);
+        }
+        if(addDayArrayList.size()>0){
+            no_data.setVisibility(View.GONE);
+        } else {
+            no_data.setVisibility(View.VISIBLE);
         }
     }
 

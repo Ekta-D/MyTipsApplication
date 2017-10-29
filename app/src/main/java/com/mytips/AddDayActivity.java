@@ -66,7 +66,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     boolean pastDateSelected;
     Calendar current_date;
     Date current_time;
-    String start_date = "", end_date = "", start_time = "", end_time = "";
+    String startDateDb = "", start_date = "", end_date = "", start_time = "", end_time = "";
     private String format = "";
     String result = "";
     TextView texview_hours;
@@ -105,7 +105,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     Toolbar toolbar;
     int total_counts_till_now = 0;
 
-    Calendar start_calendar;
+    Calendar start_calendar, end_calendar;
     String global_startday = "", global_payperiod = "";
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -119,6 +119,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         CommonMethods.setTheme(getSupportActionBar(), AddDayActivity.this);
 
         start_calendar = Calendar.getInstance();
+        end_calendar = Calendar.getInstance();
 
         findViewByIds();
 
@@ -320,6 +321,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         Intent i = getIntent();
         b = i.getExtras();
         if (b != null) {
+            if(getSupportActionBar()!=null)
+                ((TextView)findViewById(R.id.add_day_textview)).setText("Update Day");
             addDay = (AddDay) b.getSerializable(Constants.AddDayProfile);
             fillAllFields(addDay);
         }
@@ -494,7 +497,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    public String getTimePicker(int time_format_index, final int viewId, final TimeChangeListener onTimeChange) {
+    public String getTimePicker(final int time_format_index, final int viewId, final TimeChangeListener onTimeChange) {
         final Dialog timePicker = new Dialog(AddDayActivity.this);
 
         timePicker.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -529,17 +532,25 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     // showTime(startHour, startMinute, edittext_clockIn);
                     //  edittext_clockIn.setText(time);
 
-                    int hr = startHour % 12;
-                    edittext_clockIn.setText(String.format("%02d:%02d %s", hr == 0 ? 12 : hr,
-                            startMinute, startHour < 12 ? "am" : "pm"));
+                    if(time_format_index==0) {
+                        int hr = startHour % 12;
+                        edittext_clockIn.setText(String.format("%02d:%02d %s", hr == 0 ? 12 : hr,
+                                startMinute, startHour < 12 ? "am" : "pm"));
+                    } else {
+                        edittext_clockIn.setText(String.format("%02d:%02d",startHour,startMinute));
+                    }
 
                 } else if (viewId == R.id.editText_clock_out) {
                     endHour = timePick.getCurrentHour();
                     endMinute = timePick.getCurrentMinute();
-                    int hr = endHour % 12;
-                    edittext_clockOut.setText(String.format("%02d:%02d %s", hr == 0 ? 12 : hr,
-                            endMinute, endHour < 12 ? "am" : "pm"));
 
+                    if(time_format_index==0) {
+                        int hr = endHour % 12;
+                        edittext_clockOut.setText(String.format("%02d:%02d %s", hr == 0 ? 12 : hr,
+                                endMinute, endHour < 12 ? "am" : "pm"));
+                    } else {
+                        edittext_clockOut.setText(String.format("%02d:%02d",endHour,endMinute));
+                    }
                     //  showTime(endHour, endMinute, edittext_clockOut);
 
                 }
@@ -588,7 +599,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         // Getting date from Calendar View
         final CalendarView calendar = (CalendarView) viewDatePicker
                 .findViewById(R.id.datePicker);
-        Button selectDate = (Button) viewDatePicker
+        final Button selectDate = (Button) viewDatePicker
                 .findViewById(R.id.dateSelect);
         calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 
@@ -601,11 +612,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     startMonth = month;
                     startYear = year;
 
-                    start_calendar.set(Calendar.MONTH, startMonth);
-                    start_calendar.set(Calendar.DAY_OF_MONTH, startDay);
+                    /*start_calendar.set(Calendar.MONTH, startMonth);
+                    start_calendar.set(Calendar.DAY_OF_MONTH, startDay);*/
 
-
-                    start_dateCalendar.set(year, month, dayOfMonth);
+                    start_dateCalendar.set(startYear, startMonth, startDay);
                 } else if (viewId == R.id.editText_end_shift) {
                     endDay = dayOfMonth;
                     endMonth = month;
@@ -662,6 +672,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 if (viewId == R.id.editText_start_shift) {
                     start_date = selectedDate;
                     editText_startShift.setText(selectedDate);
+
                 } else if (viewId == R.id.editText_end_shift) {
                     date1 = new SimpleDateFormat(date_format).format(new Date(date));
                     end_date = date1;
@@ -681,6 +692,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 // TODO Auto-generated method stub
 
                 if (viewId == R.id.editText_start_shift) {
+
                     todayPayDay(global_startday, global_payperiod);
                 }
                 if (viewId == R.id.editText_start_shift && startDay == 0) {
@@ -698,6 +710,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     start_shift_long = dates.getTime();
                     date = new SimpleDateFormat(date_format)
                             .format(dates);
+
+                    startDateDb = currentDate;
+
+
                     editText_startShift.setText(date);
 
                 } else if (viewId == R.id.editText_end_shift && startDay == 0) {
@@ -737,6 +753,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 start_shift_long = selectedDate1.getTime();
                                 date = new SimpleDateFormat(date_format)
                                         .format(selectedDate1);
+
                             } catch (IllegalArgumentException ex) {
                                 ex.printStackTrace();
                             }
@@ -847,11 +864,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
                 try {
-                    new DatabaseOperations(AddDayActivity.this).insertAddDayInfo(selected_profile, editText_startShift.getText().toString().trim(),
+                    new DatabaseOperations(AddDayActivity.this).insertAddDayInfo(selected_profile, startDateDb,
                             edittext_clockIn.getText().toString().trim(), editText_endShift.getText().toString().trim(), edittext_clockOut.getText().toString().trim(),
                             texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                             total_tipout.getText().toString().trim(), edittext_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
-                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, start_shift_long, end_shift_long);
+                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, start_dateCalendar.getTimeInMillis(), end_dateCalendar.getTimeInMillis());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -864,7 +881,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     joinedString = convertArrayToString(selected_tipeesIDs);
                 }
                 try {
-                    new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, editText_startShift.getText().toString().trim(),
+                    new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
                             edittext_clockIn.getText().toString().trim(), editText_endShift.getText().toString().trim(), edittext_clockOut.getText().toString().trim(),
                             texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                             total_tipout.getText().toString().trim(), edittext_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
@@ -876,7 +893,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
             }
 
-            startActivity(new Intent(AddDayActivity.this, LandingActivity.class));
+            startActivity(new Intent(AddDayActivity.this, LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
             this.finish();
         } else {
             Snackbar.make(spinnerProfile, "Need more details to save the day!", Snackbar.LENGTH_LONG).show();
@@ -1240,9 +1257,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     public void fillAllFields(AddDay addDay) {
         addDayID = addDay.getId();
 
-        long start_forma = 0;
+        long start_format = 0;
         long end_format = 0;
-        start_forma = addDay.getStart_long();
+        start_format = addDay.getStart_long();
         end_format = addDay.getEnd_long();
 
 
@@ -1253,8 +1270,28 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             date_format = "MMM dd,yyyy";
         }
+
+        Calendar startDateTime = Calendar.getInstance();
+        startDateTime.setTimeInMillis(start_format);
+
+        Calendar endDateTime = Calendar.getInstance();
+        endDateTime.setTimeInMillis(end_format);
+
+        if(selected_timeformatIndex==0) {
+            edittext_clockIn.setText(String.format("%02d:%02d %s", startDateTime.get(Calendar.HOUR), startDateTime.get(Calendar.MINUTE), (startDateTime.get(Calendar.AM_PM)==0)?"AM":"PM"));
+        } else {
+            edittext_clockIn.setText(String.format("%02d:%02d",startDateTime.get(Calendar.HOUR_OF_DAY),startDateTime.get(Calendar.MINUTE)));
+        }
+
+        if(selected_timeformatIndex==0) {
+            edittext_clockOut.setText(String.format("%02d:%02d %s", endDateTime.get(Calendar.HOUR), endDateTime.get(Calendar.MINUTE), (endDateTime.get(Calendar.AM_PM)==0)?"AM":"PM"));
+        } else {
+            edittext_clockOut.setText(String.format("%02d:%02d",endDateTime.get(Calendar.HOUR_OF_DAY),endDateTime.get(Calendar.MINUTE)));
+        }
+
+
         Date d = null, d1 = null;
-        d = new Date(start_forma);
+        d = new Date(start_format);
         d1 = new Date(end_format);
 
         String start = new SimpleDateFormat(date_format).format(d);
@@ -1263,8 +1300,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         editText_startShift.setText(start);
         editText_endShift.setText(end);
-        edittext_clockIn.setText(addDay.getCheck_in());
-        edittext_clockOut.setText(addDay.getCheck_out());
+        //edittext_clockIn.setText(addDay.getCheck_in());
+        //edittext_clockOut.setText(addDay.getCheck_out());
         texview_hours.setText(addDay.getCalculated_hours());
 
         int isHoliday = addDay.getIsHolidaypay();

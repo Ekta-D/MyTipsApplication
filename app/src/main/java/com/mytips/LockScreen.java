@@ -35,7 +35,7 @@ public class LockScreen extends AppCompatActivity {
 
                     String input = editText.getText().toString().trim();
                     if (input.equalsIgnoreCase(password)) {
-                        startActivity(new Intent(LockScreen.this, LandingActivity.class));
+                        startActivity(new Intent(LockScreen.this, LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         finish();
                     } else {
                         Snackbar.make(editText, "Please enter correct password!", Snackbar.LENGTH_LONG).show();

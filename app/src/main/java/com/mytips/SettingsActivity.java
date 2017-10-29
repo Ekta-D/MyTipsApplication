@@ -338,10 +338,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
         });
         theme_list = (ListPreference) findPreference("example_list");
-        int selected_themeIndex = sharedPreferences.getInt("selected_theme", 2);
-        if (selected_themeIndex < 2) {
-            theme_list.setDefaultValue(selected_themeIndex);
-        }
+        if(theme_list.getValue()==null)
+            theme_list.setValueIndex(0);
+
         theme_list.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             @Override
             public boolean onPreferenceChange(Preference preference, Object newValue) {

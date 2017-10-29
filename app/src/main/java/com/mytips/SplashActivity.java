@@ -54,7 +54,7 @@ public class SplashActivity extends AppCompatActivity {
                     editor.putString("user_name", name.getText().toString().trim());
                     editor.putString("user_email", email.getText().toString().trim());
                     editor.commit();
-                    startActivity(new Intent(getBaseContext(), LandingActivity.class));
+                    startActivity(new Intent(getBaseContext(), LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     finish();
                 } else if (name.getText().toString().trim().equals("")) {
                     name.setError("Name is required");
@@ -75,7 +75,7 @@ public class SplashActivity extends AppCompatActivity {
 //                        startActivity(new Intent(getBaseContext(), LockScreen.class));
 //                    }
 //                    else{
-                    startActivity(new Intent(getBaseContext(), LandingActivity.class));
+                    startActivity(new Intent(getBaseContext(), LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 //                    }
 
                     finish();
