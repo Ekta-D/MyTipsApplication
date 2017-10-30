@@ -63,7 +63,8 @@ public class SplashActivity extends AppCompatActivity {
                 }
             }
         });
-        if (!isFirstTime) {
+//        if (!isFirstTime) {
+        if (sharedPreferences.getString("user_name", "").equals("")) {
             checkPermissions();
         }
         if (!sharedPreferences.getString("user_name", "").equals("")) {
