@@ -35,9 +35,9 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_toRightOf="@id/lbl_total"
-                android:textStyle="bold"
                 android:text="$0"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -63,10 +63,10 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/row_three"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/row_two"
-            android:id="@+id/row_three"
             android:layout_centerHorizontal="true"
             android:visibility="gone">
 
@@ -84,6 +84,15 @@
                 android:text="Hourly Wage: $0" />
 
         </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/filter"
+            android:visibility="gone"
+            app:backgroundTint="@color/blue_accent" />
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

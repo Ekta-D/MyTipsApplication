@@ -16,7 +16,9 @@ import com.mytips.Utils.Constants;
 public class LockScreen extends AppCompatActivity {
 
     EditText editText;
+    public static final String ISFIRST_TIME = "Isfirst_time";
     SharedPreferences sharedPreferences;
+    boolean isFirstTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +28,18 @@ public class LockScreen extends AppCompatActivity {
         editText = (EditText) findViewById(R.id.editText_lock_password);
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
 
+
+        if (sharedPreferences != null) {
+            isFirstTime = sharedPreferences.getBoolean(ISFIRST_TIME, false);
+        }
+
+
         final String password = sharedPreferences.getString(Constants.ConfirmKey, "");
+
+        if (password.equalsIgnoreCase("")) {
+            startActivity(new Intent(LockScreen.this, SplashActivity.class));
+        }
+
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {

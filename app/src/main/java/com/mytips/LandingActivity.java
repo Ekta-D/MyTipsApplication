@@ -2,23 +2,30 @@ package com.mytips;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
+import android.view.Window;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CalendarView;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -35,11 +42,11 @@ import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener {
@@ -57,18 +64,22 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     Context context;
     TextView textView_total_earnings, textView_summaryTips, textView_summery_tds, textView_summery_tip_out, textView_hour_wage;
     RelativeLayout summery_tds_layout, summery_tip_outLayout, dashboard_bottm;
+    Calendar startcalendar, endcalendar;
 
-    String selected_ProfileID;
     ArrayList<AddDay> updated_spinner;
     String selected_profileName;
     ArrayList<Profiles> profiles;
     TextView no_data;
     String start_week;
     String start_shift = "";
+    boolean pastDateSelected;
     SharedPreferences sharedPreferences;
-    String selected_summary_type="Daily";
+    String selected_summary_type = "Daily";
     int default_date_format = 0;
-
+    FloatingActionButton floatingActionButton;
+    long start_shift_long, end_shift_long;
+    ArrayList<AddDay> data;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,8 +88,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
 
+        editor = sharedPreferences.edit();
+
         default_date_format = sharedPreferences.getInt("selected_date", 2);
 
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton.setVisibility(View.VISIBLE);
+        startcalendar = Calendar.getInstance();
+        endcalendar = Calendar.getInstance();
 
         context = LandingActivity.this;
         databaseOperations = new DatabaseOperations(LandingActivity.this);
@@ -131,7 +148,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         addDayArrayList = new ArrayList<>();
         addDayArrayList = databaseOperations.fetchAddDayDetails(context);
-        if(addDayArrayList!=null && addDayArrayList.size()>0)
+        if (addDayArrayList != null && addDayArrayList.size() > 0)
             no_data.setVisibility(View.GONE);
 
         //  Log.i("add_daylist", String.valueOf(addDayArrayList.size()));
@@ -166,13 +183,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     start_week = profiles.get(position).getStartday();
 
                     //if (addDayArrayList.size() > 0) {
-                        // start_shift = addDayArrayList.get(position).getStart_shift();
-                      //  no_data.setVisibility(View.GONE);
-                        //updateView(addDayArrayList, selected_profileName);
+                    // start_shift = addDayArrayList.get(position).getStart_shift();
+                    //  no_data.setVisibility(View.GONE);
+                    //updateView(addDayArrayList, selected_profileName);
                        /* if (reportTypeArray.length > 0) {
                             selected_summary_type = spinnerReportType.getSelectedItem().;
                         }*/
-                        changeData(selected_summary_type, start_week, selected_profileName);
+                    changeData(selected_summary_type, start_week, selected_profileName);
                     //}
                 }
                 spinnerProfile.setSelection(position);
@@ -261,6 +278,75 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                final Dialog dialog1 = new Dialog(LandingActivity.this);
+                dialog1.setContentView(R.layout.search_dialog);
+
+                Button btn, btn2;
+                final EditText editText1, editText2;
+
+                btn = (Button) dialog1.findViewById(R.id.btn_01);
+                btn2 = (Button) dialog1.findViewById(R.id.btn_02);
+
+                editText1 = (EditText) dialog1.findViewById(R.id.editText_01);
+                editText2 = (EditText) dialog1.findViewById(R.id.editText_02);
+
+
+                String string1 = sharedPreferences.getString(Constants.EditTextStart, "");
+                String string2 = sharedPreferences.getString(Constants.EditTextEnd, "");
+                editText1.setText(string1);
+                editText2.setText(string2);
+
+                editText1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getDatePicker(default_date_format, R.id.editText_01, editText1);
+                    }
+                });
+
+
+                editText2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getDatePicker(default_date_format, R.id.editText_02, editText2);
+                    }
+                });
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        data = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
+                                getTimeInMillis(), selected_profileName);
+
+                        setAdapter(data);
+                        adapter.notifyDataSetChanged();
+
+                        dialog1.dismiss();
+
+                    }
+                });
+
+                btn2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+
+                        editText1.setText("");
+                        editText2.setText("");
+                        data.clear();
+                        changeData(selected_summary_type, start_week, selected_profileName);
+                        dialog1.dismiss();
+                    }
+                });
+                dialog1.show();
+            }
+
+
+        });
+
     }
 
     @Override
@@ -270,7 +356,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
         updateSpinner(profiles);
 
-        changeData(selected_summary_type,start_week,selected_profileName);
+        changeData(selected_summary_type, start_week, selected_profileName);
 
         CommonMethods.setTheme(getSupportActionBar(), LandingActivity.this);
     }
@@ -281,12 +367,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
         updateSpinner(profiles);
 
-        changeData(selected_summary_type,start_week,selected_profileName);
+        changeData(selected_summary_type, start_week, selected_profileName);
     }
 
-    private int getProfileSelection(String selection){
+    private int getProfileSelection(String selection) {
         for (Profiles s : profiles) {
-            if( s.getProfile_name()==selection) {
+            if (s.getProfile_name() == selection) {
                 int i = profiles.indexOf(s);
                 return i;
             }
@@ -294,7 +380,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         return 0;
     }
 
-    private int getReportTypeSelection(String selection){
+    private int getReportTypeSelection(String selection) {
         for (String s : reportTypeArray) {
             int i = s.indexOf(selection);
             return i;
@@ -526,7 +612,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             Calendar cal = Calendar.getInstance();
 
-            String currentDate = (cal.get(Calendar.MONTH)+1) + "/"
+            String currentDate = (cal.get(Calendar.MONTH) + 1) + "/"
                     + cal.get(Calendar.DAY_OF_MONTH) + "/"
                     + cal.get(Calendar.YEAR);
 
@@ -570,6 +656,16 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 updateBottom(addDayArrayList);
             }
 
+//            if (string_dates.size() > 0) {
+//                for (int i = 0; i < string_dates.size(); i++) {
+//                    String j = string_dates.get(i);
+//                    ArrayList<AddDay> list = new ArrayList<>();
+//                    list = new DatabaseOperations(LandingActivity.this).fetchDailyData(j, selected_profileName);
+//                    addDayArrayList.addAll(list);
+//                }
+//                setAdapter(addDayArrayList);
+//                updateBottom(addDayArrayList);
+//            }
 
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
 
@@ -645,6 +741,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             long end_date_long = end_date.getTime();
 
             addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
+
             setAdapter(addDayArrayList);
             updateBottom(addDayArrayList);
 
@@ -657,7 +754,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             setAdapter(addDayArrayList);
             updateBottom(addDayArrayList);
         }
-        if(addDayArrayList.size()>0){
+        if (addDayArrayList.size() > 0) {
             no_data.setVisibility(View.GONE);
         } else {
             no_data.setVisibility(View.VISIBLE);
@@ -675,11 +772,242 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
+    String date_format = "";
+    int startDay = 0, startMonth = 0, startYear = 0;
+    int endDay = 0, endMonth = 0, endYear = 0;
+    String selectedDate = "", date = "", start_date = "", end_date = "";
+
+    public String getDatePicker(final int format_index, final int viewId, final EditText editText) {
+
+        // Infalating Dialog for Date Picker
+        final Dialog datePicker = new Dialog(LandingActivity.this);
+        datePicker.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View viewDatePicker = inflater.inflate(R.layout.date_picker, null);
+        datePicker.setContentView(viewDatePicker);
+
+        if (format_index == 2) {
+            date_format = "MM/dd/yyyy";
+        } else if (format_index == 1) {
+            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+        } else {
+            date_format = "MMM dd,yyyy";
+        }
+
+        // Getting date from Calendar View
+        final CalendarView calendar = (CalendarView) viewDatePicker
+                .findViewById(R.id.datePicker);
+        final Button selectDate = (Button) viewDatePicker
+                .findViewById(R.id.dateSelect);
+        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year,
+                                            int month, int dayOfMonth) {
+
+                if (viewId == R.id.editText_01) {
+                    startDay = dayOfMonth;
+                    startMonth = month;
+                    startYear = year;
+
+                    /*start_calendar.set(Calendar.MONTH, startMonth);
+                    start_calendar.set(Calendar.DAY_OF_MONTH, startDay);*/
+                    startcalendar.set(startYear, startMonth, startDay);
+//                    start_dateCalendar.set(startYear, startMonth, startDay);
+                } else if (viewId == R.id.editText_02) {
+                    endDay = dayOfMonth;
+                    endMonth = month;
+                    endYear = year;
+                    endcalendar.set(endYear, endMonth, endDay);
+//                    end_dateCalendar.set(endYear, endMonth, endDay);
+                }
+
+
+                selectedDate = String.valueOf(month + 1) + "/"
+                        + String.valueOf(dayOfMonth) + "/"
+                        + String.valueOf(year);
+                System.out.println("Selected date: " + selectedDate);
+
+
+                date = new SimpleDateFormat(date_format).format(new Date(
+                        selectedDate));
+
+
+                SimpleDateFormat sdfDate = new SimpleDateFormat(date_format);
+                String currentDateString = sdfDate.format(new Date());
+                Date currentDate = null;
+                Date parsedStartDate = null;
+
+                start_date = selectedDate;
+                String date1 = new SimpleDateFormat(date_format).format(new Date(selectedDate));
+                end_date = date1;
+                try {
+                    currentDate = sdfDate.parse(currentDateString);
+                    parsedStartDate = sdfDate.parse(date);
+                } catch (ParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+
+//                if (parsedStartDate.before(currentDate)) {
+//                    Toast.makeText(AddDayActivity.this,
+//                            "Past date cannot be selected!", Toast.LENGTH_LONG)
+//                            .show();
+//                    pastDateSelected = true;
+//                } else {
+//                    pastDateSelected = false;
+//                }
+
+//                if (pastDateSelected) {
+//                    if (viewId == R.id.editText_start_shift) {
+//                        editText_startShift.setText("Set Start Date");
+//                    } else if (viewId == R.id.editText_end_shift) {
+//                        editText_endShift.setText("Set End Date");
+//                    }
+//                } else {
+                date = new SimpleDateFormat(date_format)
+                        .format(new Date(date));
+                if (viewId == R.id.editText_01) {
+                    start_date = selectedDate;
+                    editText.setText(selectedDate);
+                    editor.putString(Constants.EditTextStart, selectedDate);
+                    editor.commit();
+                } else if (viewId == R.id.editText_02) {
+                    date1 = new SimpleDateFormat(date_format).format(new Date(date));
+                    end_date = date1;
+//                        end_date = date;
+                    editText.setText(date);
+                    editor.putString(Constants.EditTextEnd, date);
+                    editor.commit();
+                }
+
+//                }
+
+            }
+        });
+
+        selectDate.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+
+                if (viewId == R.id.editText_01) {
+
+                    //   todayPayDay(global_startday, global_payperiod);
+                }
+                if (viewId == R.id.editText_01 && startDay == 0) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    String d = sdf.format(new Date());
+                    startYear = Integer.parseInt(d.substring(0, 4));
+                    startMonth = Integer.parseInt(d.substring(4, 6));
+                    startDay = Integer.parseInt(d.substring(6));
+                    System.out.println(sdf.format(new Date()) + startYear
+                            + startMonth + startDay);
+                    String currentDate = String.valueOf(startMonth) + "/"
+                            + String.valueOf(startDay) + "/"
+                            + String.valueOf(startYear);
+                    //  startDateDb = currentDate;
+                    Date dates = new Date(currentDate);
+                    // start_shift_long = dates.getTime();
+                    date = new SimpleDateFormat(date_format)
+                            .format(dates);
+
+                    editor.putString(Constants.EditTextStart, selectedDate);
+                    editor.commit();
+                    editText.setText(date);
+
+                } else if (viewId == R.id.editText_02 && startDay == 0) {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    String d = sdf.format(new Date());
+                    endYear = Integer.parseInt(d.substring(0, 4));
+                    endMonth = Integer.parseInt(d.substring(4, 6));
+                    endDay = Integer.parseInt(d.substring(6));
+                    System.out.println(sdf.format(new Date()) + endYear
+                            + endMonth + endDay);
+                    String currentDate = String.valueOf(endMonth) + "/"
+                            + String.valueOf(endDay) + "/"
+                            + String.valueOf(endYear);
+                    Date dates = new Date(currentDate);
+                    // end_shift_long = dates.getTime();
+                    date = new SimpleDateFormat(date_format)
+                            .format(dates);
+
+                    // editText_endShift.setText(date);
+
+                } else {
+
+                    if (pastDateSelected) {
+                        if (viewId == R.id.editText_01) {
+                            editText.setText("Set Start Date");
+                        } else if (viewId == R.id.editText_02) {
+                            editText.setText("Set End Date");
+                        }
+                    } else {
+                        // Toast.makeText(AddEventActivity.this,
+                        // "Select start date once again!",
+                        // Toast.LENGTH_SHORT).show();
+
+                        if (viewId == R.id.editText_01) {
+                            try {
+                                Date selectedDate1 = new Date(selectedDate);
+                                start_shift_long = selectedDate1.getTime();
+                                date = new SimpleDateFormat(date_format)
+                                        .format(selectedDate1);
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                                String d = sdf.format(selectedDate1);
+                                startYear = Integer.parseInt(d.substring(0, 4));
+                                startMonth = Integer.parseInt(d.substring(4, 6));
+                                startDay = Integer.parseInt(d.substring(6));
+                                System.out.println(sdf.format(new Date()) + startYear
+                                        + startMonth + startDay);
+                                String currentDate = String.valueOf(startMonth) + "/"
+                                        + String.valueOf(startDay) + "/"
+                                        + String.valueOf(startYear);
+                                //  startDateDb = currentDate;
+
+
+                            } catch (IllegalArgumentException ex) {
+                                ex.printStackTrace();
+                            }
+                            editor.putString(Constants.EditTextStart, date);
+                            editor.commit();
+                            editText.setText(date);
+                        }
+                        if (viewId == R.id.editText_02) {
+                            try {
+                                Date selectedDate1 = new Date(selectedDate);
+                                end_shift_long = selectedDate1.getTime();
+                                date = new SimpleDateFormat(date_format)
+                                        .format(selectedDate1);
+                            } catch (IllegalArgumentException ex) {
+                                ex.printStackTrace();
+                            }
+                            editor.putString(Constants.EditTextEnd, date);
+                            editor.commit();
+
+                            editText.setText(date);
+                        }
+
+                    }
+                }
+
+                System.out.println("DATE>>>> " + date);
+
+                datePicker.dismiss();
+
+            }
+        });
+
+        // Selecting date from Date Dialog
+
+        datePicker.show();
+        return date;
+    }
+
     public void setAdapter(ArrayList<AddDay> array) {
         adapter = new SummaryAdapter(default_date_format, LandingActivity.this, array);
         adapter.notifyDataSetChanged();
         mListView.setAdapter(adapter);
     }
-
-
 }

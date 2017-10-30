@@ -93,7 +93,7 @@ public class SummaryAdapter extends BaseAdapter {
         }
         String month = "";
         try {
-            month = getMonth(addDayArrayList.get(position).getEnd_long());
+            month = getMonth(addDayArrayList.get(position).getStart_long());
         } catch (ParseException e) {
             e.printStackTrace();
         }

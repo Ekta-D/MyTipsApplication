@@ -12,9 +12,9 @@ public class AddDay implements Serializable {
     String start_day_week;
     String profile;
     String start_shift;
-    String check_in;
+    long check_in;
     String end_shift;
-    String check_out;
+    long check_out;
     String calculated_hours;
     int isHolidaypay;
     String total_tips;
@@ -128,11 +128,11 @@ public class AddDay implements Serializable {
         this.start_shift = start_shift;
     }
 
-    public String getCheck_in() {
+    public long getCheck_in() {
         return check_in;
     }
 
-    public void setCheck_in(String check_in) {
+    public void setCheck_in(long check_in) {
         this.check_in = check_in;
     }
 
@@ -144,11 +144,11 @@ public class AddDay implements Serializable {
         this.end_shift = end_shift;
     }
 
-    public String getCheck_out() {
+    public long getCheck_out() {
         return check_out;
     }
 
-    public void setCheck_out(String check_out) {
+    public void setCheck_out(long check_out) {
         this.check_out = check_out;
     }
 

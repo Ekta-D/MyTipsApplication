@@ -71,13 +71,7 @@ public class SplashActivity extends AppCompatActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-//                    if (!sharedPreferences.getString(Constants.ConfirmKey, "").equals("")) {
-//                        startActivity(new Intent(getBaseContext(), LockScreen.class));
-//                    }
-//                    else{
                     startActivity(new Intent(getBaseContext(), LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
-//                    }
-
                     finish();
                 }
             }, 2000);

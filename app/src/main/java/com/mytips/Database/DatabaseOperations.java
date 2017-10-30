@@ -280,8 +280,8 @@ public class DatabaseOperations {
         return profilesList;
     }
 
-    public void insertAddDayInfo(String profile_name, String start_shift, String check_in,
-                                 String end_shift, String check_out, String auto_calculatedhour, int holiday_pay,
+    public void insertAddDayInfo(String profile_name, String start_shift, long check_in,
+                                 String end_shift, long check_out, String auto_calculatedhour, int holiday_pay,
                                  String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
                                  String wages_hourly, String earns, int getting_tips, int getting_tournaments, String start_day_week
@@ -375,8 +375,8 @@ public class DatabaseOperations {
                     addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
                     addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
                     addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
-                    addDay.setCheck_in(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
-                    addDay.setCheck_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
+                    addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
+                    addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
                     addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
                     addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
                     addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
@@ -465,8 +465,8 @@ public class DatabaseOperations {
                         addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
                         addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
                         addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
-                        addDay.setCheck_in(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
-                        addDay.setCheck_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
+                        addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
+                        addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
                         addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
                         addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
                         addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
@@ -520,8 +520,8 @@ public class DatabaseOperations {
                         addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
                         addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
                         addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
-                        addDay.setCheck_in(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
-                        addDay.setCheck_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
+                        addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
+                        addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
                         addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
                         addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
                         addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
@@ -572,8 +572,8 @@ public class DatabaseOperations {
                         addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
                         addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
                         addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
-                        addDay.setCheck_in(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
-                        addDay.setCheck_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
+                        addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
+                        addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
                         addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
                         addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
                         addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
@@ -652,5 +652,13 @@ public class DatabaseOperations {
         }
 
         return counts;
+    }
+
+
+    public ArrayList<AddDay> weeklySummary(String start_shift, String profile) {
+        ArrayList<AddDay> addDays = new ArrayList<>();
+
+
+        return addDays;
     }
 }

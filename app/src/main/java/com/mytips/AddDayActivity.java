@@ -28,8 +28,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Adapter.SpinnerAdapter;
@@ -62,7 +64,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             startMinute, endHour, endMinute;
     String time, date = "", selectedDate = null;
     ArrayList<String> profile_names;
-    EditText editText_startShift, editText_endShift, edittext_clockIn, edittext_clockOut, edittext_count, edittext_perTD, edittext_total, edit_total_tips;
+    EditText editText_startShift, editText_endShift, edittext_clockIn, edittext_clockOut, edittext_count, edittext_perTD,
+            edittext_total, edit_total_tips, editext_manual_tips;
     boolean pastDateSelected;
     Calendar current_date;
     Date current_time;
@@ -71,6 +74,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     String result = "";
     TextView texview_hours;
     Calendar start_dateCalendar, end_dateCalendar;
+    Calendar calStartDay, calEndDay;
     int count = 0;
     double count_perTd = 0;
     ImageButton close_icon;
@@ -104,9 +108,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     int default_date_format = 0;
     Toolbar toolbar;
     int total_counts_till_now = 0;
-
+    Switch type_switch;
     Calendar start_calendar, end_calendar;
     String global_startday = "", global_payperiod = "";
+    boolean switch_value = false;
+    boolean getTournamentTips = false;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -191,7 +197,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 if (!str.equalsIgnoreCase("")) {
                     count_perTd = Double.parseDouble(str);
                 }
-
                 double total = calculate_total(String.valueOf(count), str);
                 total_tournamentdown = total;
 
@@ -321,8 +326,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         Intent i = getIntent();
         b = i.getExtras();
         if (b != null) {
-            if(getSupportActionBar()!=null)
-                ((TextView)findViewById(R.id.add_day_textview)).setText("Update Day");
+            if (getSupportActionBar() != null)
+                ((TextView) findViewById(R.id.add_day_textview)).setText("Update Day");
             addDay = (AddDay) b.getSerializable(Constants.AddDayProfile);
             fillAllFields(addDay);
         }
@@ -332,6 +337,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Profiles profile = profilesArrayList.get(position);
+                if (profile.getGet_tournamenttip() == 1) {
+                    getTournamentTips = true;
+                }
                 holiday_off_value = profile.getHoliday_pay();
                 start_week = profile.getStartday();
                 String wage = profile.getHourly_pay();
@@ -354,19 +362,96 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
+        type_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    switch_value = true;
+                    editext_manual_tips.setText("");
+                }
 
+            }
+        });
+
+        editext_manual_tips.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                double p = 0;
+                double result1 = 0;
+                String str = s.toString();
+                if (switch_value) {
+                    if (total_tipsInput != 0) {
+                        if (!str.equalsIgnoreCase("")) {
+                            Log.i("total_", String.valueOf(total_tipPercentage));
+                            dynamic_tip_out_percentage = Double.parseDouble(str);
+                            p = p + dynamic_tip_out_percentage;
+                            percentage = p;
+                            result1 = (percentage * total_tipsInput) / 100;
+                            total_tipPercentage = p;
+                            text_tip_out_percent.setText(String.format("%.2f", total_tipPercentage) + "%");
+
+                            total_tipout.setText(String.format("%.2f", result1));
+                        }
+
+                    }
+                } else {
+                    if (total_tipsInput != 0) {
+                        if (!str.equalsIgnoreCase("")) {
+
+                            result1 = Double.parseDouble(str);
+
+                            double per = result1 / total_tipsInput;
+                            per = per * 100;
+
+                            text_tip_out_percent.setText(String.format("%.2f", per) + "%");
+                            total_tipout.setText(String.format("%.2f", result1));
+                        }
+
+                    }
+                }
+
+                String hr = String.valueOf(diffHours);
+                if (hr.contains("-")) {
+                    hr = hr.replace("-", "");
+                }
+                String m = String.valueOf(diffMinutes);
+                if (m.contains("-")) {
+                    m = m.replace("-", "");
+                }
+                String d = String.valueOf(diffDays);
+                if (d.contains("-")) {
+                    d = d.replace("-", "");
+                }
+
+                calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
+                        Integer.parseInt(m),
+                        Integer.parseInt(d), result1, total_tipsInput, total_tournamentdown
+                        , holiday_off_value);
+            }
+        });
     }
 
     public void findViewByIds() {
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
+        type_switch = (Switch) findViewById(R.id.type_switch);
+        editext_manual_tips = (EditText) findViewById(R.id.manual_tip);
 
         toolbar = (Toolbar) findViewById(R.id.day_toolbar);
         this.setSupportActionBar(toolbar);
 
         fetchedTipees = (ListView) findViewById(R.id.list_view_tipees);
-//        equal_label = (TextView) findViewById(R.id.textView25);
-//        multiply_label = (TextView) findViewById(R.id.textView24);
+
         text_tip_out_percent = (TextView) findViewById(R.id.textView_tip_out_percent);
         spinnerProfile = (Spinner) findViewById(R.id.spinner_profile);
         editText_startShift = (EditText) findViewById(R.id.editText_start_shift);
@@ -376,6 +461,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         texview_hours = (TextView) findViewById(R.id.textView_calculated_hours);
         start_dateCalendar = Calendar.getInstance();
         end_dateCalendar = Calendar.getInstance();
+        calStartDay = Calendar.getInstance();
+        calEndDay = Calendar.getInstance();
+
         holiday_pay = (CheckBox) findViewById(R.id.checkBox_holiday_pay);
         edit_total_tips = (EditText) findViewById(R.id.editText_total_tips);
         if (edit_total_tips.isFocused())
@@ -532,24 +620,24 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     // showTime(startHour, startMinute, edittext_clockIn);
                     //  edittext_clockIn.setText(time);
 
-                    if(time_format_index==0) {
+                    if (time_format_index == 0) {
                         int hr = startHour % 12;
                         edittext_clockIn.setText(String.format("%02d:%02d %s", hr == 0 ? 12 : hr,
                                 startMinute, startHour < 12 ? "am" : "pm"));
                     } else {
-                        edittext_clockIn.setText(String.format("%02d:%02d",startHour,startMinute));
+                        edittext_clockIn.setText(String.format("%02d:%02d", startHour, startMinute));
                     }
 
                 } else if (viewId == R.id.editText_clock_out) {
                     endHour = timePick.getCurrentHour();
                     endMinute = timePick.getCurrentMinute();
 
-                    if(time_format_index==0) {
+                    if (time_format_index == 0) {
                         int hr = endHour % 12;
                         edittext_clockOut.setText(String.format("%02d:%02d %s", hr == 0 ? 12 : hr,
                                 endMinute, endHour < 12 ? "am" : "pm"));
                     } else {
-                        edittext_clockOut.setText(String.format("%02d:%02d",endHour,endMinute));
+                        edittext_clockOut.setText(String.format("%02d:%02d", endHour, endMinute));
                     }
                     //  showTime(endHour, endMinute, edittext_clockOut);
 
@@ -614,13 +702,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
                     /*start_calendar.set(Calendar.MONTH, startMonth);
                     start_calendar.set(Calendar.DAY_OF_MONTH, startDay);*/
-
+                    calStartDay.set(startYear, startMonth, startDay);
                     start_dateCalendar.set(startYear, startMonth, startDay);
                 } else if (viewId == R.id.editText_end_shift) {
                     endDay = dayOfMonth;
                     endMonth = month;
                     endYear = year;
-
+                    calEndDay.set(startYear, startMonth, startDay);
                     end_dateCalendar.set(endYear, endMonth, endDay);
                 }
 
@@ -706,12 +794,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     String currentDate = String.valueOf(startMonth) + "/"
                             + String.valueOf(startDay) + "/"
                             + String.valueOf(startYear);
+                    startDateDb = currentDate;
                     Date dates = new Date(currentDate);
                     start_shift_long = dates.getTime();
                     date = new SimpleDateFormat(date_format)
                             .format(dates);
-
-                    startDateDb = currentDate;
 
 
                     editText_startShift.setText(date);
@@ -753,6 +840,18 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 start_shift_long = selectedDate1.getTime();
                                 date = new SimpleDateFormat(date_format)
                                         .format(selectedDate1);
+                                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                                String d = sdf.format(selectedDate1);
+                                startYear = Integer.parseInt(d.substring(0, 4));
+                                startMonth = Integer.parseInt(d.substring(4, 6));
+                                startDay = Integer.parseInt(d.substring(6));
+                                System.out.println(sdf.format(new Date()) + startYear
+                                        + startMonth + startDay);
+                                String currentDate = String.valueOf(startMonth) + "/"
+                                        + String.valueOf(startDay) + "/"
+                                        + String.valueOf(startYear);
+                                startDateDb = currentDate;
+
 
                             } catch (IllegalArgumentException ex) {
                                 ex.printStackTrace();
@@ -865,10 +964,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
                 try {
                     new DatabaseOperations(AddDayActivity.this).insertAddDayInfo(selected_profile, startDateDb,
-                            edittext_clockIn.getText().toString().trim(), editText_endShift.getText().toString().trim(), edittext_clockOut.getText().toString().trim(),
+                            start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
                             texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                             total_tipout.getText().toString().trim(), edittext_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
-                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, start_dateCalendar.getTimeInMillis(), end_dateCalendar.getTimeInMillis());
+                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTimeInMillis(), calEndDay.getTimeInMillis());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1013,7 +1112,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             total_tipPercentage = total_tipPercentage + dynamic_tip_out_percentage;
                             percentage = total_tipPercentage;
                             text_tip_out_percent.setText(String.format("%.2f", total_tipPercentage) + "%");
-                            percentage = total_tipPercentage;
                             double result1 = (percentage * total_tipsInput) / 100;
 
                             total_tipout.setText(String.format("%.2f", result1));
@@ -1185,6 +1283,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
     public void calculateTotalEarnings(double earnings, int total_hours, int mins, int days, double tip_out_total,
                                        double live_tip, double tounament_downs, String holiday_payoff_data) {
+        double minutes_01 = 0;
+        if (mins != 0) {
+            minutes_01 = Double.parseDouble(String.valueOf(mins));
+        }
 
         double tH = Float.valueOf(total_hours);
         int total_hour = 0;
@@ -1204,10 +1306,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         if (mins > 60) {
             tH = total_hours + 1;
         } else if (mins > 0 && mins < 60) {
-            tH = mins / 60;
+            tH = minutes_01 / 60;
 
         } else if (days <= 0 && total_hour <= 0 && mins > 0) {
-            tH = mins / 60;
+            tH = minutes_01 / 60;
         }
         if (days > 0 && total_hours > 0) {
             tH = days * 24 * total_hours;
@@ -1259,8 +1361,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         long start_format = 0;
         long end_format = 0;
-        start_format = addDay.getStart_long();
-        end_format = addDay.getEnd_long();
+        start_format = addDay.getCheck_in();
+        end_format = addDay.getCheck_out();
 
 
         if (default_date_format == 2) {
@@ -1277,16 +1379,18 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         Calendar endDateTime = Calendar.getInstance();
         endDateTime.setTimeInMillis(end_format);
 
-        if(selected_timeformatIndex==0) {
-            edittext_clockIn.setText(String.format("%02d:%02d %s", startDateTime.get(Calendar.HOUR), startDateTime.get(Calendar.MINUTE), (startDateTime.get(Calendar.AM_PM)==0)?"AM":"PM"));
+        if (selected_timeformatIndex == 0) {
+            edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
+            //     edittext_clockIn.setText(String.format("%02d:%02d %s", startDateTime.get(Calendar.HOUR), startDateTime.get(Calendar.MINUTE), (startDateTime.get(Calendar.AM_PM) == 0) ? "AM" : "PM"));
         } else {
-            edittext_clockIn.setText(String.format("%02d:%02d",startDateTime.get(Calendar.HOUR_OF_DAY),startDateTime.get(Calendar.MINUTE)));
+            edittext_clockIn.setText(String.format("%02d:%02d", startDateTime.get(Calendar.HOUR_OF_DAY), startDateTime.get(Calendar.MINUTE)));
         }
 
-        if(selected_timeformatIndex==0) {
-            edittext_clockOut.setText(String.format("%02d:%02d %s", endDateTime.get(Calendar.HOUR), endDateTime.get(Calendar.MINUTE), (endDateTime.get(Calendar.AM_PM)==0)?"AM":"PM"));
+        if (selected_timeformatIndex == 0) {
+            edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
+            //  edittext_clockOut.setText(String.format("%02d:%02d %s", endDateTime.get(Calendar.HOUR), endDateTime.get(Calendar.MINUTE), (endDateTime.get(Calendar.AM_PM) == 0) ? "AM" : "PM"));
         } else {
-            edittext_clockOut.setText(String.format("%02d:%02d",endDateTime.get(Calendar.HOUR_OF_DAY),endDateTime.get(Calendar.MINUTE)));
+            edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
         }
 
 
@@ -1433,7 +1537,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             String current_date = new SimpleDateFormat(date_format).format(date);
 
 
-            counts_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(current_date,selected_profile);
+            counts_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(current_date, selected_profile);
             todayPayDay = true;
             ifPayDay(todayPayDay, counts_list);
 
@@ -1465,10 +1569,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 reset_next_week = dates.get(6);
             }
             counts_list = new ArrayList<>();
-            counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week,selected_profile);
+            counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
 
-            Calendar today_Cal = Calendar.getInstance();
-            Date today_date = today_Cal.getTime();
+//
+            Date today_date = calStartDay.getTime();
+
             String str_date = dateFormat.format(today_date.getTime());
 
             if (str_date.equalsIgnoreCase(string_dates.get(6))) {
@@ -1478,6 +1583,48 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
             ifPayDay(todayPayDay, counts_list);
         } else if (pay_period.equalsIgnoreCase("Every 2 Weeks")) {
+
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.set(Calendar.DAY_OF_WEEK, day);
+            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+            ArrayList<String> string_dates = new ArrayList<>();
+            ArrayList<Long> dates = new ArrayList<>();
+            for (int i = 0; i < 14; i++) {
+
+                String str_date = dateFormat.format(calendar1.getTime().getTime());
+
+                Date date = calendar1.getTime();
+                long lon = date.getTime();
+
+                calendar1.add(Calendar.DATE, 1);
+
+                string_dates.add(str_date);
+
+
+                dates.add(lon);
+            }
+            long reset_next_week = 0;
+            long reset_current = 0;
+            if (dates.size() > 0) {
+
+                reset_current = dates.get(0);
+                reset_next_week = dates.get(14);
+            }
+            counts_list = new ArrayList<>();
+            counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
+
+//
+            Date today_date = calStartDay.getTime();
+
+            String str_date = dateFormat.format(today_date.getTime());
+
+            if (str_date.equalsIgnoreCase(string_dates.get(14))) {
+                Log.i("str", string_dates.get(14));
+                todayPayDay = true;
+            }
+
+            ifPayDay(todayPayDay, counts_list);
+
 
         } else {
             counts_list = new ArrayList<>();
@@ -1507,7 +1654,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 Date d2 = end_day_monthly.getTime();
                 long end_l = d2.getTime();
 
-                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l,selected_profile);
+                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
 
 
                 if (current_day == 14 || current_day == 28) {
@@ -1529,7 +1676,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 Date d2 = end_day_monthly.getTime();
                 long end_l = d2.getTime();
 
-                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l,selected_profile);
+                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
 
 
                 if (current_day == 14 || current_day == 29) {
@@ -1551,7 +1698,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 Date d2 = end_day_monthly.getTime();
                 long end_l = d2.getTime();
 
-                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l,selected_profile);
+                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
 
 
                 if (current_day == 14 || current_day == 30) {
@@ -1573,12 +1720,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 Date d2 = end_day_monthly.getTime();
                 long end_l = d2.getTime();
 
-                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l,selected_profile);
+                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
                 if (current_day == 14 || current_day == 31) {
                     todayPayDay = true;
                 }
             }
-
             ifPayDay(todayPayDay, counts_list);
         }
 
@@ -1586,32 +1732,37 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void ifPayDay(boolean isPayday, ArrayList<String> counts_list) {
-        if (isPayday) {
 
-            perTd_label.setVisibility(View.VISIBLE);
-            totalcount_label.setVisibility(View.VISIBLE);
-            edittext_perTD.setVisibility(View.VISIBLE);
-            edittext_total.setVisibility(View.VISIBLE);
-            if (counts_list.size() > 0) {
+        if (getTournamentTips) {
+            if (isPayday) {
 
-                for (int i = 0; i < counts_list.size(); i++) {
-                    String str = counts_list.get(i);
-                    if (!str.equalsIgnoreCase("")) {
-                        int count = Integer.parseInt(str);
-                        total_counts_till_now = total_counts_till_now + count;
+                perTd_label.setVisibility(View.VISIBLE);
+                totalcount_label.setVisibility(View.VISIBLE);
+                edittext_perTD.setVisibility(View.VISIBLE);
+                edittext_total.setVisibility(View.VISIBLE);
+                if (counts_list.size() > 0) {
 
+                    for (int i = 0; i < counts_list.size(); i++) {
+                        String str = counts_list.get(i);
+                        if (!str.equalsIgnoreCase("")) {
+                            int count = Integer.parseInt(str);
+                            total_counts_till_now = total_counts_till_now + count;
+
+                        }
                     }
+                    edittext_count.setText(String.valueOf(total_counts_till_now));
+                    total_counts_till_now = 0;
                 }
-                edittext_count.setText(String.valueOf(total_counts_till_now));
-                total_counts_till_now = 0;
+            } else {
+                perTd_label.setVisibility(View.GONE);
+                totalcount_label.setVisibility(View.GONE);
+                edittext_perTD.setVisibility(View.GONE);
+                edittext_total.setVisibility(View.GONE);
             }
-        } else {
-            perTd_label.setVisibility(View.GONE);
-            totalcount_label.setVisibility(View.GONE);
-            edittext_perTD.setVisibility(View.GONE);
-            edittext_total.setVisibility(View.GONE);
         }
     }
+
+
 }
 
 

@@ -59,9 +59,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.GettingTournamentDown + " INTEGER, "
 
                 + DatabaseUtils.StartShift + " TEXT, "
-                + DatabaseUtils.ClockIn + " TEXT, "
+                //  + DatabaseUtils.ClockIn + " TEXT, "
                 + DatabaseUtils.EndShift + " TEXT, "
-
+                + DatabaseUtils.ClockIn + " REAL, "
                 + DatabaseUtils.StartShiftLong + " REAL, "
                 + DatabaseUtils.EndShiftLong + " REAL, "
 
@@ -69,7 +69,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 + DatabaseUtils.WagesPerHour + " TEXT, "
                 + DatabaseUtils.TotalEarnings + " TEXT, "
-                + DatabaseUtils.ClockOut + " TEXT );");
+                + DatabaseUtils.ClockOut + " REAL " +
+                //  + DatabaseUtils.ClockOut + " TEXT " +
+                " );");
 
     }
 
