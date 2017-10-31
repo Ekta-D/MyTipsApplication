@@ -450,7 +450,6 @@ public class DatabaseOperations {
             if (cursor_count != 0) {
                 if (cursor.moveToFirst()) {
                     do {
-
                         addDay = new AddDay();
                         addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
                         addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));

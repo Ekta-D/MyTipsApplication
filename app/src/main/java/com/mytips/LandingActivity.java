@@ -52,6 +52,12 @@ import com.mytips.Model.Profiles;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
+import java.io.FileNotFoundException;
 import java.text.DateFormat;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -366,10 +372,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     @Override
                     public void onClick(View v) {
 
+                        editor.remove(Constants.EditTextStart).commit();
+                        editor.remove(Constants.EditTextEnd).commit();
 
                         editText1.setText("");
                         editText2.setText("");
-                        if (data!=null && data.size() > 0) {
+                        if (data != null && data.size() > 0) {
                             data.clear();
                         }
                         changeData(selected_summary_type, start_week, selected_profileName);
@@ -394,12 +402,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             // We use this instance as the callback for connection and connection
             // failures.
             // Since no account name is passed, the user is prompted to choose.
-//            mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                    .addApi(Drive.API)
-//                    .addScope(Drive.SCOPE_FILE)
-//                    .addConnectionCallbacks(this)
-//                    .addOnConnectionFailedListener(this)
-//                    .build();
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Drive.API)
+                    .addScope(Drive.SCOPE_FILE)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
         }
         // Connect the client. Once connected, the camera is launched.
         mGoogleApiClient.connect();*/
@@ -511,8 +519,16 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     });
                     animate.start();
                 }
+
                 return true;
 
+            case R.id.email_data:
+
+                Thread t = new Thread(thread);
+                t.start();
+
+//                Toast.makeText(context, "Email", Toast.LENGTH_SHORT).show();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -548,7 +564,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 break;
             case R.id.backup:
-                File Db = new File("/data/data/com.mytips/databases/tipseeDB");
+                /*File Db = new File("/data/data/com.mytips/databases/tipseeDB");
 
                 File fileDir = new File(Environment.getExternalStorageDirectory()
                         .toString() + "/MyTipsAppImages/database/");
@@ -573,7 +589,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     copyFile(new FileInputStream(Db), new FileOutputStream(file));
                 } catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
                 break;
         }
     }
@@ -713,10 +729,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             date_format = "MMM dd,yyyy";
         }
-
-        String weekday_name = new SimpleDateFormat("EEEE", Locale.ENGLISH).format(System.currentTimeMillis());
-
-        Log.i("weekday", weekday_name + " " + start_week);
         if (spinner_selected.equalsIgnoreCase("Daily")) {
 
             Calendar cal = Calendar.getInstance();
@@ -735,6 +747,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(Calendar.DAY_OF_WEEK, start_day);
+            calendar1.set(Calendar.HOUR_OF_DAY, 0);
+            calendar1.set(Calendar.MINUTE, 0);
+            calendar1.set(Calendar.SECOND, 0);
+            calendar1.set(Calendar.MILLISECOND, 0);
 
             DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
             ArrayList<String> string_dates = new ArrayList<>();
@@ -1235,4 +1251,43 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public void onConnectionSuspended(int cause) {
         Log.i(TAG, "GoogleApiClient connection suspended");
     }*/
+
+    Runnable thread = new Runnable() {
+        @Override
+        public void run() {
+
+            HSSFWorkbook wb = new HSSFWorkbook();
+            HSSFSheet sheet = wb.createSheet("MyTips");
+            HSSFRow row = sheet.createRow((short) 0);
+            ArrayList<AddDay> add_days_list = addDayArrayList;
+            for (int i = 0; i < add_days_list.size(); i++) {
+
+                AddDay aD = add_days_list.get(i);
+
+                HSSFCell cell = row.createCell((short) 0);
+                cell.setCellValue(aD.getCalculated_hours());
+                cell.setCellValue(aD.getProfile());
+                cell.setCellValue(aD.getDay_off());
+                cell.setCellValue(aD.getEnd_long());
+            }
+
+            FileOutputStream fileOut = null;
+            try {
+                fileOut = new FileOutputStream("workbook.xls");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                try {
+                    wb.write(fileOut);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                try {
+                    fileOut.close();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+        }
+    };
 }

@@ -3,6 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/email_data"
+        android:title="Email"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_menu"
         android:icon="@drawable/ic_dots_vertical"
