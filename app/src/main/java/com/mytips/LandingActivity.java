@@ -369,7 +369,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                         editText1.setText("");
                         editText2.setText("");
-                        if (data.size() > 0) {
+                        if (data!=null && data.size() > 0) {
                             data.clear();
                         }
                         changeData(selected_summary_type, start_week, selected_profileName);
@@ -389,7 +389,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         super.onResume();
         // TODO: 29/10/2017 update profile spinner, list data and total earnings card.
 
-        if (mGoogleApiClient == null) {
+        /*if (mGoogleApiClient == null) {
             // Create the API client and bind it to an instance variable.
             // We use this instance as the callback for connection and connection
             // failures.
@@ -402,7 +402,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 //                    .build();
         }
         // Connect the client. Once connected, the camera is launched.
-        mGoogleApiClient.connect();
+        mGoogleApiClient.connect();*/
 
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
         updateSpinner(profiles);

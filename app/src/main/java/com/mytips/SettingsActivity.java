@@ -381,6 +381,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
                 final Dialog tipees_dilog = new Dialog(SettingsActivity.this);
                 tipees_dilog.setContentView(R.layout.show_edit_tipee_dialog);
+
+                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                lp.copyFrom(tipees_dilog.getWindow().getAttributes());
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                tipees_dilog.show();
+                tipees_dilog.getWindow().setAttributes(lp);
+
                 Button add_tipee_btn = (Button) tipees_dilog.findViewById(R.id.button);
 
                 final ListView tipees_list = (ListView) tipees_dilog.findViewById(R.id.tipee_name_list);
@@ -403,6 +411,13 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                     public void onClick(View v) {
                         final Dialog dialog = new Dialog(SettingsActivity.this);
                         dialog.setContentView(R.layout.add_tipee_dialog);
+
+                        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                        lp.copyFrom(dialog.getWindow().getAttributes());
+                        lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                        dialog.show();
+                        dialog.getWindow().setAttributes(lp);
 
                         Button button_ok, button_cancel;
                         final EditText editText_tipeename, editText_tipee_out;

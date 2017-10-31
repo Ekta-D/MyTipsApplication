@@ -31,10 +31,10 @@
     <string name="pref_title_date">Date</string>
     <string name="pref_default_date">Jan 1,2017</string>
     <string name="pref_time_title">Time</string>
-    <string name="data_backup">Backup &amp; Security </string>
+    <string name="data_backup">Data &amp; Security </string>
     <string name="reset_data">Reset Data</string>
-    <string name="backup_restore">Backup &amp; Restore </string>
-    <string name="get_passcode">Set/Reset a Passcode</string>
+    <string name="backup_restore">Restore Data</string>
+    <string name="get_passcode">Set/Reset Passcode</string>
     <string name="pref_default_hour">1 hour</string>
     <string name="pref_title_add_friends_to_messages">Theme</string>
     <string name="pref_currency_title">Currency</string>
@@ -44,8 +44,6 @@
     <string name="deactive">Deactive Profiles</string>
     <string-array name="currencies">
         <item>United States </item>
-        <item>Uruguay</item>
-        <item>Standard World List</item>
     </string-array>
     <string-array name="pref_example_list_titles">
         <item>Black &amp; White</item>
@@ -66,6 +64,9 @@
         <item>1</item>
         <item>0</item>
         <item>-1</item>
+    </string-array>
+    <string-array name="pref_currency_values">
+        <item>1</item>
     </string-array>
     <string-array name="pref_time_list">
         <item>0</item>
