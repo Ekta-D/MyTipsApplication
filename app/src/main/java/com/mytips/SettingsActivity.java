@@ -463,7 +463,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         preference_set_passcode = (Preference) findPreference("get_passcode");
 
-        preference_set_passcode.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+       /* preference_set_passcode.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
@@ -559,7 +559,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 dialog1.show();
                 return true;
             }
-        });
+        });*/
     }
 
     /**
