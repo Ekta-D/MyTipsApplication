@@ -1,8 +1,10 @@
 package com.mytips;
 
+import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -11,6 +13,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -48,11 +52,10 @@ import java.util.Random;
 
 
 public class AddProfileActivity extends AppCompatActivity {
-
+    public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
 
     ImageButton imageButton;
     String profile_name;
-    //    int hourly_pay = 0;
     double hourly_pay = 0;
     EditText editText_profilename, editText_hourly_pay;
     CheckBox checkBox_supervisor, checkBox_getTournament, checkBox_getTips;
@@ -123,7 +126,6 @@ public class AddProfileActivity extends AppCompatActivity {
         editText_hourly_pay = (EditText) findViewById(R.id.editText_houly_pay);
 
 
-
         payAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, pay_period_array);
         spinner_payperiod.setAdapter(payAdapter);
 
@@ -132,6 +134,7 @@ public class AddProfileActivity extends AppCompatActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
                 payPeriod = parent.getItemAtPosition(position).toString();
+                updateView(payPeriod);
                 spinner_payperiod.setSelection(position);
             }
 
@@ -193,24 +196,30 @@ public class AddProfileActivity extends AppCompatActivity {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder alert = new AlertDialog.Builder(AddProfileActivity.this);
-                alert.setTitle("Make your selection");
-                final String names[] = {"Camera", "Gallery"};
-                alert.setItems(names, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int item) {
-                        if (item == 0) {
-                            OpenCamera();
-                            dialog.dismiss();
-                        } else {
-                            openGallery();
-                            dialog.dismiss();
+                boolean grantedPermission = checkPermissions();
+                if (!grantedPermission) {
+                    checkPermissions();
+                } else {
+                    AlertDialog.Builder alert = new AlertDialog.Builder(AddProfileActivity.this);
+                    alert.setTitle("Make your selecetion");
+                    final String names[] = {"Camera", "Gallery"};
+                    alert.setItems(names, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int item) {
+                            if (item == 0) {
+                                OpenCamera();
+                                dialog.dismiss();
+                            } else {
+                                openGallery();
+                                dialog.dismiss();
+                            }
                         }
-                    }
-                });
+                    });
 
-                AlertDialog al = alert.create();
-                al.show();
+                    AlertDialog al = alert.create();
+                    al.show();
+                }
+
             }
         });
 
@@ -491,5 +500,59 @@ public class AddProfileActivity extends AppCompatActivity {
 
         }
         return file_name;
+    }
+
+    public void updateView(String payPeriod) {
+
+        if (payPeriod.equalsIgnoreCase("Every 2 Weeks")) {
+
+        }
+
+    }
+
+    public boolean checkPermissions() {
+        int permissionWrite = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int storagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        int camera_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        int finger_print = ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        if (storagePermission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (permissionWrite != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (camera_permission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.CAMERA);
+        }
+
+        if (finger_print != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.USE_FINGERPRINT);
+        }
+
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MY_PERMISSIONS_REQUEST_ACCOUNTS);
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCOUNTS:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    //Toast.makeText(SplashActivity.this, "permissions granted!", Toast.LENGTH_SHORT).show();
+                } else {
+                    //Toast.makeText(SplashActivity.this, "permissions not granted!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
     }
 }

@@ -25,7 +25,7 @@ import java.util.List;
 
 public class SplashActivity extends AppCompatActivity {
 
-    public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
+
     public static final String ISFIRST_TIME = "Isfirst_time";
     SharedPreferences sharedPreferences;
     boolean isFirstTime;
@@ -64,15 +64,20 @@ public class SplashActivity extends AppCompatActivity {
             }
         });
 //        if (!isFirstTime) {
-        if (sharedPreferences.getString("user_name", "").equals("")) {
-            checkPermissions();
-        }
+        final String password = sharedPreferences.getString(Constants.ConfirmKey, "");
+//        if (sharedPreferences.getString("user_name", "").equals("")) {
+//            checkPermissions();
+//        }
         if (!sharedPreferences.getString("user_name", "").equals("")) {
             hideViews();
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    startActivity(new Intent(getBaseContext(), LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    if (!password.equalsIgnoreCase("")) {
+                        startActivity(new Intent(SplashActivity.this, LockScreen.class));
+                    } else {
+                        startActivity(new Intent(getBaseContext(), LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+                    }
                     finish();
                 }
             }, 2000);
@@ -86,51 +91,6 @@ public class SplashActivity extends AppCompatActivity {
         findViewById(R.id.button_go).setVisibility(View.GONE);
     }
 
-    public boolean checkPermissions() {
-        int permissionWrite = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int storagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        int camera_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        int finger_print = ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
-        List<String> listPermissionsNeeded = new ArrayList<>();
-
-        if (storagePermission != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-        if (permissionWrite != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-        if (camera_permission != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.CAMERA);
-        }
-
-        if (finger_print != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.USE_FINGERPRINT);
-        }
-
-        if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this,
-                    listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MY_PERMISSIONS_REQUEST_ACCOUNTS);
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCOUNTS:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //Toast.makeText(SplashActivity.this, "permissions granted!", Toast.LENGTH_SHORT).show();
-                } else {
-                    //Toast.makeText(SplashActivity.this, "permissions not granted!", Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
-    }
 }
 
 

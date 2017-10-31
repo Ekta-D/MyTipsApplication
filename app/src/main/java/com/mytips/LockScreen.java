@@ -34,11 +34,11 @@ public class LockScreen extends AppCompatActivity {
         }
 
 
-        final String password = sharedPreferences.getString(Constants.ConfirmKey, "");
-
-        if (password.equalsIgnoreCase("")) {
-            startActivity(new Intent(LockScreen.this, SplashActivity.class));
-        }
+       final String password = sharedPreferences.getString(Constants.ConfirmKey, "");
+//
+//        if (password.equalsIgnoreCase("")) {
+//            startActivity(new Intent(LockScreen.this, SplashActivity.class));
+//        }
 
         editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override

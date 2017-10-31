@@ -349,6 +349,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        data = new ArrayList<AddDay>();
 
                         data = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
                                 getTimeInMillis(), selected_profileName);
@@ -368,7 +369,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                         editText1.setText("");
                         editText2.setText("");
-                        data.clear();
+                        if (data.size() > 0) {
+                            data.clear();
+                        }
                         changeData(selected_summary_type, start_week, selected_profileName);
                         dialog1.dismiss();
                     }
@@ -386,20 +389,20 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         super.onResume();
         // TODO: 29/10/2017 update profile spinner, list data and total earnings card.
 
-        /*if (mGoogleApiClient == null) {
+        if (mGoogleApiClient == null) {
             // Create the API client and bind it to an instance variable.
             // We use this instance as the callback for connection and connection
             // failures.
             // Since no account name is passed, the user is prompted to choose.
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Drive.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
+//            mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                    .addApi(Drive.API)
+//                    .addScope(Drive.SCOPE_FILE)
+//                    .addConnectionCallbacks(this)
+//                    .addOnConnectionFailedListener(this)
+//                    .build();
         }
         // Connect the client. Once connected, the camera is launched.
-        mGoogleApiClient.connect();*/
+        mGoogleApiClient.connect();
 
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
         updateSpinner(profiles);
@@ -528,13 +531,24 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(new Intent(getBaseContext(), SettingsActivity.class));
                 break;
             case R.id.share:
+                try {
+                    Intent i = new Intent(Intent.ACTION_SEND);
+                    i.setType("text/plain");
+                    i.putExtra(Intent.EXTRA_SUBJECT, "My application name");
+                    String sAux = "\nLet me recommend you this application\n\n";
+                    sAux = sAux + "https://play.google.com/store/apps/details?id=Orion.Soft \n\n";
+                    i.putExtra(Intent.EXTRA_TEXT, sAux);
+                    startActivity(Intent.createChooser(i, "choose one"));
+                } catch (Exception e) {
+                    //e.toString();
+                }
 
                 break;
             case R.id.invite:
 
                 break;
             case R.id.backup:
-                /*File Db = new File("/data/data/com.mytips/databases/tipseeDB");
+                File Db = new File("/data/data/com.mytips/databases/tipseeDB");
 
                 File fileDir = new File(Environment.getExternalStorageDirectory()
                         .toString() + "/MyTipsAppImages/database/");
@@ -559,7 +573,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     copyFile(new FileInputStream(Db), new FileOutputStream(file));
                 } catch (IOException e) {
                     e.printStackTrace();
-                }*/
+                }
                 break;
         }
     }

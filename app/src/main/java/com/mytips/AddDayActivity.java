@@ -1541,7 +1541,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             todayPayDay = true;
             ifPayDay(todayPayDay, counts_list);
 
-        } else if (pay_period.equalsIgnoreCase("Weekly")) {
+        }
+        if (pay_period.equalsIgnoreCase("Weekly")) {
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(Calendar.DAY_OF_WEEK, day);
             DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
@@ -1582,51 +1583,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             }
 
             ifPayDay(todayPayDay, counts_list);
-        } else if (pay_period.equalsIgnoreCase("Every 2 Weeks")) {
-
-            Calendar calendar1 = Calendar.getInstance();
-            calendar1.set(Calendar.DAY_OF_WEEK, day);
-            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
-            ArrayList<String> string_dates = new ArrayList<>();
-            ArrayList<Long> dates = new ArrayList<>();
-            for (int i = 0; i < 14; i++) {
-
-                String str_date = dateFormat.format(calendar1.getTime().getTime());
-
-                Date date = calendar1.getTime();
-                long lon = date.getTime();
-
-                calendar1.add(Calendar.DATE, 1);
-
-                string_dates.add(str_date);
-
-
-                dates.add(lon);
-            }
-            long reset_next_week = 0;
-            long reset_current = 0;
-            if (dates.size() > 0) {
-
-                reset_current = dates.get(0);
-                reset_next_week = dates.get(14);
-            }
-            counts_list = new ArrayList<>();
-            counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
-
-//
-            Date today_date = calStartDay.getTime();
-
-            String str_date = dateFormat.format(today_date.getTime());
-
-            if (str_date.equalsIgnoreCase(string_dates.get(14))) {
-                Log.i("str", string_dates.get(14));
-                todayPayDay = true;
-            }
-
-            ifPayDay(todayPayDay, counts_list);
-
-
-        } else {
+        }
+        if (pay_period.equalsIgnoreCase("1st & 15th")) {
             counts_list = new ArrayList<>();
 
             int month = start_calendar.get(Calendar.MONTH);
@@ -1725,6 +1683,48 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     todayPayDay = true;
                 }
             }
+            ifPayDay(todayPayDay, counts_list);
+        } else {
+
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.set(Calendar.DAY_OF_WEEK, day);
+            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+            ArrayList<String> string_dates = new ArrayList<>();
+            ArrayList<Long> dates = new ArrayList<>();
+            for (int i = 0; i < 14; i++) {
+
+                String str_date = dateFormat.format(calendar1.getTime().getTime());
+
+                Date date = calendar1.getTime();
+                long lon = date.getTime();
+
+                calendar1.add(Calendar.DATE, 1);
+
+                string_dates.add(str_date);
+
+
+                dates.add(lon);
+            }
+            long reset_next_week = 0;
+            long reset_current = 0;
+            if (dates.size() > 0) {
+
+                reset_current = dates.get(0);
+                reset_next_week = dates.get(13);
+            }
+            counts_list = new ArrayList<>();
+            counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
+
+//
+            Date today_date = calStartDay.getTime();
+
+            String str_date = dateFormat.format(today_date.getTime());
+
+            if (str_date.equalsIgnoreCase(string_dates.get(13))) {
+                Log.i("str", string_dates.get(13));
+                todayPayDay = true;
+            }
+
             ifPayDay(todayPayDay, counts_list);
         }
 
