@@ -52,10 +52,6 @@ import com.mytips.Model.Profiles;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
 import java.io.FileNotFoundException;
 import java.text.DateFormat;
@@ -70,6 +66,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
 
@@ -524,10 +521,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             case R.id.email_data:
 
-                Thread t = new Thread(thread);
-                t.start();
+                String fromEmail = "beesolver.ekta@gmail.com";
 
-//                Toast.makeText(context, "Email", Toast.LENGTH_SHORT).show();
+                ArrayList<String> arrayList = new ArrayList<>();
+                arrayList.add("ekta@beesolvertechnology.com");
+                new SendMailTask(LandingActivity.this).execute(fromEmail,
+                        Constants.fromPassword, arrayList, "Subject", "body");
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -1256,38 +1255,140 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         @Override
         public void run() {
 
-            HSSFWorkbook wb = new HSSFWorkbook();
-            HSSFSheet sheet = wb.createSheet("MyTips");
-            HSSFRow row = sheet.createRow((short) 0);
-            ArrayList<AddDay> add_days_list = addDayArrayList;
-            for (int i = 0; i < add_days_list.size(); i++) {
+//            HSSFWorkbook wb = new HSSFWorkbook();
+//            HSSFSheet sheet = wb.createSheet("MyTips");
+//            HSSFRow row = sheet.createRow((short) 0);
+//            ArrayList<AddDay> add_days_list = addDayArrayList;
+//            for (int i = 0; i < add_days_list.size(); i++) {
+//
+//                AddDay aD = add_days_list.get(i);
+//
+//                HSSFCell cell = row.createCell((short) 0);
+//                cell.setCellValue(aD.getCalculated_hours());
+//                cell.setCellValue(aD.getProfile());
+//                cell.setCellValue(aD.getDay_off());
+//                cell.setCellValue(aD.getEnd_long());
+//            }
+//
+//
+//            try {
+//                FileOutputStream fileOut = null;
+//                fileOut = new FileOutputStream("workbook.xls");
+//                wb.write(fileOut);
+//                fileOut.close();
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
 
-                AddDay aD = add_days_list.get(i);
+//            int rownum = 0;
+//            HSSFSheet firstSheet;
+//            Collection<File> files;
+//            HSSFWorkbook workbook;
+//            File exactFile;
+//
+//            workbook = new HSSFWorkbook();
+//            firstSheet = workbook.createSheet("FIRST SHEET");
+//            Row headerRow = firstSheet.createRow(rownum);
+//            headerRow.setHeightInPoints(40);
+//            try {
+//                Row row = firstSheet.createRow(rownum);
+//                for (int j = 0; j < addDayArrayList.size(); j++) {
+//                    Cell cell = row.createCell(j);
+//                    cell.setCellValue(addDayArrayList.get(j).getProfile());
+//                }
+//                rownum++;
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            } finally {
+//            }
 
-                HSSFCell cell = row.createCell((short) 0);
-                cell.setCellValue(aD.getCalculated_hours());
-                cell.setCellValue(aD.getProfile());
-                cell.setCellValue(aD.getDay_off());
-                cell.setCellValue(aD.getEnd_long());
-            }
 
-            FileOutputStream fileOut = null;
-            try {
-                fileOut = new FileOutputStream("workbook.xls");
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                try {
-                    wb.write(fileOut);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-                try {
-                    fileOut.close();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            }
+//
+//            XSSFWorkbook workbook = new XSSFWorkbook();
+//            XSSFSheet sheet = workbook.createSheet("Country");
+//            ArrayList<Object[]> data = new ArrayList<Object[]>();
+//            data.add(new String[]{"Country", "Capital", "Population"});
+//            data.add(new Object[]{"India", "Delhi", 10000});
+//            data.add(new Object[]{"France", "Paris", 40000});
+//            data.add(new Object[]{"Germany", "Berlin", 20000});
+//            data.add(new Object[]{"England", "London", 30000});
+//            int rownum = 0;
+//            for (Object[] countries : data) {
+//                Row row = sheet.createRow(rownum++);
+//
+//                int cellnum = 0;
+//                for (Object obj : countries) {
+//                    Cell cell = row.createCell(cellnum++);
+//                    if (obj instanceof String)
+//                        cell.setCellValue((String) obj);
+//                    else if (obj instanceof Double)
+//                        cell.setCellValue((Double) obj);
+//                    else if (obj instanceof Integer)
+//                        cell.setCellValue((Integer) obj);
+//                }
+//            }
+//            try {
+//                //Write the workbook in file system
+//                FileOutputStream out = new FileOutputStream(new File("CountriesDetails.xls"));
+//                workbook.write(out);
+//                out.close();
+//              //  System.out.println("CountriesDetails.xlsx has been created successfully");
+//                workbook.close();
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            } finally {
+//                try {
+//                    workbook.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+
+//            File Doc = new File(Environment
+//                    .getExternalStorageDirectory().getPath()
+//                    + File.separator
+//                    + "MyTipsee");
+//            if (!Doc.exists()) {
+//                Doc.mkdir();
+//            }
+//            File imagePath = new File(Doc, "excel" + Calendar.getInstance().getTime() + ".xls");
+//
+//            String file_path = imagePath.getAbsolutePath();
+//
+//
+//            Workbook workbook = new XSSFWorkbook();
+//            Sheet sheet = workbook.createSheet("Tips");
+//            int row = 0;
+//            for (AddDay addDay : addDayArrayList) {
+//                Row row1 = sheet.createRow(row);
+//                int cell = 0;
+//               // row1.createCell(cell++).setCellValue(addDay.getProfile());
+//                row1.createCell(cell).setCellValue(addDay.getProfile());
+//            }
+//            try {
+//
+//                FileOutputStream fos = new FileOutputStream(file_path);
+//
+//                workbook.write(fos);
+//
+//                fos.close();
+//
+//
+//                System.out.println(file_path + " is successfully written");
+//
+//            } catch (FileNotFoundException e) {
+//
+//                e.printStackTrace();
+//
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//
+//            }
+
 
         }
+
     };
 }

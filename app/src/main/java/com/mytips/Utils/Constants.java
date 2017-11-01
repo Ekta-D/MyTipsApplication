@@ -14,5 +14,5 @@ public class Constants {
     public static final String ConfirmKey = "confirm_pass";
     public static final String EditTextStart = "start";
     public static final String EditTextEnd = "end";
-
+    public static final  String fromPassword="solver@2017";
 }
