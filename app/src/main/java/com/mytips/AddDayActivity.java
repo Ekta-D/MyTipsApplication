@@ -114,6 +114,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     boolean switch_value = false;
     boolean getTournamentTips = false;
     double manual_data = 0;
+    double manual_percentage_data = 0, manual_tips_data = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -368,6 +369,30 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     switch_value = true;
+                    String hr = String.valueOf(diffHours);
+                    if (hr.contains("-")) {
+                        hr = hr.replace("-", "");
+                    }
+                    String m = String.valueOf(diffMinutes);
+                    if (m.contains("-")) {
+                        m = m.replace("-", "");
+                    }
+                    String d = String.valueOf(diffDays);
+                    if (d.contains("-")) {
+                        d = d.replace("-", "");
+                    }
+                    if (manual_percentage_data > 0) {
+                        percentage = percentage - manual_percentage_data;
+
+                        result_tip_outpercentage = (percentage * total_tipsInput) / 100;
+
+                        // total_tipout.setText(String.valueOf(result));
+                        total_tipout.setText(String.format("%.2f", result_tip_outpercentage));
+                    }
+                    calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
+                            Integer.parseInt(m),
+                            Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value);
+
                     editext_manual_tips.setText("");
                 }
 
@@ -395,18 +420,32 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         if (!str.equalsIgnoreCase("")) {
 
                             Log.i("total_", String.valueOf(total_tipPercentage));
-                            manual_data = Double.parseDouble(str);
+                            p = Double.parseDouble(str);
 
-                            dynamic_tip_out_percentage = manual_data;
+                            // dynamic_tip_out_percentage = manual_data;
 
+                            // manual_percentage_data = manual_data;
+                            //  p = p + dynamic_tip_out_percentage;
+//                            manual_data = manual_data + p;
 
-                            p = p + dynamic_tip_out_percentage;
-                            percentage = p;
-                            result1 = (percentage * total_tipsInput) / 100;
-                            total_tipPercentage = p;
-                            text_tip_out_percent.setText(String.format("%.2f", total_tipPercentage) + "%");
+                            //  percentage = p;
+                            manual_percentage_data = p;
+                            result1 = (manual_percentage_data * total_tipsInput) / 100;
+                            //  total_tipPercentage = p;
+//                            text_tip_out_percent.setText(String.format("%.2f", manual_percentage_data) + "%");
+//
+//                            total_tipout.setText(String.format("%.2f", result1));
+                        }
+                        if (str.equalsIgnoreCase("")) {
+                            if (selected_tipeesIDs.size() > 0) {
+                                //   result1 = 0;
+                                checkedTipeeCalculations(selected_tipeesIDs);
+                                double per = 0;
+                                // manual_percentage_data = Double.parseDouble("0");
 
-                            total_tipout.setText(String.format("%.2f", result1));
+                                text_tip_out_percent.setText(String.format("%.2f", percentage) + "%");
+                                total_tipout.setText(String.format("%.2f", result_tip_outpercentage));
+                            }
                         }
                     }
                 } else {
@@ -416,20 +455,21 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             manual_data = Double.parseDouble(str);
                             result1 = manual_data;
 
-                            double per = result1 / total_tipsInput;
+                            double per = manual_data / total_tipsInput;
                             per = per * 100;
 
-                            text_tip_out_percent.setText(String.format("%.2f", per) + "%");
-                            total_tipout.setText(String.format("%.2f", result1));
-                        } else {
-                            result1 = 0;
-                            double per = 0;
-                            text_tip_out_percent.setText(String.format("%.2f", per) + "%");
-                            total_tipout.setText(String.format("%.2f", result1));
+                            manual_percentage_data = per;
+                            text_tip_out_percent.setText(String.format("%.2f", manual_percentage_data) + "%");
+                            total_tipout.setText(String.format("%.2f", manual_data));
                         }
 
                     }
                 }
+
+
+//                text_tip_out_percent.setText(String.format("%.2f", manual_percentage_data) + "%");
+//
+//                total_tipout.setText(String.format("%.2f", result1));
 
                 String hr = String.valueOf(diffHours);
                 if (hr.contains("-")) {
@@ -446,7 +486,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
                 calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                         Integer.parseInt(m),
-                        Integer.parseInt(d), result1, total_tipsInput, total_tournamentdown
+                        Integer.parseInt(d), manual_data, total_tipsInput, total_tournamentdown
                         , holiday_off_value);
             }
         });
@@ -1165,47 +1205,67 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 @Override
                 public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo) {
                     if (isChecked) {
-                        selected_tipeesIDs.add(tipeeInfo.getId());
-                        String per = tipeeInfo.getPercentage();
-                        dynamic_tip_out_percentage = Double.parseDouble(per);
-                        if (!per.equalsIgnoreCase("")) {
+                        checkedTipeeCalculations(selected_tipeesIDs);
+//                        selected_tipeesIDs.add(tipeeInfo.getId());
+//                        String per = tipeeInfo.getPercentage();
+//                        dynamic_tip_out_percentage = Double.parseDouble(per);
+//                        if (!per.equalsIgnoreCase("")) {
 //                            if (switch_value) {
-//                                dynamic_tip_out_percentage = dynamic_tip_out_percentage + manual_data;
+//
+//                                if (manual_percentage_data != 0) {
+//                                    dynamic_tip_out_percentage = dynamic_tip_out_percentage + manual_percentage_data;
+//                                }
+//                            } else {
+//                                if (manual_percentage_data != 0)
+//                                    dynamic_tip_out_percentage = dynamic_tip_out_percentage + manual_percentage_data;
 //                            }
-
-                            total_tipPercentage = total_tipPercentage + dynamic_tip_out_percentage;
-                            if (manual_data == 0) {
-                                total_tipPercentage = total_tipPercentage - dynamic_tip_out_percentage;
-                            }
-                            percentage = total_tipPercentage;
-                            text_tip_out_percent.setText(String.format("%.2f", total_tipPercentage) + "%");
-                            double result1 = (percentage * total_tipsInput) / 100;
-
-                            total_tipout.setText(String.format("%.2f", result1));
-
-                            String hr = String.valueOf(diffHours);
-                            if (hr.contains("-")) {
-                                hr = hr.replace("-", "");
-                            }
-                            String m = String.valueOf(diffMinutes);
-                            if (m.contains("-")) {
-                                m = m.replace("-", "");
-                            }
-                            String d = String.valueOf(diffDays);
-                            if (d.contains("-")) {
-                                d = d.replace("-", "");
-                            }
-
-                            calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
-                                    Integer.parseInt(m),
-                                    Integer.parseInt(d), result1, total_tipsInput, total_tournamentdown
-                                    , holiday_off_value);
-                        }
+//
+//                            double tt = total_tipPercentage;
+//                            total_tipPercentage = total_tipPercentage + dynamic_tip_out_percentage;
+////                            if (manual_data == 0) {
+////                                total_tipPercentage = total_tipPercentage - dynamic_tip_out_percentage;
+////                            }
+//                            percentage = total_tipPercentage;
+//                            text_tip_out_percent.setText(String.format("%.2f", total_tipPercentage) + "%");
+//                            double result1 = (percentage * total_tipsInput) / 100;
+//
+//
+//                            total_tipout.setText(String.format("%.2f", result1));
+//
+//                            String hr = String.valueOf(diffHours);
+//                            if (hr.contains("-")) {
+//                                hr = hr.replace("-", "");
+//                            }
+//                            String m = String.valueOf(diffMinutes);
+//                            if (m.contains("-")) {
+//                                m = m.replace("-", "");
+//                            }
+//                            String d = String.valueOf(diffDays);
+//                            if (d.contains("-")) {
+//                                d = d.replace("-", "");
+//                            }
+//
+//                            calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
+//                                    Integer.parseInt(m),
+//                                    Integer.parseInt(d), result1, total_tipsInput, total_tournamentdown
+//                                    , holiday_off_value);
+//                            switch_value = false;
+//
+//                        }
                     } else {
                         String per = tipeeInfo.getPercentage();
 
                         if (!per.equalsIgnoreCase("")) {
+
                             dynamic_tip_out_percentage = Double.parseDouble(per);
+
+//                            if (switch_value) {
+//
+//                                if (manual_percentage_data != 0) {
+//                                    dynamic_tip_out_percentage = dynamic_tip_out_percentage + manual_percentage_data;
+//                                }
+//                            }
+
                             total_tipPercentage = total_tipPercentage - dynamic_tip_out_percentage;
                             percentage = total_tipPercentage;
                             if (total_tipPercentage < 0) {
@@ -1233,6 +1293,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                     Integer.parseInt(m),
                                     Integer.parseInt(d), result1, total_tipsInput, total_tournamentdown
                                     , holiday_off_value);
+                            switch_value = false;
+                            manual_percentage_data = 0;
                         }
                     }
                 }
@@ -1300,10 +1362,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         day_off_timer.setVisibility(View.GONE);
 
-//        if (tipee_nodata.getText().toString().contains("Tipees not found"))
-//        {
-//
-//        }
         if (b == null) {
             tipee_nodata.setVisibility(View.VISIBLE);
         } else {
@@ -1460,15 +1518,15 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         endDateTime.setTimeInMillis(end_format);
 
         if (selected_timeformatIndex == 0) {
-            edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
-            //     edittext_clockIn.setText(String.format("%02d:%02d %s", startDateTime.get(Calendar.HOUR), startDateTime.get(Calendar.MINUTE), (startDateTime.get(Calendar.AM_PM) == 0) ? "AM" : "PM"));
+            // edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
+            edittext_clockIn.setText(String.format("%02d:%02d %s", startDateTime.get(Calendar.HOUR), startDateTime.get(Calendar.MINUTE), (startDateTime.get(Calendar.AM_PM) == 0) ? "AM" : "PM"));
         } else {
             edittext_clockIn.setText(String.format("%02d:%02d", startDateTime.get(Calendar.HOUR_OF_DAY), startDateTime.get(Calendar.MINUTE)));
         }
 
         if (selected_timeformatIndex == 0) {
-            edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
-            //  edittext_clockOut.setText(String.format("%02d:%02d %s", endDateTime.get(Calendar.HOUR), endDateTime.get(Calendar.MINUTE), (endDateTime.get(Calendar.AM_PM) == 0) ? "AM" : "PM"));
+            // edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
+            edittext_clockOut.setText(String.format("%02d:%02d %s", endDateTime.get(Calendar.HOUR), endDateTime.get(Calendar.MINUTE), (endDateTime.get(Calendar.AM_PM) == 0) ? "AM" : "PM"));
         } else {
             edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
         }
@@ -1850,6 +1908,53 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 
+    public void checkedTipeeCalculations(List<String> selectedTipeesID) {
+        selected_tipeesIDs.add(tipeeInfo.getId());
+        String per = tipeeInfo.getPercentage();
+        dynamic_tip_out_percentage = Double.parseDouble(per);
+        if (!per.equalsIgnoreCase("")) {
+            if (switch_value) {
+
+                if (manual_percentage_data != 0) {
+                    dynamic_tip_out_percentage = dynamic_tip_out_percentage + manual_percentage_data;
+                }
+            } else {
+                if (manual_percentage_data != 0)
+                    dynamic_tip_out_percentage = dynamic_tip_out_percentage + manual_percentage_data;
+            }
+
+            double tt = total_tipPercentage;
+            total_tipPercentage = total_tipPercentage + dynamic_tip_out_percentage;
+//                            if (manual_data == 0) {
+//                                total_tipPercentage = total_tipPercentage - dynamic_tip_out_percentage;
+//                            }
+            percentage = total_tipPercentage;
+            text_tip_out_percent.setText(String.format("%.2f", total_tipPercentage) + "%");
+            double result1 = (percentage * total_tipsInput) / 100;
+
+
+            total_tipout.setText(String.format("%.2f", result1));
+
+            String hr = String.valueOf(diffHours);
+            if (hr.contains("-")) {
+                hr = hr.replace("-", "");
+            }
+            String m = String.valueOf(diffMinutes);
+            if (m.contains("-")) {
+                m = m.replace("-", "");
+            }
+            String d = String.valueOf(diffDays);
+            if (d.contains("-")) {
+                d = d.replace("-", "");
+            }
+
+            calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
+                    Integer.parseInt(m),
+                    Integer.parseInt(d), result1, total_tipsInput, total_tournamentdown
+                    , holiday_off_value);
+            switch_value = false;
+        }
+    }
 }
 
 
