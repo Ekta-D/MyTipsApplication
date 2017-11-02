@@ -14,8 +14,10 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/day_toolbar"
-        android:layout_margin="5dp">
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_below="@+id/day_toolbar"
+        android:layout_centerHorizontal="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -220,12 +222,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
                         android:text="Total Tips"
-                        app:layout_constraintBottom_toBottomOf="@+id/editText_total_tips"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/checkBox_holiday_pay"
-                        app:layout_constraintVertical_bias="0.476" />
+                        app:layout_constraintBottom_toBottomOf="@+id/editText_total_tips"
+                        app:layout_constraintTop_toTopOf="@+id/editText_total_tips" />
 
 
                     <TextView
@@ -234,9 +234,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        android:text="Tips"
-                        app:layout_constraintLeft_toLeftOf="parent"
+                        android:text="Tip Outs"
                         app:layout_constraintBottom_toBottomOf="@+id/switch_value"
+                        app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/switch_value" />
 
                     <RelativeLayout
@@ -245,10 +245,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="8dp"
                         android:layout_marginRight="8dp"
-                        android:layout_marginTop="10dp"
                         android:weightSum="3"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView11">
+                        android:layout_marginTop="8dp"
+                        app:layout_constraintTop_toBottomOf="@+id/editText_total_tips">
 
                         <TextView
                             android:id="@+id/dollar"
@@ -294,7 +294,6 @@
                             android:layout_alignParentRight="true"
                             android:layout_centerHorizontal="true"
                             android:layout_centerVertical="true"
-                            android:layout_marginRight="10dp"
                             android:inputType="numberDecimal" />
                     </RelativeLayout>
 
@@ -307,7 +306,6 @@
                         android:layout_marginTop="10dp"
                         android:ems="10"
                         android:inputType="numberDecimal"
-                        android:textSize="14sp"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tips_separator" />
 
@@ -317,10 +315,10 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        android:layout_marginTop="8dp"
                         android:text="Tip Out to Tipees"
                         app:layout_constraintLeft_toLeftOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/editText_total_tips" />
+                        android:layout_marginTop="9dp"
+                        app:layout_constraintTop_toBottomOf="@+id/switch_value" />
 
                     <RelativeLayout
                         android:id="@+id/linearLayout_tipees"
@@ -331,10 +329,9 @@
                         android:layout_marginRight="8dp"
                         android:layout_marginStart="8dp"
                         android:layout_marginTop="8dp"
-                        android:orientation="horizontal"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/view_type">
+                        app:layout_constraintTop_toBottomOf="@+id/textView11">
 
                         <ListView
                             android:id="@+id/list_view_tipees"
@@ -411,7 +408,7 @@
                         app:layout_constraintBottom_toBottomOf="@+id/editText_number_of_td"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/editText_number_of_td"
-                        app:layout_constraintVertical_bias="0.5" />
+                        android:layout_marginStart="8dp" />
 
 
                     <EditText
@@ -425,7 +422,6 @@
                         android:gravity="center"
                         android:hint="0"
                         android:inputType="numberDecimal"
-                        android:textSize="14sp"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
@@ -451,7 +447,6 @@
                         android:layout_marginRight="16dp"
                         android:ems="10"
                         android:inputType="numberDecimal"
-                        android:textSize="14sp"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/editText_number_of_td" />
 
@@ -477,7 +472,6 @@
                         android:editable="false"
                         android:ems="10"
                         android:inputType="number|numberDecimal"
-                        android:textSize="14sp"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/editText_amount_per_td" />
                     <!--<TextView-->
