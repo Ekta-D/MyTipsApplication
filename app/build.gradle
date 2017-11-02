@@ -39,8 +39,8 @@ dependencies {
     })
     //  menu like whtsapp adding attachment
     /*    compile('com.github.ozodrukh:CircularReveal:1.1.1@aar') {
-                                        transitive = true;
-                                    }*/
+                                            transitive = true;
+                                        }*/
     //   compile 'com.github.davidmigloz:number-keyboard:0.3'
     // for custom keyboard
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
@@ -53,15 +53,8 @@ dependencies {
     compile 'com.google.android.gms:play-services-drive:8.4.0'
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:multidex:1.0.1'
-//    compile 'org.apache.poi:poi:3.13'
-//    compile 'org.apache.poi:poi-ooxml:3.13'
-
-
     compile 'com.sun.mail:android-mail:1.5.5'
     compile 'com.sun.mail:android-activation:1.5.5'
 
-    //    compile 'com.fasterxml:aalto-xml:1.0.0'
-    //    android{
-    //        compile 'org.apache.poi:poi:3.13'
-    //    }
+    compile files('src/libs/itextg-5.5.10.jar')
 }

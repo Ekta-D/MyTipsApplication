@@ -44,6 +44,22 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.MetadataChangeSet;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfPTableEvent;
+import com.itextpdf.text.pdf.PdfPageEventHelper;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.mytips.Adapter.SpinnerProfile;
 import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Database.DatabaseOperations;
@@ -69,6 +85,10 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener/*, ConnectionCallbacks,
         OnConnectionFailedListener*/ {
@@ -521,12 +541,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             case R.id.email_data:
 
-                String fromEmail = "beesolver.ekta@gmail.com";
 
-                ArrayList<String> arrayList = new ArrayList<>();
-                arrayList.add("ekta@beesolvertechnology.com");
-                new SendMailTask(LandingActivity.this).execute(fromEmail,
-                        Constants.fromPassword, arrayList, "Subject", "body");
+                if (addDayArrayList.size() > 0) {
+                    Thread run = new Thread(thread);
+                    run.start();
+                } else {
+                    Toast.makeText(LandingActivity.this, "No Data found", Toast.LENGTH_SHORT).show();
+                }
+
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -1191,204 +1213,340 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         super.onPause();
     }*/
 
-   /* @Override
-    protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-        switch (requestCode) {
-            case REQUEST_CODE_CAPTURE_IMAGE:
-                // Called after a photo has been taken.
-                if (resultCode == Activity.RESULT_OK) {
-                    // Store the image data as a bitmap for writing later.
-                    mBitmapToSave = (Bitmap) data.getExtras().get("data");
-                }
-                break;
-            case REQUEST_CODE_CREATOR:
-                // Called after a file is saved to Drive.
-                if (resultCode == RESULT_OK) {
-                    Log.i(TAG, "Image successfully saved.");
-                    mBitmapToSave = null;
-                    // Just start the camera again for another photo.
-                    startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE),
-                            REQUEST_CODE_CAPTURE_IMAGE);
-                }
-                break;
-        }
-    }
+    /* @Override
+     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
+         switch (requestCode) {
+             case REQUEST_CODE_CAPTURE_IMAGE:
+                 // Called after a photo has been taken.
+                 if (resultCode == Activity.RESULT_OK) {
+                     // Store the image data as a bitmap for writing later.
+                     mBitmapToSave = (Bitmap) data.getExtras().get("data");
+                 }
+                 break;
+             case REQUEST_CODE_CREATOR:
+                 // Called after a file is saved to Drive.
+                 if (resultCode == RESULT_OK) {
+                     Log.i(TAG, "Image successfully saved.");
+                     mBitmapToSave = null;
+                     // Just start the camera again for another photo.
+                     startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE),
+                             REQUEST_CODE_CAPTURE_IMAGE);
+                 }
+                 break;
+         }
+     }
 
-    @Override
-    public void onConnectionFailed(ConnectionResult result) {
-        // Called whenever the API client fails to connect.
-        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
-        if (!result.hasResolution()) {
-            // show the localized error dialog.
-            GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
-            return;
-        }
-        // The failure has a resolution. Resolve it.
-        // Called typically when the app is not yet authorized, and an
-        // authorization
-        // dialog is displayed to the user.
-        try {
-            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-        } catch (SendIntentException e) {
-            Log.e(TAG, "Exception while starting resolution activity", e);
-        }
-    }
+     @Override
+     public void onConnectionFailed(ConnectionResult result) {
+         // Called whenever the API client fails to connect.
+         Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
+         if (!result.hasResolution()) {
+             // show the localized error dialog.
+             GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
+             return;
+         }
+         // The failure has a resolution. Resolve it.
+         // Called typically when the app is not yet authorized, and an
+         // authorization
+         // dialog is displayed to the user.
+         try {
+             result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+         } catch (SendIntentException e) {
+             Log.e(TAG, "Exception while starting resolution activity", e);
+         }
+     }
 
-    @Override
-    public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "API client connected.");
-        if (mBitmapToSave == null) {
-            // This activity has no UI of its own. Just start the camera.
-            startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE),
-                    REQUEST_CODE_CAPTURE_IMAGE);
-            return;
-        }
-        saveFileToDrive();
-    }
+     @Override
+     public void onConnected(Bundle connectionHint) {
+         Log.i(TAG, "API client connected.");
+         if (mBitmapToSave == null) {
+             // This activity has no UI of its own. Just start the camera.
+             startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE),
+                     REQUEST_CODE_CAPTURE_IMAGE);
+             return;
+         }
+         saveFileToDrive();
+     }
 
-    @Override
-    public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
-    }*/
-
+     @Override
+     public void onConnectionSuspended(int cause) {
+         Log.i(TAG, "GoogleApiClient connection suspended");
+     }*/
+    PdfWriter docWriter;
+    String file_name;
     Runnable thread = new Runnable() {
         @Override
         public void run() {
 
-//            HSSFWorkbook wb = new HSSFWorkbook();
-//            HSSFSheet sheet = wb.createSheet("MyTips");
-//            HSSFRow row = sheet.createRow((short) 0);
-//            ArrayList<AddDay> add_days_list = addDayArrayList;
-//            for (int i = 0; i < add_days_list.size(); i++) {
-//
-//                AddDay aD = add_days_list.get(i);
-//
-//                HSSFCell cell = row.createCell((short) 0);
-//                cell.setCellValue(aD.getCalculated_hours());
-//                cell.setCellValue(aD.getProfile());
-//                cell.setCellValue(aD.getDay_off());
-//                cell.setCellValue(aD.getEnd_long());
-//            }
-//
-//
-//            try {
-//                FileOutputStream fileOut = null;
-//                fileOut = new FileOutputStream("workbook.xls");
-//                wb.write(fileOut);
-//                fileOut.close();
-//            } catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-
-//            int rownum = 0;
-//            HSSFSheet firstSheet;
-//            Collection<File> files;
-//            HSSFWorkbook workbook;
-//            File exactFile;
-//
-//            workbook = new HSSFWorkbook();
-//            firstSheet = workbook.createSheet("FIRST SHEET");
-//            Row headerRow = firstSheet.createRow(rownum);
-//            headerRow.setHeightInPoints(40);
-//            try {
-//                Row row = firstSheet.createRow(rownum);
-//                for (int j = 0; j < addDayArrayList.size(); j++) {
-//                    Cell cell = row.createCell(j);
-//                    cell.setCellValue(addDayArrayList.get(j).getProfile());
-//                }
-//                rownum++;
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
-//            }
+            HeaderTable event = new HeaderTable();
 
 
-//
-//            XSSFWorkbook workbook = new XSSFWorkbook();
-//            XSSFSheet sheet = workbook.createSheet("Country");
-//            ArrayList<Object[]> data = new ArrayList<Object[]>();
-//            data.add(new String[]{"Country", "Capital", "Population"});
-//            data.add(new Object[]{"India", "Delhi", 10000});
-//            data.add(new Object[]{"France", "Paris", 40000});
-//            data.add(new Object[]{"Germany", "Berlin", 20000});
-//            data.add(new Object[]{"England", "London", 30000});
-//            int rownum = 0;
-//            for (Object[] countries : data) {
-//                Row row = sheet.createRow(rownum++);
-//
-//                int cellnum = 0;
-//                for (Object obj : countries) {
-//                    Cell cell = row.createCell(cellnum++);
-//                    if (obj instanceof String)
-//                        cell.setCellValue((String) obj);
-//                    else if (obj instanceof Double)
-//                        cell.setCellValue((Double) obj);
-//                    else if (obj instanceof Integer)
-//                        cell.setCellValue((Integer) obj);
-//                }
-//            }
-//            try {
-//                //Write the workbook in file system
-//                FileOutputStream out = new FileOutputStream(new File("CountriesDetails.xls"));
-//                workbook.write(out);
-//                out.close();
-//              //  System.out.println("CountriesDetails.xlsx has been created successfully");
-//                workbook.close();
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            } finally {
-//                try {
-//                    workbook.close();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
+            Document document = null;
 
-//            File Doc = new File(Environment
-//                    .getExternalStorageDirectory().getPath()
-//                    + File.separator
-//                    + "MyTipsee");
-//            if (!Doc.exists()) {
-//                Doc.mkdir();
-//            }
-//            File imagePath = new File(Doc, "excel" + Calendar.getInstance().getTime() + ".xls");
-//
-//            String file_path = imagePath.getAbsolutePath();
-//
-//
-//            Workbook workbook = new XSSFWorkbook();
-//            Sheet sheet = workbook.createSheet("Tips");
-//            int row = 0;
-//            for (AddDay addDay : addDayArrayList) {
-//                Row row1 = sheet.createRow(row);
-//                int cell = 0;
-//               // row1.createCell(cell++).setCellValue(addDay.getProfile());
-//                row1.createCell(cell).setCellValue(addDay.getProfile());
-//            }
-//            try {
-//
-//                FileOutputStream fos = new FileOutputStream(file_path);
-//
-//                workbook.write(fos);
-//
-//                fos.close();
-//
-//
-//                System.out.println(file_path + " is successfully written");
-//
-//            } catch (FileNotFoundException e) {
-//
-//                e.printStackTrace();
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//
-//            }
 
+            document = new Document(PageSize.A4, 36, 36, 36, 36);
+
+            String root = Environment.getExternalStorageDirectory()
+                    .toString();
+
+            File myDir = new File(root + "/MyTipsDocument/");
+            if (!myDir.exists()) {
+
+                myDir.mkdirs();
+
+            }
+            Random generator = new Random();
+            int n = 10000;
+
+            n = generator.nextInt(n);
+
+            String iname = "Doc" + n + ".pdf";
+            file_name = iname;
+            File file = new File(myDir, iname);
+            Font font = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL, BaseColor.GRAY);
+
+            try {
+                docWriter = PdfWriter.getInstance(document, new FileOutputStream(file));
+                docWriter.setPageEvent(event);
+                document.setMargins(36, 36, 36, 36);
+                document.open();
+
+                PdfPCell taskcell = null;
+                float[] taskcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
+                PdfPTable tasktable = new PdfPTable(taskcolumnWidths);
+                if (addDayArrayList.size() > 0) {
+                    try {
+
+                        for (int i = 0; i < addDayArrayList.size(); i++) {
+                            PdfPCell cell = new PdfPCell();
+                            Date d = new Date(addDayArrayList.get(i).getStart_long());
+                            Calendar cal = Calendar.getInstance();
+                            cal.setTime(d);
+                            Date date1 = cal.getTime();
+                            if (default_date_format == 2) {
+                                date_format = "MM/dd/yyyy";
+                            } else if (default_date_format == 1) {
+                                date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+                            } else {
+                                date_format = "MMM dd,yyyy";
+                            }
+                            date = new SimpleDateFormat(date_format).format(date1);
+                            cell = new PdfPCell(new Phrase(date, font));
+
+
+                            cell.setPaddingTop(3);
+                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            cell.setPaddingBottom(3);
+                            cell.disableBorderSide(2);
+                            cell.disableBorderSide(3);
+                            tasktable.addCell(cell);
+
+
+                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getProfile(), font));
+                            cell.setPaddingTop(3);
+                            cell.setPaddingBottom(3);
+                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            cell.disableBorderSide(2);
+                            cell.disableBorderSide(3);
+                            tasktable.addCell(cell);
+
+                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getCalculated_hours(), font));
+                            cell.setPaddingTop(3);
+                            cell.setPaddingBottom(3);
+                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            cell.disableBorderSide(2);
+                            cell.disableBorderSide(3);
+                            tasktable.addCell(cell);
+
+                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getTotal_tips(), font));
+                            cell.setPaddingTop(3);
+                            cell.setPaddingBottom(3);
+                            cell.disableBorderSide(2);
+                            cell.disableBorderSide(3);
+                            taskcell.setHorizontalAlignment(Element.ALIGN_LEFT);
+                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            tasktable.addCell(cell);
+
+                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getTounament_count(), font));
+                            cell.setPaddingTop(3);
+                            cell.setPaddingBottom(3);
+                            cell.disableBorderSide(2);
+                            cell.disableBorderSide(3);
+                            taskcell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                            tasktable.addCell(cell);
+
+                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getTip_out(), font));
+                            cell.setPaddingTop(3);
+                            cell.setPaddingBottom(3);
+                            cell.disableBorderSide(2);
+                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            cell.disableBorderSide(3);
+                            tasktable.addCell(cell);
+
+
+                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getWages_hourly(), font));
+                            cell.setPaddingTop(3);
+                            cell.setPaddingBottom(3);
+                            cell.disableBorderSide(2);
+                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            cell.disableBorderSide(3);
+                            tasktable.addCell(cell);
+
+                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getTotal_earnings(), font));
+                            cell.setPaddingTop(3);
+                            cell.setPaddingBottom(3);
+                            cell.disableBorderSide(2);
+                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            cell.disableBorderSide(3);
+                            tasktable.addCell(cell);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+                document.newPage();
+                document.add(tasktable);
+
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+
+            document.close();
+            sendEmail();
 
         }
 
     };
+
+    public void sendEmail() {
+        final String fromEmail = "beesolver.ekta@gmail.com";
+
+        final ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("ekta@beesolvertechnology.com");
+//
+        final File pdf = new File(Environment.getExternalStorageDirectory()
+                .toString() + "/MyTipsDocument/" + file_name);
+        LandingActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new SendMailTask(LandingActivity.this).execute(fromEmail,
+                        Constants.fromPassword, arrayList, "Subject", "body", pdf.getAbsolutePath());
+            }
+        });
+
+    }
+
+    private class HeaderTable extends PdfPageEventHelper {
+        private HeaderTable() {
+
+        }
+
+        @Override
+        public void onStartPage(PdfWriter writer, Document document) {
+//            super.onStartPage(writer, document);
+
+
+            Font blackfont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD, BaseColor.BLACK);
+
+
+            float[] taskcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
+            PdfPTable tasktable = new PdfPTable(taskcolumnWidths);
+            // set table width a percentage of the page width
+            tasktable.setWidthPercentage(100);
+            tasktable.setExtendLastRow(true);
+            tasktable.setTableEvent(new BorderEvent());
+            tasktable.getDefaultCell().disableBorderSide(2);
+            tasktable.getDefaultCell().disableBorderSide(3);
+
+            PdfPCell taskcell = new PdfPCell(new Phrase("Date", blackfont));
+            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+            taskcell.setBackgroundColor(BaseColor.WHITE);
+            taskcell.setFixedHeight(20f);
+            tasktable.addCell(taskcell);
+            taskcell = new PdfPCell(new Phrase("Profile", blackfont));
+            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+            taskcell.setBackgroundColor(BaseColor.WHITE);
+            taskcell.setFixedHeight(20f);
+            tasktable.addCell(taskcell);
+            taskcell = new PdfPCell(new Phrase("Working hours", blackfont));
+            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+            taskcell.setBackgroundColor(BaseColor.WHITE);
+            taskcell.setFixedHeight(20f);
+
+            tasktable.addCell(taskcell);
+
+
+            taskcell = new PdfPCell(new Phrase("Live Tips", blackfont));
+            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            taskcell.setBackgroundColor(BaseColor.WHITE);
+            taskcell.setFixedHeight(20f);
+
+            tasktable.addCell(taskcell);
+
+
+            taskcell = new PdfPCell(new Phrase("TD Count", blackfont));
+            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            taskcell.setBackgroundColor(BaseColor.WHITE);
+            taskcell.setFixedHeight(20f);
+
+            tasktable.addCell(taskcell);
+
+            taskcell = new PdfPCell(new Phrase("Tip Out", blackfont));
+            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            taskcell.setBackgroundColor(BaseColor.WHITE);
+            taskcell.setFixedHeight(20f);
+
+            tasktable.addCell(taskcell);
+
+            taskcell = new PdfPCell(new Phrase("Hourly Wage", blackfont));
+            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            taskcell.setBackgroundColor(BaseColor.WHITE);
+            taskcell.setFixedHeight(20f);
+
+            tasktable.addCell(taskcell);
+
+            taskcell = new PdfPCell(new Phrase("Total", blackfont));
+            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+            taskcell.setBackgroundColor(BaseColor.WHITE);
+            taskcell.setFixedHeight(20f);
+
+            tasktable.addCell(taskcell);
+            try {
+                document.add(tasktable);
+            } catch (DocumentException e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+            super.onEndPage(writer, document);
+        }
+    }
+
+    private class BorderEvent implements PdfPTableEvent {
+        public void tableLayout(PdfPTable table, float[][] widths, float[] heights, int headerRows, int rowStart, PdfContentByte[] canvases) {
+            float width[] = widths[0];
+            float x1 = width[0];
+            float x2 = width[width.length - 1];
+            float y1 = heights[0];
+            float y2 = heights[heights.length - 1];
+            PdfContentByte cb = canvases[PdfPTable.LINECANVAS];
+            cb.rectangle(x1, y1, x2 - x1, y2 - y1);
+            cb.stroke();
+            cb.resetRGBColorStroke();
+        }
+    }
 }

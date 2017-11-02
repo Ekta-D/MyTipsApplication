@@ -9,38 +9,38 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-      android:layout_margin="20dp"
-        android:layout_height="wrap_content">
-    <Button
-        android:id="@+id/btn_set_passcode"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set a Passcode" />
+        android:layout_margin="20dp">
 
-    <Button
-        android:id="@+id/btn_fingerprint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_set_passcode"
-        android:layout_marginTop="20dp"
-        android:text="Set Fingerprint" />
+        <Button
+            android:id="@+id/btn_set_passcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set a Passcode" />
 
-    <Button
-        android:id="@+id/btn_reset_passcode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_fingerprint"
-        android:layout_marginTop="20dp"
-        android:text="Reset Passcode"
-        />
+        <Button
+            android:id="@+id/btn_fingerprint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_set_passcode"
+            android:layout_marginTop="20dp"
+            android:text="Set Fingerprint"
+            android:visibility="gone" />
 
-    <Button
-        android:id="@+id/btn_remove_passcode"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_reset_passcode"
-        android:layout_marginTop="20dp"
-        android:text="Remove Passcode"
-       />
+        <Button
+            android:id="@+id/btn_reset_passcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_fingerprint"
+            android:layout_marginTop="20dp"
+            android:text="Reset Passcode" />
+
+        <Button
+            android:id="@+id/btn_remove_passcode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_reset_passcode"
+            android:layout_marginTop="20dp"
+            android:text="Remove Passcode" />
     </RelativeLayout>
 </RelativeLayout>
