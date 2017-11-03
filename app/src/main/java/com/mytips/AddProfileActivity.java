@@ -198,8 +198,11 @@ public class AddProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 boolean grantedPermission = checkPermissions();
-                if (!grantedPermission) {
-                    checkPermissions();
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (!grantedPermission) {
+                        checkPermissions();
+                    }
+                    //only api 23 above
                 } else {
                     AlertDialog.Builder alert = new AlertDialog.Builder(AddProfileActivity.this);
                     alert.setTitle("Make your selecetion");

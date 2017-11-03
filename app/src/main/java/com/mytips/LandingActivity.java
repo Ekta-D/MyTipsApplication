@@ -2,13 +2,18 @@ package com.mytips;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
@@ -39,10 +44,15 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.ErrorDialogFragment;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveContents;
+import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -60,9 +70,11 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPTableEvent;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.pdf.codec.Base64;
 import com.mytips.Adapter.SpinnerProfile;
 import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Database.DatabaseOperations;
+import com.mytips.Database.DatabaseUtils;
 import com.mytips.Model.AddDay;
 import com.mytips.Model.Profiles;
 import com.mytips.Utils.CommonMethods;
@@ -70,6 +82,7 @@ import com.mytips.Utils.Constants;
 
 
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -90,7 +103,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class LandingActivity extends AppCompatActivity implements View.OnClickListener/*, ConnectionCallbacks,
+public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener/*, ConnectionCallbacks,
         OnConnectionFailedListener*/ {
 
     private LinearLayout mRevealView;
@@ -102,17 +115,17 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     Toolbar toolbar;
     ArrayList<AddDay> addDayArrayList;
     DatabaseOperations databaseOperations;
-
+    File backupDB = null;
     Context context;
     TextView textView_total_earnings, textView_summaryTips, textView_summery_tds, textView_summery_tip_out, textView_hour_wage;
     RelativeLayout summery_tds_layout, summery_tip_outLayout, dashboard_bottm;
     Calendar startcalendar, endcalendar;
-
+    private static final int DIALOG_ERROR_CODE = 100;
     ArrayList<AddDay> updated_spinner;
     String selected_profileName;
     ArrayList<Profiles> profiles;
     TextView no_data;
-    String start_week;
+    String start_week = "";
     String start_shift = "";
     boolean pastDateSelected;
     SharedPreferences sharedPreferences;
@@ -127,6 +140,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     private static final int REQUEST_CODE_CREATOR = 2;
     private static final int REQUEST_CODE_RESOLUTION = 3;
     private GoogleApiClient mGoogleApiClient;
+    private boolean mResolvingError = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,7 +250,11 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                        /* if (reportTypeArray.length > 0) {
                             selected_summary_type = spinnerReportType.getSelectedItem().;
                         }*/
-                    changeData(selected_summary_type, start_week, selected_profileName);
+
+                    if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
+                        changeData(selected_summary_type, start_week, selected_profileName);
+                    }
+
                     //}
                 }
                 spinnerProfile.setSelection(position);
@@ -272,8 +290,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 spinnerReportType.setSelection(position);
                 selected_summary_type = parent.getSelectedItem().toString();
-                changeData(selected_summary_type, start_week, selected_profileName);
-
+                if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
+                    changeData(selected_summary_type, start_week, selected_profileName);
+                }
             }
 
             @Override
@@ -397,7 +416,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         if (data != null && data.size() > 0) {
                             data.clear();
                         }
-                        changeData(selected_summary_type, start_week, selected_profileName);
+                        if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
+                            changeData(selected_summary_type, start_week, selected_profileName);
+                        }
                         dialog1.dismiss();
                     }
                 });
@@ -414,7 +435,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         super.onResume();
         // TODO: 29/10/2017 update profile spinner, list data and total earnings card.
 
-        /*if (mGoogleApiClient == null) {
+        if (mGoogleApiClient == null) {
             // Create the API client and bind it to an instance variable.
             // We use this instance as the callback for connection and connection
             // failures.
@@ -427,12 +448,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     .build();
         }
         // Connect the client. Once connected, the camera is launched.
-        mGoogleApiClient.connect();*/
+        //  mGoogleApiClient.connect();
 
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
         updateSpinner(profiles);
-
-        changeData(selected_summary_type, start_week, selected_profileName);
+        if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
+            changeData(selected_summary_type, start_week, selected_profileName);
+        }
 
         CommonMethods.setTheme(getSupportActionBar(), LandingActivity.this);
     }
@@ -442,8 +464,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         super.onNewIntent(intent);
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
         updateSpinner(profiles);
-
-        changeData(selected_summary_type, start_week, selected_profileName);
+        if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
+            changeData(selected_summary_type, start_week, selected_profileName);
+        }
     }
 
     private int getProfileSelection(String selection) {
@@ -585,44 +608,100 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 break;
             case R.id.backup:
-                /*File Db = new File("/data/data/com.mytips/databases/tipseeDB");
 
-                File fileDir = new File(Environment.getExternalStorageDirectory()
-                        .toString() + "/MyTipsAppImages/database/");
+                String email = sharedPreferences.getString("user_email", "");
+                Log.i("login_email", email);
 
-                if(!fileDir.exists()){
-                    fileDir.mkdirs();
-                }
+                if (!email.contains("@gmail.com")) {
+                    AlertDialog.Builder alert_builder = new AlertDialog.Builder(LandingActivity.this);
+                    alert_builder.setTitle("Make sure your account is of google");
+                    alert_builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = alert_builder.create();
+                    alertDialog.show();
 
-                File file = new File(Environment.getExternalStorageDirectory()
-                        .toString() + "/MyTipsAppImages/database/" + "MyTipsDatabase.db");
-
-                if(!file.exists()) {
+                } else {
                     try {
-                        file.createNewFile();
-                    } catch (IOException e) {
+//                        File Db = new File("/data/data/com.mytips/databases/" + DatabaseUtils.db_Name);
+//
+//                        File fileDir = new File(Environment.getExternalStorageDirectory()
+//                                .toString() + "/MyTipsApp/database/");
+//
+//                        if (!fileDir.exists()) {
+//                            fileDir.mkdirs();
+//                        }
+//
+//                        File file = new File(Environment.getExternalStorageDirectory()
+//                                .toString() + "/MyTipsApp/database/" + DatabaseUtils.db_Name);
+//
+//                        if (!file.exists()) {
+//                            try {
+//                                file.createNewFile();
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                        file.setWritable(true);
+//
+//                        try {
+//                            copyFile(Db, file);
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+
+                        File sd = Environment.getExternalStorageDirectory();
+                        final File data = Environment.getDataDirectory();
+                        FileChannel source = null;
+                        FileChannel destination = null;
+                        String currentDBPath = "/data/" + "com.mytips" + "/databases/" + DatabaseUtils.db_Name;
+                        String backupDBPath = DatabaseUtils.db_Name;
+                        File currentDB = new File(data, currentDBPath);
+                        backupDB = new File(sd, backupDBPath);
+                        try {
+                            source = new FileInputStream(currentDB).getChannel();
+                            destination = new FileOutputStream(backupDB).getChannel();
+                            destination.transferFrom(source, 0, source.size());
+                            source.close();
+                            destination.close();
+                            Toast.makeText(this, "DB Exported!", Toast.LENGTH_LONG).show();
+
+                            try {
+                                mGoogleApiClient = new GoogleApiClient.Builder(this)
+                                        .addApi(Drive.API)
+                                        .addScope(Drive.SCOPE_FILE)
+                                        .addConnectionCallbacks(this)
+                                        .addOnConnectionFailedListener(this)
+                                        .build();
+                                mGoogleApiClient.connect();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }
-                file.setWritable(true);
 
-                try {
-                    copyFile(new FileInputStream(Db), new FileOutputStream(file));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }*/
+                }
                 break;
         }
     }
 
-    public void copyFile(FileInputStream fromFile, FileOutputStream toFile) throws IOException {
+    public void copyFile(File fromFile, File toFile) throws IOException {
         FileChannel fromChannel = null;
         FileChannel toChannel = null;
         try {
-            fromChannel = fromFile.getChannel();
-            toChannel = toFile.getChannel();
+            fromChannel = new FileInputStream(fromFile).getChannel();
+            toChannel = new FileInputStream(toFile).getChannel();
             fromChannel.transferTo(0, fromChannel.size(), toChannel);
-            //saveFileToDrive(toFile);
+            // saveFileToDrive(toFile);
             Toast.makeText(LandingActivity.this, "Backup file saved!", Toast.LENGTH_LONG).show();
         } finally {
             try {
@@ -1157,10 +1236,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         mListView.setAdapter(adapter);
     }
 
-   /* private void saveFileToDrive(File uploadFile) {
+    private void saveFileToDrive(File uploadFile) {
         // Start by creating a new contents, and setting a callback.
         Log.i(TAG, "Creating new contents.");
-
         Drive.DriveApi.newDriveContents(mGoogleApiClient)
                 .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
 
@@ -1179,7 +1257,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         OutputStream outputStream = result.getDriveContents().getOutputStream();
                         // Write the bitmap data from it.
                         ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
-                        image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
+                        //   image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
                         try {
                             outputStream.write(bitmapStream.toByteArray());
                         } catch (IOException e1) {
@@ -1198,7 +1276,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         try {
                             startIntentSenderForResult(
                                     intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
-                        } catch (SendIntentException e) {
+                        } catch (IntentSender.SendIntentException e) {
                             Log.i(TAG, "Failed to launch file chooser.");
                         }
                     }
@@ -1207,71 +1285,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onPause() {
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.disconnect();
-        }
+//        if (mGoogleApiClient != null) {
+//            mGoogleApiClient.disconnect();
+//        }
         super.onPause();
-    }*/
+    }
 
-    /* @Override
-     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
-         switch (requestCode) {
-             case REQUEST_CODE_CAPTURE_IMAGE:
-                 // Called after a photo has been taken.
-                 if (resultCode == Activity.RESULT_OK) {
-                     // Store the image data as a bitmap for writing later.
-                     mBitmapToSave = (Bitmap) data.getExtras().get("data");
-                 }
-                 break;
-             case REQUEST_CODE_CREATOR:
-                 // Called after a file is saved to Drive.
-                 if (resultCode == RESULT_OK) {
-                     Log.i(TAG, "Image successfully saved.");
-                     mBitmapToSave = null;
-                     // Just start the camera again for another photo.
-                     startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE),
-                             REQUEST_CODE_CAPTURE_IMAGE);
-                 }
-                 break;
-         }
-     }
-
-     @Override
-     public void onConnectionFailed(ConnectionResult result) {
-         // Called whenever the API client fails to connect.
-         Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
-         if (!result.hasResolution()) {
-             // show the localized error dialog.
-             GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
-             return;
-         }
-         // The failure has a resolution. Resolve it.
-         // Called typically when the app is not yet authorized, and an
-         // authorization
-         // dialog is displayed to the user.
-         try {
-             result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-         } catch (SendIntentException e) {
-             Log.e(TAG, "Exception while starting resolution activity", e);
-         }
-     }
-
-     @Override
-     public void onConnected(Bundle connectionHint) {
-         Log.i(TAG, "API client connected.");
-         if (mBitmapToSave == null) {
-             // This activity has no UI of its own. Just start the camera.
-             startActivityForResult(new Intent(MediaStore.ACTION_IMAGE_CAPTURE),
-                     REQUEST_CODE_CAPTURE_IMAGE);
-             return;
-         }
-         saveFileToDrive();
-     }
-
-     @Override
-     public void onConnectionSuspended(int cause) {
-         Log.i(TAG, "GoogleApiClient connection suspended");
-     }*/
     PdfWriter docWriter;
     String file_name;
     Runnable thread = new Runnable() {
@@ -1445,6 +1464,87 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+        Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+            @Override
+            public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
+
+                DriveContents contents = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
+                        driveContentsResult.getDriveContents() : null;
+
+                if (contents != null)
+                    try {
+                        OutputStream outputStream = contents.getOutputStream();
+                        if (outputStream != null)
+                            try {
+                                InputStream inputStream = new FileInputStream(backupDB);
+                                byte[] buf = new byte[4096];
+                                int c;
+                                while ((c = inputStream.read(buf, 0, buf.length)) > 0) {
+                                    outputStream.write(buf, 0, c);
+                                    outputStream.flush();
+                                }
+                                outputStream.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                        .setTitle("glucosio.realm")
+                        .setMimeType("text/plain")
+                        .build();
+
+            }
+        });
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+        Log.i(TAG, "GoogleApiClient connection failed: " + connectionResult.toString());
+
+//        if (!connectionResult.hasResolution()) {
+//            // show the localized error dialog.
+//            GoogleApiAvailability.getInstance().getErrorDialog(this, connectionResult.getErrorCode(), 0).show();
+//            return;
+//        }
+//        // The failure has a resolution. Resolve it.
+//        // Called typically when the app is not yet authorized, and an
+//        // authorization
+//        // dialog is displayed to the user.
+//        try {
+//            connectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+//        } catch (IntentSender.SendIntentException e) {
+//            Log.e(TAG, "Exception while starting resolution activity", e);
+//        }
+        if (mResolvingError) { // If already in resolution state, just return.
+            return;
+        } else if (connectionResult.hasResolution()) { // Error can be resolved by starting an intent with user interaction
+            mResolvingError = true;
+            try {
+                connectionResult.startResolutionForResult(this, DIALOG_ERROR_CODE);
+            } catch (IntentSender.SendIntentException e) {
+                e.printStackTrace();
+            }
+        } else { // Error cannot be resolved. Display Error Dialog stating the reason if possible.
+            ErrorDialogFragment fragment = new ErrorDialogFragment();
+            Bundle args = new Bundle();
+            args.putInt("error", connectionResult.getErrorCode());
+            fragment.setArguments(args);
+            fragment.show(getFragmentManager(), "errordialog");
+        }
+
+    }
+
     private class HeaderTable extends PdfPageEventHelper {
         private HeaderTable() {
 
@@ -1549,4 +1649,32 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             cb.resetRGBColorStroke();
         }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!mResolvingError) {
+//            mGoogleApiClient.connect(); // Connect the client to Google Drive
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //  mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == DIALOG_ERROR_CODE) {
+            mResolvingError = false;
+            if (resultCode == RESULT_OK) { // Error was resolved, now connect to the client if not done so.
+                if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
+                    mGoogleApiClient.connect();
+                }
+            }
+        }
+    }
+
 }

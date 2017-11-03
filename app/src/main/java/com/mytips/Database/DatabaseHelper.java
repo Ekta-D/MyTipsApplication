@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.mytips.Interface.TipeeChecked;
+
 /**
  * Created by Beesolver on 05-10-2017.
  */
@@ -57,6 +59,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 + DatabaseUtils.GettingTips + " INTEGER, "
                 + DatabaseUtils.GettingTournamentDown + " INTEGER, "
+
+                + DatabaseUtils.TipeeDollarChecked + " INTEGER, "
+                + DatabaseUtils.ManualTips + " TEXT, "
 
                 + DatabaseUtils.StartShift + " TEXT, "
                 //  + DatabaseUtils.ClockIn + " TEXT, "

@@ -26,6 +26,26 @@ public class AddDay implements Serializable {
     String total_tournament_downs;
     int getting_tips;
     long start_long;
+    int dollar_checked;
+
+    public int getDollar_checked() {
+        return dollar_checked;
+    }
+
+    public void setDollar_checked(int dollar_checked) {
+        this.dollar_checked = dollar_checked;
+    }
+
+    public String getManual_tips() {
+        return manual_tips;
+    }
+
+    public void setManual_tips(String manual_tips) {
+        this.manual_tips = manual_tips;
+    }
+
+    String manual_tips;
+
 
     public long getStart_long() {
         return start_long;

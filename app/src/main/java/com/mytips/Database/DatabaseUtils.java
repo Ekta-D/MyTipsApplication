@@ -61,6 +61,7 @@ public class DatabaseUtils {
     public static final String GettingTournamentDown = "getting_tournament_down";
     public static final String StartShiftLong = "start_shift_long";
     public static final String EndShiftLong = "end_shift_long";
-
+    public static final String TipeeDollarChecked = "dollar_checked";
+    public static final String ManualTips = "manual_tips";
 
 }

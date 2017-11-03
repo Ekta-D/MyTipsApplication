@@ -285,7 +285,7 @@ public class DatabaseOperations {
                                  String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
                                  String wages_hourly, String earns, int getting_tips, int getting_tournaments, String start_day_week
-            , long start_long, long end_long) {
+            , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar) {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
@@ -310,6 +310,8 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.StartDayWeek, start_day_week);
         contentValues.put(DatabaseUtils.StartShiftLong, start_long);
         contentValues.put(DatabaseUtils.EndShiftLong, end_long);
+        contentValues.put(DatabaseUtils.TipeeDollarChecked, is_dollar_checked);
+        contentValues.put(DatabaseUtils.ManualTips, manual_tips_dollar);
 
         try {
             db.insert(DatabaseUtils.ADD_DAY_TABLE, null, contentValues);
@@ -322,7 +324,7 @@ public class DatabaseOperations {
         AddDay addDay;
         Cursor cursor = null;
         ArrayList<AddDay> addDayArrayList = new ArrayList<>();
-        String[] projections = new String[23];
+        String[] projections = new String[25];
         projections[0] = DatabaseUtils.Profile;
         projections[1] = DatabaseUtils.CalculatedHours;
         projections[2] = DatabaseUtils.isHolidayPay;
@@ -346,6 +348,8 @@ public class DatabaseOperations {
         projections[20] = DatabaseUtils.StartDayWeek;
         projections[21] = DatabaseUtils.StartShiftLong;
         projections[22] = DatabaseUtils.EndShiftLong;
+        projections[23]=DatabaseUtils.TipeeDollarChecked;
+        projections[24]=DatabaseUtils.ManualTips;
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, projections,
                     null, null, null);
@@ -385,6 +389,8 @@ public class DatabaseOperations {
                     addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                     addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                     addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
+                    addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
+                    addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
                     addDayArrayList.add(addDay);
                 }
                 while (cursor.moveToNext());
@@ -393,12 +399,12 @@ public class DatabaseOperations {
         return addDayArrayList;
     }
 
-    public void updateAddDayInfo(String id, String profile_name, String start_shift, String check_in,
-                                 String end_shift, String check_out, String auto_calculatedhour, int holiday_pay,
+    public void updateAddDayInfo(String id, String profile_name, String start_shift, long check_in,
+                                 String end_shift, long check_out, String auto_calculatedhour, int holiday_pay,
                                  String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
-                                 String wages_hourly, String earns, int getting_tips, int getting_tournaments
-            , String start_day_week, long start_long, long end_long) {
+                                 String wages_hourly, String earns, int getting_tips, int getting_tournaments, String start_day_week
+            , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
         contentValues.put(DatabaseUtils.CalculatedHours, auto_calculatedhour);
@@ -422,6 +428,8 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.StartDayWeek, start_day_week);
         contentValues.put(DatabaseUtils.StartShiftLong, start_long);
         contentValues.put(DatabaseUtils.EndShiftLong, end_long);
+        contentValues.put(DatabaseUtils.TipeeDollarChecked, is_dollar_checked);
+        contentValues.put(DatabaseUtils.ManualTips, manual_tips_dollar);
         try {
             int changedRecord = db.update(DatabaseUtils.ADD_DAY_TABLE, contentValues, DatabaseUtils.Add_ID + " =? ", new String[]{String.valueOf(id)});
             System.out.println("updated_add" + changedRecord);
@@ -474,6 +482,8 @@ public class DatabaseOperations {
                         addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                         addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
+                        addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
+                        addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
                         fetched_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -490,6 +500,7 @@ public class DatabaseOperations {
         ArrayList<AddDay> daily_data = new ArrayList<>();
         AddDay addDay = null;
         Cursor cursor = null;
+        //String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile=  '" + profile + "'";
         String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile=  '" + profile + "'";
         try {
             cursor = db.rawQuery(query, null);
@@ -529,6 +540,8 @@ public class DatabaseOperations {
                         addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                         addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
+                        addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
+                        addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
                         daily_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -581,6 +594,8 @@ public class DatabaseOperations {
                         addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                         addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
+                        addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
+                        addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
                         fetched_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -654,10 +669,4 @@ public class DatabaseOperations {
     }
 
 
-    public ArrayList<AddDay> weeklySummary(String start_shift, String profile) {
-        ArrayList<AddDay> addDays = new ArrayList<>();
-
-
-        return addDays;
-    }
 }
