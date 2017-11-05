@@ -101,7 +101,7 @@ public class SetPassword extends AppCompatActivity {
         String old = editText_old.getText().toString().trim();
         if (!stored_password.equalsIgnoreCase("")) {
             if (!old.equalsIgnoreCase(stored_password)) {
-                Toast.makeText(this, "Old Password not matched!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Old Password did not match!", Toast.LENGTH_SHORT).show();
                 return;
             }
         }
@@ -109,5 +109,6 @@ public class SetPassword extends AppCompatActivity {
         editor.apply();
         Intent i = new Intent(this, ConfirmPassword.class);
         startActivity(i);
+        finish();
     }
 }

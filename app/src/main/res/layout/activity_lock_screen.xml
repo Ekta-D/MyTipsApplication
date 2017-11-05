@@ -13,6 +13,8 @@
         android:layout_centerVertical="true"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
+        android:hint="Enter Passcode to Unlock!"
+        android:gravity="center_horizontal"
         android:imeOptions="actionDone"
         android:id="@+id/editText_lock_password"
         android:inputType="numberPassword" />

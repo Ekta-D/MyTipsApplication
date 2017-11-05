@@ -530,7 +530,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 btn_setpasscode.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startActivity(new Intent(SettingsActivity.this, SetPassword.class));
+                        startActivity(new Intent(SettingsActivity.this, SetPassword.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         dialog1.dismiss();
                     }
                 });
@@ -539,7 +539,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 btn_resetpasscode.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        startActivity(new Intent(SettingsActivity.this, SetPassword.class));
+                        startActivity(new Intent(SettingsActivity.this, SetPassword.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                         dialog1.dismiss();
                     }
                 });
@@ -646,7 +646,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public boolean onOptionsItemSelected(MenuItem item) {
             int id = item.getItemId();
             if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), SettingsActivity.class));
+                startActivity(new Intent(getActivity(), SettingsActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 return true;
             }
             return super.onOptionsItemSelected(item);

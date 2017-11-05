@@ -469,23 +469,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private int getProfileSelection(String selection) {
-        for (Profiles s : profiles) {
-            if (s.getProfile_name() == selection) {
-                int i = profiles.indexOf(s);
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    private int getReportTypeSelection(String selection) {
-        for (String s : reportTypeArray) {
-            int i = s.indexOf(selection);
-            return i;
-        }
-        return 0;
-    }
 
 
     @Override
@@ -588,7 +571,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 startActivity(new Intent(getBaseContext(), ActiveProfiles.class));
                 break;
             case R.id.preferences:
-                startActivity(new Intent(getBaseContext(), SettingsActivity.class));
+                startActivity(new Intent(getBaseContext(), SettingsActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                 break;
             case R.id.share:
                 try {

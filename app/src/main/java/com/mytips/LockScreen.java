@@ -11,6 +11,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
 public class LockScreen extends AppCompatActivity {
@@ -32,7 +33,7 @@ public class LockScreen extends AppCompatActivity {
         if (sharedPreferences != null) {
             isFirstTime = sharedPreferences.getBoolean(ISFIRST_TIME, false);
         }
-
+        CommonMethods.setTheme(getSupportActionBar(), LockScreen.this);
 
        final String password = sharedPreferences.getString(Constants.ConfirmKey, "");
 //

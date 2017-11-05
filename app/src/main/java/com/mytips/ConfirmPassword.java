@@ -75,7 +75,7 @@ public class ConfirmPassword extends AppCompatActivity {
                     editor.apply();
 
                     Toast.makeText(ConfirmPassword.this, "Password saved successfully!", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(ConfirmPassword.this,SettingsActivity.class));
+                    startActivity(new Intent(ConfirmPassword.this,SettingsActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     ConfirmPassword.this.finish();
                 }
             }

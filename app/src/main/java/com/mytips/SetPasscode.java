@@ -34,7 +34,7 @@ public class SetPasscode extends AppCompatActivity {
         button_set_passcode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(SetPasscode.this, SetPassword.class));
+                startActivity(new Intent(SetPasscode.this, SetPassword.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             }
         });
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

@@ -28,7 +28,7 @@ public class Settings extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.action_setting) {
-            startActivity(new Intent(Settings.this, SettingsActivity.class));
+            startActivity(new Intent(Settings.this, SettingsActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
             return true;
         }
         return super.onOptionsItemSelected(item);
