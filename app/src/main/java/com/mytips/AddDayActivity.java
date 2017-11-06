@@ -993,18 +993,18 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             min = min.replace("-", " ");
 
         }
-        String sec = String.valueOf(diffSeconds);
-        if (sec.contains("-")) {
-            sec = sec.replace("-", " ");
-        }
+//        String sec = String.valueOf(diffSeconds);
+//        if (sec.contains("-")) {
+//            sec = sec.replace("-", " ");
+//        }
         if (diffDays != 0) {
             String day = String.valueOf(diffDays);
             if (day.contains("-")) {
                 day = day.replace("-", " ");
             }
-            result = day + "days," + hours + "h" + min + "m" + sec + "s";
+            result = day + "days," + hours + "h" + min + "m";
         } else {
-            result = hours + "h" + min + "m" + sec + "s";
+            result = hours + "h" + min + "m";
         }
 
         return result;
@@ -1422,15 +1422,39 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         total_tipoutPer.setVisibility(View.VISIBLE);
         edit_total_tips.setVisibility(View.VISIBLE);
         total_tipout.setVisibility(View.VISIBLE);
-        //  multiply_label.setVisibility(View.VISIBLE);
+
+        if (getTournamentTips) {
+            if (todayPayDay) {
+
+                perTd_label.setVisibility(View.VISIBLE);
+                totalcount_label.setVisibility(View.VISIBLE);
+                edittext_perTD.setVisibility(View.VISIBLE);
+                edittext_total.setVisibility(View.VISIBLE);
+//                if (counts_list.size() > 0) {
+//
+//                    for (int i = 0; i < counts_list.size(); i++) {
+//                        String str = counts_list.get(i);
+//                        if (!str.equalsIgnoreCase("")) {
+//                            int count = Integer.parseInt(str);
+//                            total_counts_till_now = total_counts_till_now + count;
+//
+//                        }
+//                    }
+//                    edittext_count.setText(String.valueOf(total_counts_till_now));
+//                    total_counts_till_now = 0;
+//                }
+            } else {
+                perTd_label.setVisibility(View.GONE);
+                totalcount_label.setVisibility(View.GONE);
+                edittext_perTD.setVisibility(View.GONE);
+                edittext_total.setVisibility(View.GONE);
+            }
+        }
         tournament_downlabel.setVisibility(View.VISIBLE);
         cout_label.setVisibility(View.VISIBLE);
-        perTd_label.setVisibility(View.VISIBLE);
-        totalcount_label.setVisibility(View.VISIBLE);
-        // equal_label.setVisibility(View.VISIBLE);
+
         edittext_count.setVisibility(View.VISIBLE);
-        edittext_perTD.setVisibility(View.VISIBLE);
-        edittext_total.setVisibility(View.VISIBLE);
+
         text_tip_out_percent.setVisibility(View.VISIBLE);
         total_tipoutlabel.setVisibility(View.VISIBLE);
         fetchedTipees.setVisibility(View.VISIBLE);
@@ -1464,9 +1488,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             minutes_01 = Double.parseDouble(String.valueOf(mins));
         }
 
-        double tH = Float.valueOf(total_hours);
+        double tH = 0;
+        double total_hr = Double.parseDouble(String.valueOf(total_hours));
         int total_hour = 0;
-        int earning = 0;
         total_earnings = (TextView) findViewById(R.id.total_earnings);
 
         live_tips = (TextView) findViewById(R.id.summery_tips);
@@ -1480,7 +1504,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         hourly_wages.setVisibility(View.GONE);
 
         if (mins > 60) {
-            tH = total_hours + 1;
+            tH = total_hr + 1;
         } else if (mins > 0 && mins < 60) {
             tH = minutes_01 / 60;
 
@@ -1492,7 +1516,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         } else if (days > 0 && total_hours < 0) {
             tH = days * 24;
         } else if (days <= 0) {
-            tH = total_hours;
+            tH = tH + total_hr;
         }
 
         double finalEarning = tH * earnings;
@@ -1521,7 +1545,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
 
         double totalEarnings = finalEarning + live_tip + tounament_downs - tip_out_total;
-        earns = String.valueOf(totalEarnings);
+        earns = String.valueOf(String.format("%.2f", totalEarnings));
 
         if (earns.contains("-")) {
             earns = earns.replace("-", "");
@@ -1658,33 +1682,49 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         int getting_tournamenttips = addDay.getGettingg_tournamnts();
 
-        if (getting_tournamenttips == 0) {
-            tournament_downlabel.setVisibility(View.GONE);
-            cout_label.setVisibility(View.GONE);
-            perTd_label.setVisibility(View.GONE);
-            totalcount_label.setVisibility(View.GONE);
-            edittext_count.setVisibility(View.GONE);
-            edittext_perTD.setVisibility(View.GONE);
-            //  multiply_label.setVisibility(View.GONE);
-            edittext_total.setVisibility(View.GONE);
-            // equal_label.setVisibility(View.GONE);
-        } else {
-            tournament_downlabel.setVisibility(View.VISIBLE);
-            cout_label.setVisibility(View.VISIBLE);
-            perTd_label.setVisibility(View.VISIBLE);
-            totalcount_label.setVisibility(View.VISIBLE);
-            edittext_count.setVisibility(View.VISIBLE);
-            edittext_perTD.setVisibility(View.VISIBLE);
-            edittext_total.setVisibility(View.VISIBLE);
-        }
+        if (getting_tournamenttips == 1) {
+            getTournamentTips = true;
 
+        }
+        //   String start_day_frombundle = "", pay_period_frombundle = "";
 
         for (int i = 0; i < profilesArrayList.size(); i++) {
             if (profilesArrayList.get(i).getProfile_name().equalsIgnoreCase(addDay.getProfile())) {
                 updateView(profilesArrayList.get(i), b);
+//                start_day_frombundle = profilesArrayList.get(i).getStartday();
+//                pay_period_frombundle = profilesArrayList.get(i).getPay_period();
+
                 spinnerProfile.setSelection(i);
             }
         }
+
+//        if (getting_tournamenttips == 0) {
+//            tournament_downlabel.setVisibility(View.GONE);
+//            cout_label.setVisibility(View.GONE);
+//            perTd_label.setVisibility(View.GONE);
+//            totalcount_label.setVisibility(View.GONE);
+//            edittext_count.setVisibility(View.GONE);
+//            edittext_perTD.setVisibility(View.GONE);
+//            //  multiply_label.setVisibility(View.GONE);
+//            edittext_total.setVisibility(View.GONE);
+//            // equal_label.setVisibility(View.GONE);
+//        } else {
+////            tournament_downlabel.setVisibility(View.VISIBLE);
+////            cout_label.setVisibility(View.VISIBLE);
+////            perTd_label.setVisibility(View.VISIBLE);
+////            totalcount_label.setVisibility(View.VISIBLE);
+////            edittext_count.setVisibility(View.VISIBLE);
+////            edittext_perTD.setVisibility(View.VISIBLE);
+////            edittext_total.setVisibility(View.VISIBLE);
+//
+//            tournamentSeparator.setVisibility(View.VISIBLE);
+//            tournament_downlabel.setVisibility(View.VISIBLE);
+//            cout_label.setVisibility(View.VISIBLE);
+//            edittext_count.setVisibility(View.VISIBLE);
+//          //  todayPayDay(start_day_frombundle, pay_period_frombundle);
+//
+//            // todayPayDay(start_day, profile.getPay_period());
+//        }
 
 
         int day_off = addDay.getDay_off();
@@ -1706,9 +1746,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
     }
 
+    boolean todayPayDay = false;
 
     public ArrayList<String> todayPayDay(String start_day, String pay_period) {
-        boolean todayPayDay = false;
+
         ArrayList<String> counts_list = new ArrayList<>();
         String date_format = "";
         if (default_date_format == 2) {
@@ -1876,7 +1917,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
             }
             ifPayDay(todayPayDay, counts_list);
-        } else {
+        }
+        if (pay_period.equalsIgnoreCase("Every 2 Weeks")) {
 
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(Calendar.DAY_OF_WEEK, day);

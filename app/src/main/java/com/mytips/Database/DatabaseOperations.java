@@ -348,8 +348,8 @@ public class DatabaseOperations {
         projections[20] = DatabaseUtils.StartDayWeek;
         projections[21] = DatabaseUtils.StartShiftLong;
         projections[22] = DatabaseUtils.EndShiftLong;
-        projections[23]=DatabaseUtils.TipeeDollarChecked;
-        projections[24]=DatabaseUtils.ManualTips;
+        projections[23] = DatabaseUtils.TipeeDollarChecked;
+        projections[24] = DatabaseUtils.ManualTips;
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, projections,
                     null, null, null);
@@ -444,7 +444,13 @@ public class DatabaseOperations {
 
         AddDay addDay = null;
         Cursor cursor = null;
-        String query = "select * from  add_table where start_shift_long >= '" + resetfrom + "' AND   start_shift_long<='" + resetTo + "' AND  profile= '" + profile + "'  Order By start_shift_long";
+        String query = "";
+        if (profile.equalsIgnoreCase("All")) {
+            query = "select * from  add_table where start_shift_long >= '" + resetfrom + "' AND   start_shift_long<='" + resetTo + "'  Order By start_shift_long";
+        } else {
+            query = "select * from  add_table where start_shift_long >= '" + resetfrom + "' AND   start_shift_long<='" + resetTo + "' AND  profile= '" + profile + "'  Order By start_shift_long";
+        }
+
         try {
             cursor = db.rawQuery(query, null);
         } catch (Exception e) {
@@ -555,7 +561,14 @@ public class DatabaseOperations {
         ArrayList<AddDay> fetched_data = new ArrayList<>();
         AddDay addDay = null;
         Cursor cursor = null;
-        String query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%'  AND  profile= '" + profile + "' Order By start_shift_long";
+        String query = "";
+        if (profile.equalsIgnoreCase("All")) {
+            query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%' Order By start_shift_long";
+        }
+        else{
+            query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%'  AND  profile= '" + profile + "' Order By start_shift_long";
+        }
+
         try {
             cursor = db.rawQuery(query, null);
         } catch (Exception e) {
@@ -610,7 +623,7 @@ public class DatabaseOperations {
         ArrayList<String> counts = new ArrayList<>();
         String string = "";
         Cursor cursor = null;
-        String query = "select * from  add_table where start_shift_long >= '" + reset_from + "' AND   start_shift_long<='" + reset_to + "'   AND  profile= '" + profile + "'  Order By start_shift_long";
+        String query = "select * from  add_table where start_shift_long >= '" + reset_from + "' AND   start_shift_long<='" + reset_to + "'   AND  profile= '" + profile + "' ";
         try {
             cursor = db.rawQuery(query, null);
         } catch (Exception e) {

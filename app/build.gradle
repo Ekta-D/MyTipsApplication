@@ -32,6 +32,8 @@ repositories {
         url "https://maven.java.net/content/groups/public/"
     }
 }
+
+
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -55,6 +57,13 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.sun.mail:android-mail:1.5.5'
     compile 'com.sun.mail:android-activation:1.5.5'
+
+//    compile('com.google.api-client:google-api-client-android:1.22.0') {
+//        exclude group: 'org.apache.httpcomponents'
+//    }
+//    compile('com.google.apis:google-api-services-drive:v3-rev29-1.22.0') {
+//        exclude group: 'org.apache.httpcomponents'
+//    }
 
     compile files('src/libs/itextg-5.5.10.jar')
 }

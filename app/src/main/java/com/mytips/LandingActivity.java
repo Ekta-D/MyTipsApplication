@@ -16,8 +16,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Environment;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -45,8 +43,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.ErrorDialogFragment;
-import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
@@ -435,22 +432,27 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         super.onResume();
         // TODO: 29/10/2017 update profile spinner, list data and total earnings card.
 
-        if (mGoogleApiClient == null) {
-            // Create the API client and bind it to an instance variable.
-            // We use this instance as the callback for connection and connection
-            // failures.
-            // Since no account name is passed, the user is prompted to choose.
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Drive.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-        }
+//        if (mGoogleApiClient == null) {
+//            // Create the API client and bind it to an instance variable.
+//            // We use this instance as the callback for connection and connection
+//            // failures.
+//            // Since no account name is passed, the user is prompted to choose.
+//            mGoogleApiClient = new GoogleApiClient.Builder(this)
+//                    .addApi(Drive.API)
+//                    .addScope(Drive.SCOPE_FILE)
+//                    .addConnectionCallbacks(this)
+//                    .addOnConnectionFailedListener(this)
+//                    .build();
+//        }
         // Connect the client. Once connected, the camera is launched.
         //  mGoogleApiClient.connect();
 
+
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
+        Profiles profiles0 = new Profiles();
+        profiles0.setProfile_name("All");
+        profiles0.setStartday("Sunday");
+        profiles.add(0, profiles0);
         updateSpinner(profiles);
         if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
             changeData(selected_summary_type, start_week, selected_profileName);
@@ -463,12 +465,15 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
+        Profiles profiles0 = new Profiles();
+        profiles0.setProfile_name("All");
+        profiles0.setStartday("Sunday");
+        profiles.add(0, profiles0);
         updateSpinner(profiles);
         if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
             changeData(selected_summary_type, start_week, selected_profileName);
         }
     }
-
 
 
     @Override
@@ -652,18 +657,27 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             destination.close();
                             Toast.makeText(this, "DB Exported!", Toast.LENGTH_LONG).show();
 
-                            try {
-                                mGoogleApiClient = new GoogleApiClient.Builder(this)
-                                        .addApi(Drive.API)
-                                        .addScope(Drive.SCOPE_FILE)
-                                        .addConnectionCallbacks(this)
-                                        .addOnConnectionFailedListener(this)
-                                        .build();
-                                mGoogleApiClient.connect();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+                            if (mGoogleApiClient == null) {
+                                try {
+                                    mGoogleApiClient = new GoogleApiClient.Builder(this)
+                                            .addApi(Drive.API)
+                                            .addScope(Drive.SCOPE_FILE)
+                                            .addConnectionCallbacks(this)
+                                            .addOnConnectionFailedListener(this)
+                                            .build();
 
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            mGoogleApiClient.connect();
+
+
+                            // TODO: 06-11-2017 account varification  and include to add two new jar files
+
+//                            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
+//                            credential.setSelectedAccountName(accountName);
+//                            Drive service = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).build();
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -714,7 +728,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
         if (selectedProfile.size() > 0) {
             mListView.setVisibility(View.VISIBLE);
-            //     dashboard_bottm.setVisibility(View.VISIBLE);
             adapter = new SummaryAdapter(default_date_format, LandingActivity.this, selectedProfile);
             mListView.setAdapter(adapter);
             no_data.setVisibility(View.GONE);
@@ -723,7 +736,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             no_data.setVisibility(View.VISIBLE);
             mListView.setVisibility(View.GONE);
             updateBottom(selectedProfile);
-            //   dashboard_bottm.setVisibility(View.GONE);
         }
 
     }
@@ -770,11 +782,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 hrs = hrs + t;
             }
         }
-        textView_total_earnings.setText(String.valueOf(totalEarnings));
-
-        textView_summaryTips.setText("Live Tips:$" + String.valueOf(total_livetips) + ", ");
-        textView_summery_tds.setText("Tournament Downs:$" + String.valueOf(tournament_totalTD) + ", ");
-        textView_summery_tip_out.setText("Tip-out:$" + String.valueOf(totalOuts) + ", ");
+        textView_total_earnings.setText("$" + String.valueOf(String.format("%.2f", totalEarnings)));
+        textView_summaryTips.setText("Live Tips:$" + String.valueOf(String.format("%.2f", total_livetips)) + ", ");
+        textView_summery_tds.setText("Tournament Downs:$" + String.valueOf(String.format("%.2f", tournament_totalTD)) + ", ");
+        textView_summery_tip_out.setText("Tip-out:$" + String.valueOf(String.format("%.2f", totalOuts)) + ", ");
         textView_hour_wage.setText("Hourly Wage:$" + String.valueOf(hrs));
     }
 
@@ -791,6 +802,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     public void updateSpinner(ArrayList<Profiles> profilesArrayList) {
         if (profilesArrayList.size() > 0) {
+
             SpinnerProfile profileAdapter = new SpinnerProfile(context, profilesArrayList);
             spinnerProfile.setAdapter(profileAdapter);
             selected_profileName = profilesArrayList.get(0).getProfile_name();
@@ -800,7 +812,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             spinnerProfile.setAdapter(profileAdapter);
             selected_profileName = profiles_empty[0];
         }
-
     }
 
     public void changeData(String spinner_selected, String start_week, String selected_profileName) {
@@ -948,8 +959,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             Date end_date = end_calendar.getTime();
             long end_date_long = end_date.getTime();
 
-            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
 
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
             setAdapter(addDayArrayList);
             updateBottom(addDayArrayList);
 
@@ -1249,7 +1260,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         // Create the initial metadata - MIME type and title.
                         // Note that the user will be able to change the title later.
                         MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                                .setMimeType("image/jpeg").setTitle("Android Photo.png").build();
+                                .setMimeType("text/plain").setTitle("Database").build();
                         // Create an intent for the file chooser, and start it.
                         IntentSender intentSender = Drive.DriveApi
                                 .newCreateFileActivityBuilder()
@@ -1450,6 +1461,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
+        Log.i("drive", "connected called");
         Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
             @Override
             public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
@@ -1488,42 +1500,41 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onConnectionSuspended(int i) {
 
+        Log.i("drive", "connected suspend");
     }
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
-        Log.i(TAG, "GoogleApiClient connection failed: " + connectionResult.toString());
 
-//        if (!connectionResult.hasResolution()) {
-//            // show the localized error dialog.
-//            GoogleApiAvailability.getInstance().getErrorDialog(this, connectionResult.getErrorCode(), 0).show();
+        Log.i("drive", "connected failed");
+//        Log.i(TAG, "GoogleApiClient connection failed: " + connectionResult.toString());
+//
+//        if (mResolvingError) { // If already in resolution state, just return.
 //            return;
+//        } else if (connectionResult.hasResolution()) { // Error can be resolved by starting an intent with user interaction
+//            mResolvingError = true;
+//            try {
+//                connectionResult.startResolutionForResult(this, DIALOG_ERROR_CODE);
+//            } catch (IntentSender.SendIntentException e) {
+//                e.printStackTrace();
+//            }
+//        } else { // Error cannot be resolved. Display Error Dialog stating the reason if possible.
+//            ErrorDialogFragment fragment = new ErrorDialogFragment();
+//            Bundle args = new Bundle();
+//            args.putInt("error", connectionResult.getErrorCode());
+//            fragment.setArguments(args);
+//            fragment.show(getFragmentManager(), "errordialog");
 //        }
-//        // The failure has a resolution. Resolve it.
-//        // Called typically when the app is not yet authorized, and an
-//        // authorization
-//        // dialog is displayed to the user.
-//        try {
-//            connectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-//        } catch (IntentSender.SendIntentException e) {
-//            Log.e(TAG, "Exception while starting resolution activity", e);
-//        }
-        if (mResolvingError) { // If already in resolution state, just return.
-            return;
-        } else if (connectionResult.hasResolution()) { // Error can be resolved by starting an intent with user interaction
-            mResolvingError = true;
+
+        if (connectionResult.hasResolution()) {
             try {
-                connectionResult.startResolutionForResult(this, DIALOG_ERROR_CODE);
+                connectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
             } catch (IntentSender.SendIntentException e) {
-                e.printStackTrace();
+                // Unable to resolve, message user appropriately
             }
-        } else { // Error cannot be resolved. Display Error Dialog stating the reason if possible.
-            ErrorDialogFragment fragment = new ErrorDialogFragment();
-            Bundle args = new Bundle();
-            args.putInt("error", connectionResult.getErrorCode());
-            fragment.setArguments(args);
-            fragment.show(getFragmentManager(), "errordialog");
+        } else {
+            GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, 0).show();
         }
 
     }
@@ -1650,13 +1661,22 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 //        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == DIALOG_ERROR_CODE) {
-            mResolvingError = false;
-            if (resultCode == RESULT_OK) { // Error was resolved, now connect to the client if not done so.
-                if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
+//        if (requestCode == DIALOG_ERROR_CODE) {
+//            mResolvingError = false;
+//            if (resultCode == RESULT_OK) { // Error was resolved, now connect to the client if not done so.
+//                if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
+//                    mGoogleApiClient.connect();
+//                }
+//            }
+//        }
+
+        switch (requestCode) {
+            case REQUEST_CODE_RESOLUTION:
+                if (resultCode == RESULT_OK) {
+                    Object file = data.getExtras().get("data");
                     mGoogleApiClient.connect();
                 }
-            }
+                break;
         }
     }
 

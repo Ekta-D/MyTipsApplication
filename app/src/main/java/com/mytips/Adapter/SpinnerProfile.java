@@ -61,7 +61,9 @@ public class SpinnerProfile extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
+
         holder.textView.setText(addDayArrayList.get(position).getProfile_name());
+
 
         return convertView;
     }
