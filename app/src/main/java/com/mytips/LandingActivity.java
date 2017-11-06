@@ -675,9 +675,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                             // TODO: 06-11-2017 account varification  and include to add two new jar files
 
-//                            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
-//                            credential.setSelectedAccountName(accountName);
-//                            Drive service = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).build();
+                            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
+                            credential.setSelectedAccountName(accountName);
+                            Drive service = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).build();
 
                         } catch (IOException e) {
                             e.printStackTrace();
