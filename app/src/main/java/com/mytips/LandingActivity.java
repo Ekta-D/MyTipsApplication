@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -42,6 +43,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -49,8 +52,12 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveContents;
+import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
+import com.google.android.gms.drive.OpenFileActivityBuilder;
+import com.google.android.gms.drive.query.Query;
+import com.google.api.client.json.gson.GsonFactory;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
@@ -100,9 +107,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
-public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener/*, ConnectionCallbacks,
-        OnConnectionFailedListener*/ {
-
+public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private LinearLayout mRevealView;
     private boolean hidden = true;
     private ImageButton add_day, profile, share, invite, preferences, backup;
@@ -430,22 +435,20 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
-        // TODO: 29/10/2017 update profile spinner, list data and total earnings card.
-
-//        if (mGoogleApiClient == null) {
-//            // Create the API client and bind it to an instance variable.
-//            // We use this instance as the callback for connection and connection
-//            // failures.
-//            // Since no account name is passed, the user is prompted to choose.
-//            mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                    .addApi(Drive.API)
-//                    .addScope(Drive.SCOPE_FILE)
-//                    .addConnectionCallbacks(this)
-//                    .addOnConnectionFailedListener(this)
-//                    .build();
-//        }
-        // Connect the client. Once connected, the camera is launched.
-        //  mGoogleApiClient.connect();
+        if (mGoogleApiClient == null) {
+            // Create the API client and bind it to an instance variable.
+            // We use this instance as the callback for connection and connection
+            // failures.
+            // Since no account name is passed, the user is prompted to choose.
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Drive.API)
+                    .addScope(Drive.SCOPE_FILE)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+        //Connect the client. Once connected, the camera is launched.
+        mGoogleApiClient.connect();
 
 
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
@@ -656,6 +659,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             source.close();
                             destination.close();
                             Toast.makeText(this, "DB Exported!", Toast.LENGTH_LONG).show();
+//                            mGoogleSignInCLient = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
+//                                    .requestScopes(Drive.SCOPE_FILE).build();
+
 
                             if (mGoogleApiClient == null) {
                                 try {
@@ -671,13 +677,50 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                 }
                             }
                             mGoogleApiClient.connect();
+                            uploadToDrive();
 
+//                            final DriveFolder folder = mFolderDriveId.asDriveFolder();
+//                            Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+//                                @Override
+//                                public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
+//
+//                                    DriveContents contents = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
+//                                            driveContentsResult.getDriveContents() : null;
+//
+//                                    if (contents != null)
+//                                        try {
+//                                            OutputStream outputStream = contents.getOutputStream();
+//                                            if (outputStream != null)
+//                                                try {
+//                                                    InputStream inputStream = new FileInputStream(backupDB.getPath());
+//                                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+//
+//                                                    byte[] buf = new byte[4096];
+//                                                    int c;
+//                                                    while ((c = inputStream.read(buf, 0, buf.length)) > 0) {
+//                                                        byteArrayOutputStream.write(buf, 0, c);
+//                                                        byte[] bytes = byteArrayOutputStream.toByteArray();
+//                                                        outputStream.write(bytes);
+//                                                        outputStream.close();
+//                                                        inputStream.close();
+//                                                    }
+//                                                    outputStream.close();
+//                                                } catch (IOException e) {
+//                                                    e.printStackTrace();
+//                                                }
+//                                        } catch (Exception e) {
+//                                            e.printStackTrace();
+//                                        }
+//                                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+//                                            .setTitle("tipees.realm")
+//                                            .setMimeType("text/plain")
+//                                            .setStarred(true)
+//                                            .build();
+
+//                                }
+//                            });
 
                             // TODO: 06-11-2017 account varification  and include to add two new jar files
-
-                            GoogleAccountCredential credential = GoogleAccountCredential.usingOAuth2(this, DriveScopes.DRIVE);
-                            credential.setSelectedAccountName(accountName);
-                            Drive service = new Drive.Builder(AndroidHttp.newCompatibleTransport(), new GsonFactory(), credential).build();
 
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -1263,6 +1306,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                 .setMimeType("text/plain").setTitle("Database").build();
                         // Create an intent for the file chooser, and start it.
                         IntentSender intentSender = Drive.DriveApi
+
                                 .newCreateFileActivityBuilder()
                                 .setInitialMetadata(metadataChangeSet)
                                 .setInitialDriveContents(result.getDriveContents())
@@ -1462,39 +1506,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public void onConnected(@Nullable Bundle bundle) {
 
         Log.i("drive", "connected called");
-        Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-            @Override
-            public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
+        //  uploadToDrive();
 
-                DriveContents contents = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
-                        driveContentsResult.getDriveContents() : null;
 
-                if (contents != null)
-                    try {
-                        OutputStream outputStream = contents.getOutputStream();
-                        if (outputStream != null)
-                            try {
-                                InputStream inputStream = new FileInputStream(backupDB);
-                                byte[] buf = new byte[4096];
-                                int c;
-                                while ((c = inputStream.read(buf, 0, buf.length)) > 0) {
-                                    outputStream.write(buf, 0, c);
-                                    outputStream.flush();
-                                }
-                                outputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle("glucosio.realm")
-                        .setMimeType("text/plain")
-                        .build();
-
-            }
-        });
     }
 
     @Override
@@ -1660,24 +1674,83 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == DIALOG_ERROR_CODE) {
-//            mResolvingError = false;
-//            if (resultCode == RESULT_OK) { // Error was resolved, now connect to the client if not done so.
-//                if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
-//                    mGoogleApiClient.connect();
-//                }
-//            }
-//        }
 
         switch (requestCode) {
             case REQUEST_CODE_RESOLUTION:
                 if (resultCode == RESULT_OK) {
-                    Object file = data.getExtras().get("data");
-                    mGoogleApiClient.connect();
+//                    Object file = data.getExtras().get("data");
+//                    mGoogleApiClient.connect();
+
+                    DriveId mFolderDriveId = (DriveId) data.getParcelableExtra(
+                            OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
+                    uploadToDrive();
+
                 }
                 break;
         }
     }
+
+
+    public void uploadToDrive() {
+
+        //  final DriveFolder folder = mFolderDriveId.asDriveFolder();
+        Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+            @Override
+            public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
+
+                DriveContents contents = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
+                        driveContentsResult.getDriveContents() : null;
+
+                if (contents != null)
+                    try {
+                        OutputStream outputStream = contents.getOutputStream();
+                        if (outputStream != null)
+                            try {
+                                InputStream inputStream = new FileInputStream(backupDB.getPath());
+                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+                                byte[] buf = new byte[4096];
+                                int c;
+                                while ((c = inputStream.read(buf, 0, buf.length)) > 0) {
+                                    byteArrayOutputStream.write(buf, 0, c);
+                                    byte[] bytes = byteArrayOutputStream.toByteArray();
+                                    outputStream.write(bytes);
+                                    outputStream.flush();
+//                                    outputStream.close();
+                                    //  inputStream.close();
+                                }
+                                outputStream.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                        .setTitle(Constants.DatabaseFileName)
+                        .setMimeType("text/plain")
+                        .setStarred(true)
+                        .build();
+
+                IntentSender intentSender = Drive.DriveApi
+                        .newCreateFileActivityBuilder()
+                        .setInitialMetadata(changeSet)
+                        .setInitialDriveContents(driveContentsResult.getDriveContents())
+                        .build(mGoogleApiClient);
+//                IntentSender intentSender = Drive.DriveApi
+//                        .newOpenFileActivityBuilder()
+//                        .setMimeType(new String[]{DriveFolder.MIME_TYPE})
+//                        .build(mGoogleApiClient);
+                try {
+                    startIntentSenderForResult(
+                            intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
+                } catch (IntentSender.SendIntentException e) {
+                    Log.i(TAG, "Failed to launch file chooser.");
+                }
+
+            }
+        });
+    }
+
 
 }

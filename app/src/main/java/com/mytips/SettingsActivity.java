@@ -4,6 +4,7 @@ package com.mytips;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -14,12 +15,15 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
@@ -36,6 +40,17 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveContents;
+import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.DriveId;
+import com.google.android.gms.drive.query.Filters;
+import com.google.android.gms.drive.query.Query;
+import com.google.android.gms.drive.query.SearchableField;
 import com.mytips.Adapter.AddTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.TipeeInfo;
@@ -43,6 +58,9 @@ import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 import com.mytips.Preferences.Preferences;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -57,11 +75,12 @@ import java.util.UUID;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity {
+public class SettingsActivity extends AppCompatPreferenceActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
+    private GoogleApiClient mGoogleApiClient;
     double tipee_percent;
     String tipee_name_tipout;
     SharedPreferences sharedPreferences;
@@ -156,7 +175,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         addPreferencesFromResource(R.xml.pref_general);
 //        setHasOptionsMenu(true);
         final EditTextPreference editTextPreference_name, editTextPreference_email;
-        Preference editTextPreference_show_add_tipee;
+        Preference editTextPreference_show_add_tipee, restore_data;
         final Preference preference_set_passcode;
         final ListPreference date_list, time_list, currency_list, theme_list;
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences
@@ -338,7 +357,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             }
         });
         theme_list = (ListPreference) findPreference("example_list");
-        if(theme_list.getValue()==null)
+        if (theme_list.getValue() == null)
             theme_list.setValueIndex(0);
 
         theme_list.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
@@ -478,7 +497,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
         preference_set_passcode = (Preference) findPreference("get_passcode");
 
-    preference_set_passcode.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        preference_set_passcode.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
 
@@ -575,6 +594,17 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
                 return true;
             }
         });
+
+
+        restore_data = (Preference) findPreference("backup_restore");
+        restore_data.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                readFromGoogleDrive();
+
+                return true;
+            }
+        });
     }
 
     /**
@@ -627,6 +657,21 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 //                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
     /**
      * This fragment shows general preferences only. It is used when the
      * activity is showing a two-pane settings UI.
@@ -655,5 +700,89 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
 
     ArrayList<TipeeInfo> tippess_infolist = new ArrayList<>();
 
+
+    void readFromGoogleDrive() {
+        byte[] buf = null;
+        if (mGoogleApiClient == null) {
+            // Create the API client and bind it to an instance variable.
+            // We use this instance as the callback for connection and connection
+            // failures.
+            // Since no account name is passed, the user is prompted to choose.
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(Drive.API)
+                    .addScope(Drive.SCOPE_FILE)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+        //Connect the client. Once connected, the camera is launched.
+        mGoogleApiClient.connect();
+        Query query = new Query
+                .Builder()
+                .addFilter(Filters.eq(SearchableField.TITLE, Constants.DatabaseFileName))
+                .build();
+        new SearchFileTask().execute(query);
+
+    }
+
+    ProgressDialog progress;
+
+    class SearchFileTask extends AsyncTask<Query, Void, DriveApi.MetadataBufferResult> {
+
+
+        @Override
+        protected void onPreExecute() {
+//            super.onPreExecute();
+            progress = new ProgressDialog(SettingsActivity.this);
+            progress.show();
+        }
+
+        @Override
+        protected DriveApi.MetadataBufferResult doInBackground(Query... params) {
+            return Drive.DriveApi.query(mGoogleApiClient, params[0]).await();
+        }
+
+        @Override
+        protected void onPostExecute(DriveApi.MetadataBufferResult metadataBufferResult) {
+            if (metadataBufferResult.getMetadataBuffer().getCount() == 0) {
+                Toast.makeText(SettingsActivity.this, "No file", Toast.LENGTH_SHORT).show();
+            } else {
+//                Toast.makeText(SettingsActivity.this, "Yes file exists", Toast.LENGTH_SHORT).show();
+
+                //  DriveFile driveFile = Drive.DriveApi.getFile(mGoogleApiClient, );
+                Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+                    @Override
+                    public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
+                        DriveId drive_id = driveContentsResult.getDriveContents().getDriveId();
+                        DriveFile driveFile = Drive.DriveApi.getFile(mGoogleApiClient, drive_id);
+
+                        driveFile.open(mGoogleApiClient, DriveFile.MODE_READ_ONLY, null).setResultCallback(
+                                new ResultCallback<DriveApi.DriveContentsResult>() {
+                                    @Override
+                                    public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
+                                        DriveContents contents = driveContentsResult.getDriveContents();
+                                        BufferedReader reader=new BufferedReader(new InputStreamReader(contents.getInputStream()));
+                                        StringBuilder string_builder=new StringBuilder();
+                                        String line;
+                                        try {
+                                            while ((line = reader.readLine()) != null) {
+                                                string_builder.append(line);
+                                            }
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    }
+                                }
+                        );
+                    }
+                });
+
+
+            }
+            progress.dismiss();
+            //   super.onPostExecute(metadataBufferResult);
+        }
+    }
 
 }
