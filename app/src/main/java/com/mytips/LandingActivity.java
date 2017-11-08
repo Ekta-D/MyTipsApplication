@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -54,9 +55,12 @@ import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
+import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
+import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
+import com.google.android.gms.drive.query.SearchableField;
 import com.google.api.client.json.gson.GsonFactory;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -143,6 +147,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     private static final int REQUEST_CODE_RESOLUTION = 3;
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingError = false;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -600,6 +605,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.backup:
 
+                progressDialog = new ProgressDialog(LandingActivity.this);
+                progressDialog.setMessage("Please wait! Uploading database");
+                progressDialog.show();
                 String email = sharedPreferences.getString("user_email", "");
                 Log.i("login_email", email);
 
@@ -659,8 +667,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             source.close();
                             destination.close();
                             Toast.makeText(this, "DB Exported!", Toast.LENGTH_LONG).show();
-//                            mGoogleSignInCLient = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_GAMES_SIGN_IN)
-//                                    .requestScopes(Drive.SCOPE_FILE).build();
 
 
                             if (mGoogleApiClient == null) {
@@ -1681,8 +1687,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 //                    Object file = data.getExtras().get("data");
 //                    mGoogleApiClient.connect();
 
-                    DriveId mFolderDriveId = (DriveId) data.getParcelableExtra(
-                            OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
+//                    DriveId mFolderDriveId = (DriveId) data.getParcelableExtra(
+//                            OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
                     uploadToDrive();
 
                 }
@@ -1693,7 +1699,59 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     public void uploadToDrive() {
 
-        //  final DriveFolder folder = mFolderDriveId.asDriveFolder();
+
+        Query query =
+                new Query.Builder().addFilter(Filters.and(Filters.eq(SearchableField.TITLE, Constants.FolderName)))
+                        .build();
+//        Query query =
+//                new Query.Builder().addFilter(Filters.and(Filters.eq(SearchableField.TITLE, Constants.FolderName),
+//                        Filters.eq(SearchableField.TRASHED, false)))
+//                        .build();  //   Filters.eq(SearchableField.TRASHED, false))) this will search even in trash
+        Drive.DriveApi.query(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
+            @Override
+            public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
+                if (!metadataBufferResult.getStatus().isSuccess()) {
+                    Log.i("drive", "can not create folder in root");
+
+                } else {
+                    boolean isFound = false;
+                    for (Metadata m : metadataBufferResult.getMetadataBuffer()) {
+                        if (m.getTitle().equals(Constants.FolderName)) {
+                            Log.e(TAG, "Folder exists");
+                        //    isFound = true;
+                            DriveId driveId = m.getDriveId();
+                            create_file_in_folder(driveId);
+                            break;
+                        }
+                    }
+                    if (!isFound) {
+                        Log.i(TAG, "Folder not found; creating it.");
+                        MetadataChangeSet changeSet = new MetadataChangeSet.Builder().setTitle(Constants.FolderName).build();
+                        Drive.DriveApi.getRootFolder(mGoogleApiClient)
+                                .createFolder(mGoogleApiClient, changeSet)
+                                .setResultCallback(new ResultCallback<DriveFolder.DriveFolderResult>() {
+                                    @Override
+                                    public void onResult(DriveFolder.DriveFolderResult result) {
+                                        if (!result.getStatus().isSuccess()) {
+                                            Log.e(TAG, "U AR A MORON! Error while trying to create the folder");
+                                        } else {
+                                            Log.i(TAG, "Created a folder");
+                                            DriveId driveId = result.getDriveFolder().getDriveId();
+                                            create_file_in_folder(driveId);
+                                        }
+                                    }
+                                });
+                    }
+                }
+            }
+        });
+
+
+    }
+
+    boolean isDone = false;
+
+    public void create_file_in_folder(final DriveId driveId) {
         Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
             @Override
             public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
@@ -1716,8 +1774,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                     byte[] bytes = byteArrayOutputStream.toByteArray();
                                     outputStream.write(bytes);
                                     outputStream.flush();
-//                                    outputStream.close();
-                                    //  inputStream.close();
                                 }
                                 outputStream.close();
                             } catch (IOException e) {
@@ -1729,24 +1785,42 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
                         .setTitle(Constants.DatabaseFileName)
                         .setMimeType("text/plain")
-                        .setStarred(true)
+                        .setStarred(false)
                         .build();
+                DriveFolder folder = driveId.asDriveFolder();
+                editor.putString(Constants.SharedDriveId, driveId.encodeToString());
+                editor.commit();
 
-                IntentSender intentSender = Drive.DriveApi
-                        .newCreateFileActivityBuilder()
-                        .setInitialMetadata(changeSet)
-                        .setInitialDriveContents(driveContentsResult.getDriveContents())
-                        .build(mGoogleApiClient);
-//                IntentSender intentSender = Drive.DriveApi
-//                        .newOpenFileActivityBuilder()
-//                        .setMimeType(new String[]{DriveFolder.MIME_TYPE})
-//                        .build(mGoogleApiClient);
-                try {
-                    startIntentSenderForResult(
-                            intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
-                } catch (IntentSender.SendIntentException e) {
-                    Log.i(TAG, "Failed to launch file chooser.");
+                folder.createFile(mGoogleApiClient, changeSet, driveContentsResult.getDriveContents())
+                        .setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
+                            @Override
+                            public void onResult(@NonNull DriveFolder.DriveFileResult driveFileResult) {
+                                isDone = true;
+                                if (!driveFileResult.getStatus().isSuccess()) {
+                                    Log.e(TAG, "U AR A MORON!  Error while trying to create the file");
+                                    return;
+                                } else {
+                                    Log.v(TAG, "Created a file: " + driveFileResult.getDriveFile().getDriveId());
+                                }
+
+                            }
+                        });
+                if (isDone) {
+                    progressDialog.dismiss();
                 }
+
+
+//                IntentSender intentSender = Drive.DriveApi
+//                        .newCreateFileActivityBuilder()
+//                        .setInitialMetadata(changeSet)
+//                        .setInitialDriveContents(driveContentsResult.getDriveContents())
+//                        .build(mGoogleApiClient);
+//                try {
+//                    startIntentSenderForResult(
+//                            intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
+//                } catch (IntentSender.SendIntentException e) {
+//                    Log.i(TAG, "Failed to launch file chooser.");
+//                }
 
             }
         });

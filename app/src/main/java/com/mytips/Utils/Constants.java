@@ -16,5 +16,9 @@ public class Constants {
     public static final String EditTextEnd = "end";
     public static final String fromPassword = "solver@2017";
     public static final String DatabaseFileName = "tipees.realm";
+    public static final String FolderName = "Data";
+    public static final String SharedDriveId = "drive_id";
+
+
 
 }

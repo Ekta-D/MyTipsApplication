@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -31,6 +32,7 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
@@ -47,7 +49,11 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
+import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
+import com.google.android.gms.drive.DriveResource;
+import com.google.android.gms.drive.MetadataBuffer;
+import com.google.android.gms.drive.internal.DriveServiceResponse;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
@@ -58,9 +64,19 @@ import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 import com.mytips.Preferences.Preferences;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -80,6 +96,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
+
+    ProgressDialog progress;
     private GoogleApiClient mGoogleApiClient;
     double tipee_percent;
     String tipee_name_tipout;
@@ -719,13 +737,16 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
         mGoogleApiClient.connect();
         Query query = new Query
                 .Builder()
-                .addFilter(Filters.eq(SearchableField.TITLE, Constants.DatabaseFileName))
+                .addFilter(Filters.eq(SearchableField.TITLE, Constants.FolderName))
                 .build();
+
+
         new SearchFileTask().execute(query);
 
     }
 
-    ProgressDialog progress;
+    DriveId drive_id = null;
+
 
     class SearchFileTask extends AsyncTask<Query, Void, DriveApi.MetadataBufferResult> {
 
@@ -744,45 +765,110 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
 
         @Override
         protected void onPostExecute(DriveApi.MetadataBufferResult metadataBufferResult) {
+
+
             if (metadataBufferResult.getMetadataBuffer().getCount() == 0) {
                 Toast.makeText(SettingsActivity.this, "No file", Toast.LENGTH_SHORT).show();
             } else {
-//                Toast.makeText(SettingsActivity.this, "Yes file exists", Toast.LENGTH_SHORT).show();
+                String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
+                drive_id = DriveId.decodeFromString(driveID);
+                // DriveFile driveFolder = drive_id.asDriveFile();
 
-                //  DriveFile driveFile = Drive.DriveApi.getFile(mGoogleApiClient, );
-                Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+                final DriveFile driveFile = Drive.DriveApi.getFile(mGoogleApiClient, drive_id);
+                Query query = new Query
+                        .Builder()
+                        .addFilter(Filters.eq(SearchableField.TITLE, Constants.FolderName))
+                        .build();
+                Drive.DriveApi.query(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
                     @Override
-                    public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
-                        DriveId drive_id = driveContentsResult.getDriveContents().getDriveId();
-                        DriveFile driveFile = Drive.DriveApi.getFile(mGoogleApiClient, drive_id);
+                    public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
+                        MetadataBuffer metaData = metadataBufferResult.getMetadataBuffer();
+                        for (int i = 0; i < metaData.getCount(); i++) {
+                            drive_id = metaData.get(i).getDriveId();
+                            String embed = metaData.get(i).getEmbedLink();
+                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                            StrictMode.setThreadPolicy(policy); // for handshake failed
+                            downloadData d = new downloadData();
+                            d.execute(embed);
 
-                        driveFile.open(mGoogleApiClient, DriveFile.MODE_READ_ONLY, null).setResultCallback(
-                                new ResultCallback<DriveApi.DriveContentsResult>() {
-                                    @Override
-                                    public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
-                                        DriveContents contents = driveContentsResult.getDriveContents();
-                                        BufferedReader reader=new BufferedReader(new InputStreamReader(contents.getInputStream()));
-                                        StringBuilder string_builder=new StringBuilder();
-                                        String line;
-                                        try {
-                                            while ((line = reader.readLine()) != null) {
-                                                string_builder.append(line);
-                                            }
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
+                            Log.i("drive", driveFile.toString());
 
-                                    }
-                                }
-                        );
+                        }
                     }
                 });
-
-
             }
-            progress.dismiss();
+
             //   super.onPostExecute(metadataBufferResult);
         }
     }
 
+
+}
+
+class downloadData extends AsyncTask<String, String, String> {
+    @Override
+    protected String doInBackground(String... params) {
+        int count;
+        InputStream input = null;
+        OutputStream output = null;
+        HttpURLConnection connection = null;
+        URL url1 = null;
+        try {
+            url1 = new URL(params[0]);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        URLConnection conection = null;
+        try {
+            conection = url1.openConnection();
+            conection.connect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // getting file length
+        int lenghtOfFile = conection.getContentLength();
+
+        // input stream to read file - with 8k buffer
+        InputStream input1 = null;
+        OutputStream output1 = null;
+        try {
+            input1 = new BufferedInputStream(url1.openStream(), 8192);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Output stream to write file
+        try {
+            output1 = new FileOutputStream("/sdcard/downloadedDatabase");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        byte data[] = new byte[1024];
+
+        long total = 0;
+
+        try {
+            while ((count = input1.read(data)) != -1) {
+                total += count;
+                output1.write(data, 0, count);
+
+            }
+            output1.flush();
+
+            // closing streams
+            output1.close();
+            input1.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+    }
 }
