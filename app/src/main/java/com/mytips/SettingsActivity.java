@@ -18,6 +18,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
@@ -42,6 +43,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
@@ -75,6 +77,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -754,8 +757,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
         @Override
         protected void onPreExecute() {
 //            super.onPreExecute();
-            progress = new ProgressDialog(SettingsActivity.this);
-            progress.show();
+//            progress = new ProgressDialog(SettingsActivity.this);
+//            progress.show();
         }
 
         @Override
@@ -772,7 +775,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
             } else {
                 String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
                 drive_id = DriveId.decodeFromString(driveID);
-                // DriveFile driveFolder = drive_id.asDriveFile();
 
                 final DriveFile driveFile = Drive.DriveApi.getFile(mGoogleApiClient, drive_id);
                 Query query = new Query
@@ -811,23 +813,25 @@ class downloadData extends AsyncTask<String, String, String> {
         int count;
         InputStream input = null;
         OutputStream output = null;
-        HttpURLConnection connection = null;
+        URLConnection connection1 = null;
+        //   connection1.setDoInput(true);
         URL url1 = null;
         try {
             url1 = new URL(params[0]);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        URLConnection conection = null;
+        //  URLConnection conection = null;
         try {
-            conection = url1.openConnection();
-            conection.connect();
+            connection1 = url1.openConnection();
+
+            connection1.connect();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         // getting file length
-        int lenghtOfFile = conection.getContentLength();
+        int lenghtOfFile = connection1.getContentLength();
 
         // input stream to read file - with 8k buffer
         InputStream input1 = null;
@@ -840,12 +844,13 @@ class downloadData extends AsyncTask<String, String, String> {
 
         // Output stream to write file
         try {
-            output1 = new FileOutputStream("/sdcard/downloadedDatabase");
+            output1 = new FileOutputStream(Environment.getExternalStorageDirectory().toString() + "/" + Constants.FetchedData);
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
 
-        byte data[] = new byte[1024];
+        byte data[] = new byte[4*1024];
 
         long total = 0;
 

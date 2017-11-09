@@ -685,47 +685,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             mGoogleApiClient.connect();
                             uploadToDrive();
 
-//                            final DriveFolder folder = mFolderDriveId.asDriveFolder();
-//                            Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-//                                @Override
-//                                public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
-//
-//                                    DriveContents contents = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
-//                                            driveContentsResult.getDriveContents() : null;
-//
-//                                    if (contents != null)
-//                                        try {
-//                                            OutputStream outputStream = contents.getOutputStream();
-//                                            if (outputStream != null)
-//                                                try {
-//                                                    InputStream inputStream = new FileInputStream(backupDB.getPath());
-//                                                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-//
-//                                                    byte[] buf = new byte[4096];
-//                                                    int c;
-//                                                    while ((c = inputStream.read(buf, 0, buf.length)) > 0) {
-//                                                        byteArrayOutputStream.write(buf, 0, c);
-//                                                        byte[] bytes = byteArrayOutputStream.toByteArray();
-//                                                        outputStream.write(bytes);
-//                                                        outputStream.close();
-//                                                        inputStream.close();
-//                                                    }
-//                                                    outputStream.close();
-//                                                } catch (IOException e) {
-//                                                    e.printStackTrace();
-//                                                }
-//                                        } catch (Exception e) {
-//                                            e.printStackTrace();
-//                                        }
-//                                    MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-//                                            .setTitle("tipees.realm")
-//                                            .setMimeType("text/plain")
-//                                            .setStarred(true)
-//                                            .build();
-
-//                                }
-//                            });
-
                             // TODO: 06-11-2017 account varification  and include to add two new jar files
 
                         } catch (IOException e) {
@@ -1279,54 +1238,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         mListView.setAdapter(adapter);
     }
 
-    private void saveFileToDrive(File uploadFile) {
-        // Start by creating a new contents, and setting a callback.
-        Log.i(TAG, "Creating new contents.");
-        Drive.DriveApi.newDriveContents(mGoogleApiClient)
-                .setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-
-                    @Override
-                    public void onResult(DriveApi.DriveContentsResult result) {
-                        // If the operation was not successful, we cannot do anything
-                        // and must
-                        // fail.
-                        if (!result.getStatus().isSuccess()) {
-                            Log.i(TAG, "Failed to create new contents.");
-                            return;
-                        }
-                        // Otherwise, we can write our data to the new contents.
-                        Log.i(TAG, "New contents created.");
-                        // Get an output stream for the contents.
-                        OutputStream outputStream = result.getDriveContents().getOutputStream();
-                        // Write the bitmap data from it.
-                        ByteArrayOutputStream bitmapStream = new ByteArrayOutputStream();
-                        //   image.compress(Bitmap.CompressFormat.PNG, 100, bitmapStream);
-                        try {
-                            outputStream.write(bitmapStream.toByteArray());
-                        } catch (IOException e1) {
-                            Log.i(TAG, "Unable to write file contents.");
-                        }
-                        // Create the initial metadata - MIME type and title.
-                        // Note that the user will be able to change the title later.
-                        MetadataChangeSet metadataChangeSet = new MetadataChangeSet.Builder()
-                                .setMimeType("text/plain").setTitle("Database").build();
-                        // Create an intent for the file chooser, and start it.
-                        IntentSender intentSender = Drive.DriveApi
-
-                                .newCreateFileActivityBuilder()
-                                .setInitialMetadata(metadataChangeSet)
-                                .setInitialDriveContents(result.getDriveContents())
-                                .build(mGoogleApiClient);
-                        try {
-                            startIntentSenderForResult(
-                                    intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
-                        } catch (IntentSender.SendIntentException e) {
-                            Log.i(TAG, "Failed to launch file chooser.");
-                        }
-                    }
-                });
-    }
-
     @Override
     protected void onPause() {
 //        if (mGoogleApiClient != null) {
@@ -1718,7 +1629,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     for (Metadata m : metadataBufferResult.getMetadataBuffer()) {
                         if (m.getTitle().equals(Constants.FolderName)) {
                             Log.e(TAG, "Folder exists");
-                        //    isFound = true;
+                            //    isFound = true;
                             DriveId driveId = m.getDriveId();
                             create_file_in_folder(driveId);
                             break;
@@ -1784,8 +1695,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
                         .setTitle(Constants.DatabaseFileName)
-                        .setMimeType("text/plain")
-                        .setStarred(false)
+                        .setMimeType("application/x-sqlite3")
                         .build();
                 DriveFolder folder = driveId.asDriveFolder();
                 editor.putString(Constants.SharedDriveId, driveId.encodeToString());
