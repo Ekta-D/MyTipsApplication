@@ -1647,8 +1647,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     public void create_file_in_folder(final DriveId driveId) {
 
-
-
         Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
             @Override
             public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
@@ -1698,7 +1696,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 }
 
                 // Copy the bits from instream to outstream
-                byte[] buf = new byte[1024];
+                byte[] buf = new byte[4096];
                 int len;
                 try {
                     while ((len = in1.read(buf)) > 0) {
