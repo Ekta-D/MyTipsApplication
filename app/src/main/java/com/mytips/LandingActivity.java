@@ -5,12 +5,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -31,6 +33,7 @@ import android.view.ViewAnimationUtils;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -699,28 +702,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    public void copyFile(File fromFile, File toFile) throws IOException {
-        FileChannel fromChannel = null;
-        FileChannel toChannel = null;
-        try {
-            fromChannel = new FileInputStream(fromFile).getChannel();
-            toChannel = new FileInputStream(toFile).getChannel();
-            fromChannel.transferTo(0, fromChannel.size(), toChannel);
-            // saveFileToDrive(toFile);
-            Toast.makeText(LandingActivity.this, "Backup file saved!", Toast.LENGTH_LONG).show();
-        } finally {
-            try {
-                if (fromChannel != null) {
-                    fromChannel.close();
-                }
-            } finally {
-                if (toChannel != null) {
-                    toChannel.close();
-                }
-            }
 
-        }
-    }
 
     SummaryAdapter adapter;
     ArrayList<AddDay> selectedProfile;
@@ -1618,6 +1600,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 //                new Query.Builder().addFilter(Filters.and(Filters.eq(SearchableField.TITLE, Constants.FolderName),
 //                        Filters.eq(SearchableField.TRASHED, false)))
 //                        .build();  //   Filters.eq(SearchableField.TRASHED, false))) this will search even in trash
+
         Drive.DriveApi.query(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
             @Override
             public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
@@ -1663,15 +1646,22 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     boolean isDone = false;
 
     public void create_file_in_folder(final DriveId driveId) {
+
+
+
         Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
             @Override
             public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
 
                 DriveContents contents = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
                         driveContentsResult.getDriveContents() : null;
-
+                InputStream in1 = null;
+                File image2 = new File(Environment.getExternalStorageDirectory()
+                        .toString() + "/" + "CopyCreated");
                 if (contents != null)
-                    try {
+
+
+                 /*   try {
                         OutputStream outputStream = contents.getOutputStream();
                         if (outputStream != null)
                             try {
@@ -1692,10 +1682,63 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             }
                     } catch (Exception e) {
                         e.printStackTrace();
+                    }*/
+
+                try {
+
+                    in1 = new FileInputStream(backupDB.getAbsolutePath());
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                OutputStream out = null;
+                try {
+                    out = new FileOutputStream(image2);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                // Copy the bits from instream to outstream
+                byte[] buf = new byte[1024];
+                int len;
+                try {
+                    while ((len = in1.read(buf)) > 0) {
+                        try {
+                            out.write(buf, 0, len);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    in1.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+
+//                FileInputStream fileInputStream;
+//                FileOutputStream fileOutputStream;
+//
+//                byte[] bytesfile = new byte[4096];
+//                try {
+//                    fileInputStream = new FileInputStream(backupDB);
+//                    fileInputStream.read(bytesfile);
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
                 MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
                         .setTitle(Constants.DatabaseFileName)
-                        .setMimeType("application/x-sqlite3")
+//                        .setMimeType("multipart/form-data")
+                        .setMimeType("text/plain")
                         .build();
                 DriveFolder folder = driveId.asDriveFolder();
                 editor.putString(Constants.SharedDriveId, driveId.encodeToString());

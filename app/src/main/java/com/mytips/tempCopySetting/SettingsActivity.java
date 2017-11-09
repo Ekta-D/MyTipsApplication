@@ -1,4 +1,4 @@
-package com.mytips;
+package com.mytips.tempCopySetting;
 
 
 import android.Manifest;
@@ -19,57 +19,50 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceFragment;
+import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
-import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.MetadataBuffer;
-import com.google.android.gms.drive.internal.DriveServiceResponse;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
-import com.itextpdf.text.pdf.codec.Base64;
 import com.mytips.Adapter.AddTipeeAdapter;
+import com.mytips.AppCompatPreferenceActivity;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.TipeeInfo;
+import com.mytips.Preferences.Preferences;
+import com.mytips.R;
+import com.mytips.SetPassword;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
-import com.mytips.Preferences.Preferences;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -78,11 +71,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -817,53 +805,53 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
 class downloadData extends AsyncTask<String, String, String> {
     @Override
     protected String doInBackground(String... params) {
-        int count;
-        InputStream input = null;
-        OutputStream output = null;
-        URLConnection connection1 = null;
-        //   connection1.setDoInput(true);
-        URL url1 = null;
-        try {
-            url1 = new URL(params[0]);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        //  URLConnection conection = null;
+//        int count;
+//        InputStream input = null;
+//        OutputStream output = null;
+//        URLConnection connection1 = null;
+//        //   connection1.setDoInput(true);
+//        URL url1 = null;
 //        try {
-//            connection1 = url1.openConnection();
-//
-//            connection1.connect();
-//        } catch (IOException e) {
+//            url1 = new URL(params[0]);
+//        } catch (MalformedURLException e) {
 //            e.printStackTrace();
 //        }
-
-        // getting file length
-        //  int lenghtOfFile = connection1.getContentLength();
-
-        // input stream to read file - with 8k buffer
-        ByteArrayOutputStream input1 = null;
-        FileOutputStream output1 = null;
-        input1 = new ByteArrayOutputStream();
-
-        try {
-            input = url1.openStream();
-            byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
-            int n;
-            while ( (n = input.read(byteChunk)) > 0 ) {
-                input1.write(byteChunk, 0, n);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            if (input!=null )
-            {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+//        //  URLConnection conection = null;
+////        try {
+////            connection1 = url1.openConnection();
+////
+////            connection1.connect();
+////        } catch (IOException e) {
+////            e.printStackTrace();
+////        }
+//
+//        // getting file length
+//        //  int lenghtOfFile = connection1.getContentLength();
+//
+//        // input stream to read file - with 8k buffer
+//        ByteArrayOutputStream input1 = null;
+//        FileOutputStream output1 = null;
+//        input1 = new ByteArrayOutputStream();
+//
+//        try {
+//            input = url1.openStream();
+//            byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
+//            int n;
+//            while ( (n = input.read(byteChunk)) > 0 ) {
+//                input1.write(byteChunk, 0, n);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }finally {
+//            if (input!=null )
+//            {
+//                try {
+//                    input.close();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
 
 
         //////////////////////////////////***********************************?????????////////////////////
@@ -896,9 +884,10 @@ class downloadData extends AsyncTask<String, String, String> {
 //        }
 
 
-     /*   File image = new File(Environment.getExternalStorageDirectory()
+        File image = new File(Environment.getExternalStorageDirectory()
                 .toString() + "/" + "tipseeDB");
-
+        File image2 = new File(Environment.getExternalStorageDirectory()
+                .toString() + "/" + "fetched");
         BufferedReader in = null;
         try {
             in = new BufferedReader(new InputStreamReader(new FileInputStream(image.getAbsolutePath())));
@@ -913,19 +902,81 @@ class downloadData extends AsyncTask<String, String, String> {
             e.printStackTrace();
         }
 
-        File image1 = new File(Environment.getExternalStorageDirectory()
-                .toString() + "/copy" + "/fetch");
+
+      /*  FileOutputStream outputStream = null;
         try {
-            InputStream input = new FileInputStream(image.getAbsolutePath());
-            OutputStream output = new FileOutputStream(image1.getAbsolutePath());
-            byte[] bu = new byte[1024];
-            int len;
-            while ((len = input.read(bu)) > 0) {
-                output.write(bu, 0, len);
+            outputStream = new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/", "fetched"));
+            InputStream inputStream = new FileInputStream(image2.getAbsolutePath());
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+            byte[] buf = new byte[1024];
+            int c;
+            while ((c = inputStream.read(buf, 0, buf.length)) > 0) {
+                byteArrayOutputStream.write(buf, 0, c);
+                byte[] bytes = byteArrayOutputStream.toByteArray();
+                outputStream.write(bytes);
+                outputStream.flush();
             }
+            outputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
+        InputStream in1 = null;
+        try {
+            in1 = new FileInputStream(image.getAbsolutePath());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+        }
+        OutputStream out = null;
+        try {
+            out = new FileOutputStream(image2);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        // Copy the bits from instream to outstream
+        byte[] buf = new byte[1024];
+        int len;
+        try {
+            while ((len = in1.read(buf)) > 0) {
+                try {
+                    out.write(buf, 0, len);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            in1.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            out.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+//        try {
+        //           InputStream input = new FileInputStream(image.getAbsolutePath());
+//            OutputStream output = new FileOutputStream(image1.getAbsolutePath());
+//            byte[] bu = new byte[1024];
+//            int len;
+//            while ((len = input.read(bu)) > 0) {
+//                output.write(bu, 0, len);
+//            }
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+   /*     try {
+            FileOutputStream out = new FileOutputStream(image2.getAbsolutePath());
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         }*/
 //        try {
