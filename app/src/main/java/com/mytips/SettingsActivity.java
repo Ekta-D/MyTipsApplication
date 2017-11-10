@@ -3,11 +3,15 @@ package com.mytips;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -27,6 +31,7 @@ import android.preference.PreferenceActivity;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
@@ -62,6 +67,7 @@ import com.google.android.gms.drive.query.SearchableField;
 import com.itextpdf.text.pdf.codec.Base64;
 import com.mytips.Adapter.AddTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
+import com.mytips.Database.DatabaseUtils;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
@@ -83,6 +89,7 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -104,13 +111,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    public Context context;
 
-    ProgressDialog progress;
+    public File f1 = null;
+    public Context context;
+    String action = "done";
     private GoogleApiClient mGoogleApiClient;
     double tipee_percent;
     String tipee_name_tipout;
     SharedPreferences sharedPreferences;
+
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
             new Preference.OnPreferenceChangeListener() {
                 @Override
@@ -190,16 +199,26 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
                         .getString(preference.getKey(), ""));
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setupActionBar();
         CommonMethods.setTheme(getSupportActionBar(), SettingsActivity.this);
-
+        progressDialog = new ProgressDialog(SettingsActivity.this);
         context = SettingsActivity.this;
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
 
+        mReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(action)) {
+                    Thread thread = new Thread(runnable);
+                    thread.start();
+                }
+            }
+        };
         addPreferencesFromResource(R.xml.pref_general);
 //        setHasOptionsMenu(true);
         final EditTextPreference editTextPreference_name, editTextPreference_email;
@@ -688,6 +707,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
+        if (mGoogleApiClient.isConnected()) {
+            String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
+            File fl = new File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
+            DownloadFile(DriveId.decodeFromString(driveID), fl);
+        }
     }
 
     @Override
@@ -698,6 +722,18 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
     }
 
     /**
@@ -747,209 +783,147 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
         mGoogleApiClient.connect();
         Query query = new Query
                 .Builder()
-                .addFilter(Filters.eq(SearchableField.TITLE, Constants.FolderName))
+                .addFilter(Filters.eq(SearchableField.TITLE, Constants.DatabaseFileName))
                 .build();
+        String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
+        File fl = new File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
 
-
-        new SearchFileTask().execute(query);
-
+//        DownloadFile(DriveId.decodeFromString(driveID), fl);
     }
 
-    DriveId drive_id = null;
+    ProgressDialog progressDialog;
+    boolean isDone = false;
+    BroadcastReceiver mReceiver;
 
 
-    class SearchFileTask extends AsyncTask<Query, Void, DriveApi.MetadataBufferResult> {
-
-
-        @Override
-        protected void onPreExecute() {
-//            super.onPreExecute();
-//            progress = new ProgressDialog(SettingsActivity.this);
-//            progress.show();
-        }
-
-        @Override
-        protected DriveApi.MetadataBufferResult doInBackground(Query... params) {
-            return Drive.DriveApi.query(mGoogleApiClient, params[0]).await();
-        }
-
-        @Override
-        protected void onPostExecute(DriveApi.MetadataBufferResult metadataBufferResult) {
-
-
-            if (metadataBufferResult.getMetadataBuffer().getCount() == 0) {
-                Toast.makeText(SettingsActivity.this, "No file", Toast.LENGTH_SHORT).show();
-            } else {
-                String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
-                drive_id = DriveId.decodeFromString(driveID);
-
-                final DriveFile driveFile = Drive.DriveApi.getFile(mGoogleApiClient, drive_id);
-                Query query = new Query
-                        .Builder()
-                        .addFilter(Filters.eq(SearchableField.TITLE, Constants.FolderName))
-                        .build();
-                Drive.DriveApi.query(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
-                    @Override
-                    public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
-                        MetadataBuffer metaData = metadataBufferResult.getMetadataBuffer();
-                        for (int i = 0; i < metaData.getCount(); i++) {
-                            drive_id = metaData.get(i).getDriveId();
-                            String embed = metaData.get(i).getEmbedLink();
-//                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-//                            StrictMode.setThreadPolicy(policy); // for handshake failed
-                            downloadData d = new downloadData();
-                            d.execute(embed);
-
-                            Log.i("drive", driveFile.toString());
-
-                        }
-                    }
-                });
+    private void DownloadFile(final DriveId driveId, final File filename) {
+        progressDialog.setMessage("Restoring factory!");
+        progressDialog.show();
+        if (!filename.exists()) {
+            try {
+                filename.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            //   super.onPostExecute(metadataBufferResult);
         }
+
+        if (mGoogleApiClient.isConnected()) {
+            //   mGoogleApiClient.connect();
+            DriveFile file = Drive.DriveApi.getFile(
+                    mGoogleApiClient, driveId);
+            file.getMetadata(mGoogleApiClient)
+                    .setResultCallback(metadataRetrievedCallback);
+
+        } else {
+            mGoogleApiClient.connect(GoogleApiClient.SIGN_IN_MODE_REQUIRED);
+        }
+
     }
 
+    boolean is_done = false;
+    private ResultCallback<DriveResource.MetadataResult> metadataRetrievedCallback = new ResultCallback<DriveResource.MetadataResult>() {
+        @Override
+        public void onResult(DriveResource.MetadataResult result) {
+            if (result.getStatus().isSuccess()) {
+                is_done = true;
+                Intent intent = new Intent();
+                intent.setAction(action);
+                LocalBroadcastManager manager = LocalBroadcastManager.getInstance(SettingsActivity.this);
+                manager.sendBroadcast(intent);
+                return;
+            }
+        }
+    };
 
-}
 
-class downloadData extends AsyncTask<String, String, String> {
+    public boolean fileCopy(File src, File dst) throws IOException {
+        boolean is_completed = false;
+        InputStream in = new FileInputStream(src.getAbsolutePath());
+        OutputStream mOutput = new FileOutputStream(dst.getAbsolutePath());
+        byte[] mBuffer = new byte[1024];
+        int mLength;
+        while ((mLength = in.read(mBuffer)) > 0) {
+            mOutput.write(mBuffer, 0, mLength);
+            is_completed = true;
+        }
+        mOutput.flush();
+        mOutput.close();
+        in.close();
+
+        restartApp();
+        return is_completed;
+    }
+
+    public void restartApp() {
+        Intent mStartActivity = new Intent(context, LandingActivity.class);
+        int mPendingIntentId = 123456;
+        PendingIntent mPendingIntent = PendingIntent.getActivity(context, mPendingIntentId, mStartActivity, PendingIntent.FLAG_CANCEL_CURRENT);
+        AlarmManager mgr = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, mPendingIntent);
+        System.exit(0);
+    }
+
     @Override
-    protected String doInBackground(String... params) {
-        int count;
-        InputStream input = null;
-        OutputStream output = null;
-        URLConnection connection1 = null;
-        //   connection1.setDoInput(true);
-        URL url1 = null;
-        try {
-            url1 = new URL(params[0]);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        //  URLConnection conection = null;
-//        try {
-//            connection1 = url1.openConnection();
-//
-//            connection1.connect();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(action);
 
-        // getting file length
-        //  int lenghtOfFile = connection1.getContentLength();
+        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
+        manager.registerReceiver(mReceiver, filter);
+    }
 
-        // input stream to read file - with 8k buffer
-        ByteArrayOutputStream input1 = null;
-        FileOutputStream output1 = null;
-        input1 = new ByteArrayOutputStream();
+    Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            if (is_done) {
+                String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
 
-        try {
-            input = url1.openStream();
-            byte[] byteChunk = new byte[4096]; // Or whatever size you want to read in at a time.
-            int n;
-            while ( (n = input.read(byteChunk)) > 0 ) {
-                input1.write(byteChunk, 0, n);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            if (input!=null )
-            {
+                DriveFile file = Drive.DriveApi.getFile(
+                        mGoogleApiClient, DriveId.decodeFromString(driveID));
+
+                DriveApi.DriveContentsResult driveContentsResult = file.open(
+                        mGoogleApiClient,
+                        DriveFile.MODE_READ_ONLY, null).await();
+                DriveContents driveContents = driveContentsResult
+                        .getDriveContents();
+                InputStream inputstream = driveContents.getInputStream();
+
                 try {
-                    input.close();
+                    f1 = new File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
+                    FileOutputStream fileOutput = new FileOutputStream(f1);
+
+                    byte[] buffer = new byte[1024];
+                    int bufferLength = 0;
+                    while ((bufferLength = inputstream.read(buffer)) > 0) {
+                        fileOutput.write(buffer, 0, bufferLength);
+                        isDone = true;
+
+                    }
+                    fileOutput.close();
+                    inputstream.close();
+                    if (isDone) {
+                        final File data = Environment.getDataDirectory();
+                        String currentDBPath = "/data/" + "com.mytips" + "/databases/" + DatabaseUtils.db_Name;
+                        File currentDB = new File(data, currentDBPath);
+                        try {
+                            fileCopy(f1, currentDB);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        progressDialog.dismiss();
+                    }
                 } catch (IOException e) {
+                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
+
             }
         }
-
-
-        //////////////////////////////////***********************************?????????////////////////////
-        // Output stream to write file
-//        try {
-//            output1 = new FileOutputStream(Environment.getExternalStorageDirectory().toString() + "/" + Constants.FetchedData);
-//
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-
-
-//        byte data[] = new byte[4 * 1024];
-//
-//        long total = 0;
-//
-//        try {
-//            while ((count = input1.read(data)) != -1) {
-//                total += count;
-//                output1.write(data, 0, count);
-//
-//            }
-//            output1.flush();
-//
-//            // closing streams
-//            output1.close();
-//            input1.close();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-
-     /*   File image = new File(Environment.getExternalStorageDirectory()
-                .toString() + "/" + "tipseeDB");
-
-        BufferedReader in = null;
-        try {
-            in = new BufferedReader(new InputStreamReader(new FileInputStream(image.getAbsolutePath())));
-            String line;
-            StringBuffer buffer = new StringBuffer();
-            while ((line = in.readLine()) != null) {
-                buffer.append(line);
-            }
-
-            Log.d(TAG, buffer.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        File image1 = new File(Environment.getExternalStorageDirectory()
-                .toString() + "/copy" + "/fetch");
-        try {
-            InputStream input = new FileInputStream(image.getAbsolutePath());
-            OutputStream output = new FileOutputStream(image1.getAbsolutePath());
-            byte[] bu = new byte[1024];
-            int len;
-            while ((len = input.read(bu)) > 0) {
-                output.write(bu, 0, len);
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
-//        try {
-//
-//            FileOutputStream fos;
-//
-//            fos = new FileOutputStream(new File(Environment.getExternalStorageDirectory() + "/SampleFettched", "fetched.Db"));
-//            byte[] b = new byte[8];
-//            int i;
-//            while ((i = fis.read(b)) != -1) {
-//                fos.write(b, 0, i);
-//            }
-//            fos.flush();
-//            fos.close();
-//            fis.close();
-//        } catch (IOException e1) {
-//            e1.printStackTrace();
-//        }
-
-        return null;
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-    }
+    };
 }
+
+
+
+
+

@@ -1,5 +1,6 @@
 package com.mytips;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Activity;
@@ -11,15 +12,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.os.Environment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -56,8 +61,10 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveContents;
+import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
+import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.OpenFileActivityBuilder;
@@ -108,6 +115,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
@@ -150,12 +158,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     private static final int REQUEST_CODE_RESOLUTION = 3;
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingError = false;
-    ProgressDialog progressDialog;
-
+    public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
+
+        boolean grantedPermission = checkPermissions();
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!grantedPermission) {
+                checkPermissions();
+            }
+            //only api 23 above
+        }
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
 
@@ -608,9 +623,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.backup:
 
-                progressDialog = new ProgressDialog(LandingActivity.this);
-                progressDialog.setMessage("Please wait! Uploading database");
-                progressDialog.show();
+//                progressDialog = new ProgressDialog(LandingActivity.this);
+//                progressDialog.setMessage("Please wait! Uploading database");
+//                progressDialog.show();
                 String email = sharedPreferences.getString("user_email", "");
                 Log.i("login_email", email);
 
@@ -701,7 +716,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
         }
     }
-
 
 
     SummaryAdapter adapter;
@@ -1577,205 +1591,149 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         switch (requestCode) {
             case REQUEST_CODE_RESOLUTION:
                 if (resultCode == RESULT_OK) {
-//                    Object file = data.getExtras().get("data");
-//                    mGoogleApiClient.connect();
-
-//                    DriveId mFolderDriveId = (DriveId) data.getParcelableExtra(
-//                            OpenFileActivityBuilder.EXTRA_RESPONSE_DRIVE_ID);
-                    uploadToDrive();
+                 //   uploadToDrive();
 
                 }
                 break;
         }
     }
 
-
     public void uploadToDrive() {
 
-
-        Query query =
-                new Query.Builder().addFilter(Filters.and(Filters.eq(SearchableField.TITLE, Constants.FolderName)))
-                        .build();
-//        Query query =
-//                new Query.Builder().addFilter(Filters.and(Filters.eq(SearchableField.TITLE, Constants.FolderName),
-//                        Filters.eq(SearchableField.TRASHED, false)))
-//                        .build();  //   Filters.eq(SearchableField.TRASHED, false))) this will search even in trash
-
-        Drive.DriveApi.query(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
-            @Override
-            public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
-                if (!metadataBufferResult.getStatus().isSuccess()) {
-                    Log.i("drive", "can not create folder in root");
-
-                } else {
-                    boolean isFound = false;
-                    for (Metadata m : metadataBufferResult.getMetadataBuffer()) {
-                        if (m.getTitle().equals(Constants.FolderName)) {
-                            Log.e(TAG, "Folder exists");
-                            //    isFound = true;
-                            DriveId driveId = m.getDriveId();
-                            create_file_in_folder(driveId);
-                            break;
-                        }
-                    }
-                    if (!isFound) {
-                        Log.i(TAG, "Folder not found; creating it.");
-                        MetadataChangeSet changeSet = new MetadataChangeSet.Builder().setTitle(Constants.FolderName).build();
-                        Drive.DriveApi.getRootFolder(mGoogleApiClient)
-                                .createFolder(mGoogleApiClient, changeSet)
-                                .setResultCallback(new ResultCallback<DriveFolder.DriveFolderResult>() {
-                                    @Override
-                                    public void onResult(DriveFolder.DriveFolderResult result) {
-                                        if (!result.getStatus().isSuccess()) {
-                                            Log.e(TAG, "U AR A MORON! Error while trying to create the folder");
-                                        } else {
-                                            Log.i(TAG, "Created a folder");
-                                            DriveId driveId = result.getDriveFolder().getDriveId();
-                                            create_file_in_folder(driveId);
-                                        }
-                                    }
-                                });
-                    }
-                }
-            }
-        });
-
-
+        create_file_in_folder();
     }
 
-    boolean isDone = false;
+    ProgressDialog progressDialog;
 
-    public void create_file_in_folder(final DriveId driveId) {
+    public void create_file_in_folder() {
 
+        progressDialog = new ProgressDialog(LandingActivity.this);
+        progressDialog.setMessage("Uploading database!");
+        progressDialog.show();
         Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
             @Override
             public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
 
-                DriveContents contents = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
-                        driveContentsResult.getDriveContents() : null;
-                InputStream in1 = null;
-                File image2 = new File(Environment.getExternalStorageDirectory()
-                        .toString() + "/" + "CopyCreated");
-                if (contents != null)
-
-
-                 /*   try {
-                        OutputStream outputStream = contents.getOutputStream();
-                        if (outputStream != null)
-                            try {
-                                InputStream inputStream = new FileInputStream(backupDB.getPath());
-                                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-                                byte[] buf = new byte[4096];
-                                int c;
-                                while ((c = inputStream.read(buf, 0, buf.length)) > 0) {
-                                    byteArrayOutputStream.write(buf, 0, c);
-                                    byte[] bytes = byteArrayOutputStream.toByteArray();
-                                    outputStream.write(bytes);
-                                    outputStream.flush();
-                                }
-                                outputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }*/
-
-                try {
-
-                    in1 = new FileInputStream(backupDB.getAbsolutePath());
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                OutputStream out = null;
-                try {
-                    out = new FileOutputStream(image2);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-
-                // Copy the bits from instream to outstream
-                byte[] buf = new byte[4096];
-                int len;
-                try {
-                    while ((len = in1.read(buf)) > 0) {
-                        try {
-                            out.write(buf, 0, len);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    in1.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-
-//                FileInputStream fileInputStream;
-//                FileOutputStream fileOutputStream;
-//
-//                byte[] bytesfile = new byte[4096];
-//                try {
-//                    fileInputStream = new FileInputStream(backupDB);
-//                    fileInputStream.read(bytesfile);
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                        .setTitle(Constants.DatabaseFileName)
-//                        .setMimeType("multipart/form-data")
-                        .setMimeType("text/plain")
-                        .build();
-                DriveFolder folder = driveId.asDriveFolder();
-                editor.putString(Constants.SharedDriveId, driveId.encodeToString());
-                editor.commit();
-
-                folder.createFile(mGoogleApiClient, changeSet, driveContentsResult.getDriveContents())
-                        .setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
-                            @Override
-                            public void onResult(@NonNull DriveFolder.DriveFileResult driveFileResult) {
-                                isDone = true;
-                                if (!driveFileResult.getStatus().isSuccess()) {
-                                    Log.e(TAG, "U AR A MORON!  Error while trying to create the file");
-                                    return;
-                                } else {
-                                    Log.v(TAG, "Created a file: " + driveFileResult.getDriveFile().getDriveId());
-                                }
-
-                            }
-                        });
-                if (isDone) {
-                    progressDialog.dismiss();
-                }
-
-
-//                IntentSender intentSender = Drive.DriveApi
-//                        .newCreateFileActivityBuilder()
-//                        .setInitialMetadata(changeSet)
-//                        .setInitialDriveContents(driveContentsResult.getDriveContents())
-//                        .build(mGoogleApiClient);
-//                try {
-//                    startIntentSenderForResult(
-//                            intentSender, REQUEST_CODE_CREATOR, null, 0, 0, 0);
-//                } catch (IntentSender.SendIntentException e) {
-//                    Log.i(TAG, "Failed to launch file chooser.");
-//                }
+                saveToDrive(Drive.DriveApi.getRootFolder(mGoogleApiClient), "tipeesDB.db", "text/plain", backupDB);
 
             }
         });
     }
 
+    boolean is_completed = false;
+
+
+    void saveToDrive(final DriveFolder pFldr, final String titl,
+                     final String mime, final java.io.File file) {
+        if (mGoogleApiClient != null && pFldr != null && titl != null && mime != null && file != null)
+            try {
+                // create content from file
+                Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+                    @Override
+                    public void onResult(DriveApi.DriveContentsResult driveContentsResult) {
+                        DriveContents cont = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
+                                driveContentsResult.getDriveContents() : null;
+
+                        // write file to content, chunk by chunk
+                        if (cont != null) try {
+                            OutputStream oos = cont.getOutputStream();
+                            if (oos != null) try {
+                                InputStream is = new FileInputStream(file);
+                                byte[] buf = new byte[4096];
+                                int c;
+                                while ((c = is.read(buf, 0, buf.length)) > 0) {
+                                    oos.write(buf, 0, c);
+                                    oos.flush();
+                                }
+                            } finally {
+                                oos.close();
+                            }
+
+                            // content's COOL, create metadata
+                            MetadataChangeSet meta = new MetadataChangeSet.Builder().setTitle(titl).setMimeType(mime).build();
+
+                            // now create file on GooDrive
+                            pFldr.createFile(mGoogleApiClient, meta, cont).setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
+                                @Override
+                                public void onResult(DriveFolder.DriveFileResult driveFileResult) {
+                                    if (driveFileResult != null && driveFileResult.getStatus().isSuccess()) {
+                                        DriveFile dFil = driveFileResult != null && driveFileResult.getStatus().isSuccess() ?
+                                                driveFileResult.getDriveFile() : null;
+                                        if (dFil != null) {
+                                            // BINGO , file uploaded
+                                            dFil.getMetadata(mGoogleApiClient).setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                                                @Override
+                                                public void onResult(DriveResource.MetadataResult metadataResult) {
+                                                    if (metadataResult != null && metadataResult.getStatus().isSuccess()) {
+                                                        is_completed = true;
+                                                        DriveId mDriveId = metadataResult.getMetadata().getDriveId();
+                                                        editor.putString(Constants.SharedDriveId, mDriveId.encodeToString());
+                                                        editor.commit();
+                                                    }
+                                                    if (is_completed) {
+                                                        progressDialog.dismiss();
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    } else { /* report error */ }
+                                }
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+    }
+
+    public boolean checkPermissions() {
+        int permissionWrite = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int storagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+
+        int camera_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        int finger_print = ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        if (storagePermission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+        }
+        if (permissionWrite != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+        if (camera_permission != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.CAMERA);
+        }
+
+        if (finger_print != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.USE_FINGERPRINT);
+        }
+
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(this,
+                    listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MY_PERMISSIONS_REQUEST_ACCOUNTS);
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_ACCOUNTS:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    //Toast.makeText(SplashActivity.this, "permissions granted!", Toast.LENGTH_SHORT).show();
+                } else {
+                    //Toast.makeText(SplashActivity.this, "permissions not granted!", Toast.LENGTH_SHORT).show();
+                }
+                break;
+        }
+    }
 
 }

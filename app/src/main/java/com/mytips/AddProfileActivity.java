@@ -197,13 +197,13 @@ public class AddProfileActivity extends AppCompatActivity {
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                boolean grantedPermission = checkPermissions();
+              /*  boolean grantedPermission = checkPermissions();
                 if (Build.VERSION.SDK_INT >= 23) {
                     if (!grantedPermission) {
                         checkPermissions();
                     }
                     //only api 23 above
-                } else {
+                } else {*/
                     AlertDialog.Builder alert = new AlertDialog.Builder(AddProfileActivity.this);
                     alert.setTitle("Make your selecetion");
                     final String names[] = {"Camera", "Gallery"};
@@ -222,7 +222,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
                     AlertDialog al = alert.create();
                     al.show();
-                }
+//                }
 
             }
         });
@@ -523,7 +523,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
     }
 
-    public boolean checkPermissions() {
+/*    public boolean checkPermissions() {
         int permissionWrite = ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int storagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -567,5 +567,5 @@ public class AddProfileActivity extends AppCompatActivity {
                 }
                 break;
         }
-    }
+    }*/
 }
