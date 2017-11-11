@@ -52,6 +52,7 @@ import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveContents;
@@ -59,16 +60,37 @@ import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
+import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
-import com.google.android.gms.drive.internal.DriveServiceResponse;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
-import com.itextpdf.text.pdf.codec.Base64;
+//import com.google.android.gms.tasks.Task;
+//import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+//import com.google.api.client.http.HttpRequest;
+//import com.google.api.client.http.HttpRequestInitializer;
+//import com.google.api.client.http.HttpTransport;
+//import com.google.api.client.http.javanet.NetHttpTransport;
+//import com.google.api.client.json.JsonFactory;
+//import com.google.api.client.json.jackson2.JacksonFactory;
+//import com.google.api.services.drive.model.FileList;
+//import com.itextpdf.text.pdf.codec.Base64;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.compute.ComputeCredential;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpRequest;
+import com.google.api.client.http.HttpRequestInitializer;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.drive.model.FileList;
+import com.itextpdf.text.Meta;
 import com.mytips.Adapter.AddTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Database.DatabaseUtils;
 import com.mytips.Model.TipeeInfo;
+//import com.google.api.services.drive.model.File;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 import com.mytips.Preferences.Preferences;
@@ -90,7 +112,9 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.FileChannel;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
@@ -112,7 +136,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
      * to reflect its new value.
      */
 
-    public File f1 = null;
+    public java.io.File f1 = null;
     public Context context;
     String action = "done";
     private GoogleApiClient mGoogleApiClient;
@@ -709,7 +733,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
 
         if (mGoogleApiClient.isConnected()) {
             String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
-            File fl = new File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
+            java.io.File fl = new java.io.File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
             DownloadFile(DriveId.decodeFromString(driveID), fl);
         }
     }
@@ -724,17 +748,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
 
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mGoogleApiClient.disconnect();
-    }
-
-    @Override
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
 
     /**
      * This fragment shows general preferences only. It is used when the
@@ -781,13 +794,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
         }
         //Connect the client. Once connected, the camera is launched.
         mGoogleApiClient.connect();
-        Query query = new Query
-                .Builder()
-                .addFilter(Filters.eq(SearchableField.TITLE, Constants.DatabaseFileName))
-                .build();
-        String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
-        File fl = new File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
-
 //        DownloadFile(DriveId.decodeFromString(driveID), fl);
     }
 
@@ -796,7 +802,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
     BroadcastReceiver mReceiver;
 
 
-    private void DownloadFile(final DriveId driveId, final File filename) {
+    private void DownloadFile(final DriveId driveId, final java.io.File filename) {
         progressDialog.setMessage("Restoring factory!");
         progressDialog.show();
         if (!filename.exists()) {
@@ -836,7 +842,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
     };
 
 
-    public boolean fileCopy(File src, File dst) throws IOException {
+    public boolean fileCopy(java.io.File src, java.io.File dst) throws IOException {
         boolean is_completed = false;
         InputStream in = new FileInputStream(src.getAbsolutePath());
         OutputStream mOutput = new FileOutputStream(dst.getAbsolutePath());
@@ -873,11 +879,15 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
         manager.registerReceiver(mReceiver, filter);
     }
 
+    String driveID = "";
     Runnable runnable = new Runnable() {
         @Override
         public void run() {
             if (is_done) {
-                String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
+                driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
+
+                loadFile(Constants.DatabaseFileName);
+
 
                 DriveFile file = Drive.DriveApi.getFile(
                         mGoogleApiClient, DriveId.decodeFromString(driveID));
@@ -890,7 +900,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
                 InputStream inputstream = driveContents.getInputStream();
 
                 try {
-                    f1 = new File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
+                    f1 = new java.io.File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
                     FileOutputStream fileOutput = new FileOutputStream(f1);
 
                     byte[] buffer = new byte[1024];
@@ -903,9 +913,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
                     fileOutput.close();
                     inputstream.close();
                     if (isDone) {
-                        final File data = Environment.getDataDirectory();
+                        final java.io.File data = Environment.getDataDirectory();
                         String currentDBPath = "/data/" + "com.mytips" + "/databases/" + DatabaseUtils.db_Name;
-                        File currentDB = new File(data, currentDBPath);
+                        java.io.File currentDB = new java.io.File(data, currentDBPath);
                         try {
                             fileCopy(f1, currentDB);
                         } catch (IOException e) {
@@ -921,6 +931,48 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
             }
         }
     };
+
+    private void loadFile(String filename) {
+        Query query = new Query.Builder()
+                .addFilter(Filters.eq(SearchableField.TITLE, filename))
+                .build();
+
+        DriveFolder driveFolder = Drive.DriveApi.getRootFolder(mGoogleApiClient);
+        driveFolder.queryChildren(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
+            @Override
+            public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
+                final MetadataBuffer metadataBuffer = metadataBufferResult.getMetadataBuffer();
+                for (Metadata metadata : metadataBuffer) {
+                    String li = metadata.getEmbedLink();
+                    DriveId driveId = metadata.getDriveId();
+                    Log.i("link", li);
+
+                }
+            }
+        });
+    }
+   /* private static List<com.google.api.services.drive.model.File> retrieveAllFiles(com.google.api.services.drive.Drive services) {
+        List<com.google.api.services.drive.model.File> result = new ArrayList<>();
+        com.google.api.services.drive.Drive.Files.List request = null;
+        do {
+            try {
+                request = services.files().list();
+                FileList fileList = request.execute();
+                result.addAll(fileList.getItems());
+                request.setPageToken(fileList.getNextPageToken());
+
+            } catch (IOException e) {
+                System.out.println("An error occurred: " + e);
+
+            }
+        } while (request.getPageToken() != null &&
+                request.getPageToken().length() > 0);
+        Log.i("result", result.toString());
+
+        return result;
+
+    }*/
+
 }
 
 

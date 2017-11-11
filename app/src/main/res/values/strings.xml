@@ -16,6 +16,7 @@
     <string name="tipee_title">Tipee</string>
     <!-- Strings related to Settings -->
     <string name="api_key">AIzaSyDH6Oyg2S100M4Hu8jZ6lFb_QzBWMzjRKA</string>
+    <string name="folder_id">DriveId:CAESABiiAiCIsOjCx1coAQ==</string>
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 

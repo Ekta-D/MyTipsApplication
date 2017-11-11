@@ -101,6 +101,8 @@ import com.mytips.Utils.Constants;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -159,6 +161,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingError = false;
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -1591,7 +1594,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         switch (requestCode) {
             case REQUEST_CODE_RESOLUTION:
                 if (resultCode == RESULT_OK) {
-                 //   uploadToDrive();
+                    //   uploadToDrive();
 
                 }
                 break;
@@ -1614,7 +1617,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
 
-                saveToDrive(Drive.DriveApi.getRootFolder(mGoogleApiClient), "tipeesDB.db", "text/plain", backupDB);
+
+                saveToDrive(Drive.DriveApi.getRootFolder(mGoogleApiClient), "tipeesDB.db", "text/plain", backupDB,driveContentsResult);
 
             }
         });
@@ -1624,10 +1628,21 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
     void saveToDrive(final DriveFolder pFldr, final String titl,
-                     final String mime, final java.io.File file) {
+                     final String mime, final java.io.File file, DriveApi.DriveContentsResult driveContentsResult) {
+
+        // makeFolder();
+        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                .setTitle(Constants.DatabaseFileName)
+                .setMimeType(mime)
+                .setStarred(false)
+                .build();
         if (mGoogleApiClient != null && pFldr != null && titl != null && mime != null && file != null)
             try {
                 // create content from file
+                String drive_folder_created_id = getResources().getString(R.string.folder_id);
+                DriveId drivers_folder_id = DriveId.decodeFromString(drive_folder_created_id);
+                DriveFolder driveFolder = drivers_folder_id.asDriveFolder();
+
                 Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
                     public void onResult(DriveApi.DriveContentsResult driveContentsResult) {
@@ -1667,6 +1682,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                                     if (metadataResult != null && metadataResult.getStatus().isSuccess()) {
                                                         is_completed = true;
                                                         DriveId mDriveId = metadataResult.getMetadata().getDriveId();
+
                                                         editor.putString(Constants.SharedDriveId, mDriveId.encodeToString());
                                                         editor.commit();
                                                     }
@@ -1736,4 +1752,33 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+
+    public void makeFolder() {
+
+        Query query =
+                new Query.Builder().addFilter(Filters.and(Filters.eq(SearchableField.TITLE, Constants.FolderName)))
+                        .build();
+
+        Drive.DriveApi.query(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
+            @Override
+            public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder().setTitle(Constants.FolderName).build();
+                Drive.DriveApi.getRootFolder(mGoogleApiClient)
+                        .createFolder(mGoogleApiClient, changeSet).setResultCallback(new ResultCallback<DriveFolder.DriveFolderResult>() {
+                    @Override
+                    public void onResult(@NonNull DriveFolder.DriveFolderResult driveFolderResult) {
+                        if (!driveFolderResult.getStatus().isSuccess()) {
+                            Log.e(TAG, "U AR A MORON! Error while trying to create the folder");
+                        } else {
+                            Log.i(TAG, "Created a folder");
+                            DriveId driversId = driveFolderResult.getDriveFolder().getDriveId();
+                            String folder_driverid = driversId.encodeToString();
+                            Log.i("folder", folder_driverid);
+
+                        }
+                    }
+                });
+            }
+        });
+    }
 }
