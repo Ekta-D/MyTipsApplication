@@ -116,7 +116,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     boolean getTournamentTips = false;
     double manual_data = 0;
     String manually_added_tips = "";
-
+    int selected_profile_id = 0;
     double manual_percentage_data = 0, manual_tips_data = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -357,6 +357,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 global_payperiod = profile.getPay_period();
 
                 selected_profile = profile.getProfile_name();
+                selected_profile_id = profile.getId();
                 updateView(profile, b);
             }
 
@@ -765,6 +766,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     calStartDay.set(Calendar.MILLISECOND, 0);
 
                     start_dateCalendar.set(startYear, startMonth, startDay);
+
 //                    selectedDate = String.valueOf(startMonth + 1) + "/"
 //                            + String.valueOf(startDay) + "/"
 //                            + String.valueOf(startYear);
@@ -920,21 +922,33 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 selectedDate = String.valueOf(calStartDay.get(Calendar.MONTH) + 1) + "/"
                                         + String.valueOf(calStartDay.get(Calendar.DAY_OF_MONTH)) + "/"
                                         + String.valueOf(calStartDay.get(Calendar.YEAR));
+                                startDateDb = selectedDate;
                                 Date selectedDate1 = new Date(selectedDate);
                                 start_shift_long = selectedDate1.getTime();
                                 date = new SimpleDateFormat(date_format)
                                         .format(selectedDate1);
                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                                 String d = sdf.format(selectedDate1);
+
                                 startYear = Integer.parseInt(d.substring(0, 4));
                                 startMonth = Integer.parseInt(d.substring(4, 6));
                                 startDay = Integer.parseInt(d.substring(6));
                                 System.out.println(sdf.format(new Date()) + startYear
                                         + startMonth + startDay);
+                                selectedDate = String.valueOf(calStartDay.get(Calendar.MONTH) + 1) + "/"
+                                        + String.valueOf(calStartDay.get(Calendar.DAY_OF_MONTH)) + "/"
+                                        + String.valueOf(calStartDay.get(Calendar.YEAR));
+
+                                Date dates = new Date(selectedDate);
+                                start_shift_long = dates.getTime();
+
+
+                                System.out.println(sdf.format(new Date()) + startYear
+                                        + startMonth + startDay);
                                 String currentDate = String.valueOf(startMonth) + "/"
                                         + String.valueOf(startDay) + "/"
                                         + String.valueOf(startYear);
-                                startDateDb = currentDate;
+                               // startDateDb = currentDate;
 
 
                             } catch (IllegalArgumentException ex) {
@@ -1051,7 +1065,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
 
                 try {
-                    new DatabaseOperations(AddDayActivity.this).insertAddDayInfo(selected_profile, startDateDb,
+                    new DatabaseOperations(AddDayActivity.this).insertAddDayInfo(selected_profile, selected_profile_id, startDateDb,
                             start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
                             texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                             total_tipout.getText().toString().trim(), edittext_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),

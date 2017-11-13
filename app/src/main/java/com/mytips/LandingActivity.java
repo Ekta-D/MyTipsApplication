@@ -115,14 +115,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
 
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private LinearLayout mRevealView;
@@ -461,7 +457,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
-        if (mGoogleApiClient == null) {
+      /*  if (mGoogleApiClient == null) {
             // Create the API client and bind it to an instance variable.
             // We use this instance as the callback for connection and connection
             // failures.
@@ -474,7 +470,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     .build();
         }
         //Connect the client. Once connected, the camera is launched.
-        mGoogleApiClient.connect();
+        mGoogleApiClient.connect();*/
 
 
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
@@ -622,13 +618,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 break;
             case R.id.invite:
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_EMAIL, "enter email");
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My application name");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, "My application text");
+
+
+                shareIntent.setType("text/html");
+                Intent intent = Intent.createChooser(shareIntent, "Choose Email Client");
+                startActivityForResult(intent, 100);
 
                 break;
             case R.id.backup:
 
-//                progressDialog = new ProgressDialog(LandingActivity.this);
-//                progressDialog.setMessage("Please wait! Uploading database");
-//                progressDialog.show();
                 String email = sharedPreferences.getString("user_email", "");
                 Log.i("login_email", email);
 
@@ -645,33 +647,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     alertDialog.show();
 
                 } else {
+
+
                     try {
-//                        File Db = new File("/data/data/com.mytips/databases/" + DatabaseUtils.db_Name);
-//
-//                        File fileDir = new File(Environment.getExternalStorageDirectory()
-//                                .toString() + "/MyTipsApp/database/");
-//
-//                        if (!fileDir.exists()) {
-//                            fileDir.mkdirs();
-//                        }
-//
-//                        File file = new File(Environment.getExternalStorageDirectory()
-//                                .toString() + "/MyTipsApp/database/" + DatabaseUtils.db_Name);
-//
-//                        if (!file.exists()) {
-//                            try {
-//                                file.createNewFile();
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//                        file.setWritable(true);
-//
-//                        try {
-//                            copyFile(Db, file);
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
 
                         File sd = Environment.getExternalStorageDirectory();
                         final File data = Environment.getDataDirectory();
@@ -1401,10 +1379,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     };
 
     public void sendEmail() {
-        final String fromEmail = "beesolver.ekta@gmail.com";
+        final String fromEmail = "mytipsdatabase@gmail.com";
 
         final ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add("ekta@beesolvertechnology.com");
+        String stored_email = sharedPreferences.getString("user_email", "");
+        //arrayList.add("ekta@beesolvertechnology.com");
+        arrayList.add(stored_email);
 //
         final File pdf = new File(Environment.getExternalStorageDirectory()
                 .toString() + "/MyTipsDocument/" + file_name);
@@ -1618,7 +1598,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
 
 
-                saveToDrive(Drive.DriveApi.getRootFolder(mGoogleApiClient), "tipeesDB.db", "text/plain", backupDB,driveContentsResult);
+                saveToDrive(Drive.DriveApi.getRootFolder(mGoogleApiClient), "tipeesDB.db", "text/plain", backupDB, driveContentsResult);
 
             }
         });
@@ -1631,17 +1611,16 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                      final String mime, final java.io.File file, DriveApi.DriveContentsResult driveContentsResult) {
 
         // makeFolder();
-        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+       /* MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
                 .setTitle(Constants.DatabaseFileName)
                 .setMimeType(mime)
                 .setStarred(false)
-                .build();
+                .build();*/
         if (mGoogleApiClient != null && pFldr != null && titl != null && mime != null && file != null)
             try {
                 // create content from file
                 String drive_folder_created_id = getResources().getString(R.string.folder_id);
                 DriveId drivers_folder_id = DriveId.decodeFromString(drive_folder_created_id);
-                DriveFolder driveFolder = drivers_folder_id.asDriveFolder();
 
                 Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
                     @Override
@@ -1691,6 +1670,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                                     }
                                                 }
                                             });
+                                            progressDialog.dismiss();
+
                                         }
                                     } else { /* report error */ }
                                 }
@@ -1704,6 +1685,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 e.printStackTrace();
             }
 
+        progressDialog.dismiss();
+
     }
 
     public boolean checkPermissions() {
@@ -1713,6 +1696,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         int camera_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
         int finger_print = ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
+
         List<String> listPermissionsNeeded = new ArrayList<>();
 
         if (storagePermission != PackageManager.PERMISSION_GRANTED) {
@@ -1752,33 +1736,4 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-
-    public void makeFolder() {
-
-        Query query =
-                new Query.Builder().addFilter(Filters.and(Filters.eq(SearchableField.TITLE, Constants.FolderName)))
-                        .build();
-
-        Drive.DriveApi.query(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
-            @Override
-            public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder().setTitle(Constants.FolderName).build();
-                Drive.DriveApi.getRootFolder(mGoogleApiClient)
-                        .createFolder(mGoogleApiClient, changeSet).setResultCallback(new ResultCallback<DriveFolder.DriveFolderResult>() {
-                    @Override
-                    public void onResult(@NonNull DriveFolder.DriveFolderResult driveFolderResult) {
-                        if (!driveFolderResult.getStatus().isSuccess()) {
-                            Log.e(TAG, "U AR A MORON! Error while trying to create the folder");
-                        } else {
-                            Log.i(TAG, "Created a folder");
-                            DriveId driversId = driveFolderResult.getDriveFolder().getDriveId();
-                            String folder_driverid = driversId.encodeToString();
-                            Log.i("folder", folder_driverid);
-
-                        }
-                    }
-                });
-            }
-        });
-    }
 }

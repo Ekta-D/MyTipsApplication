@@ -38,7 +38,7 @@ public class DatabaseUtils {
 
 
     //add day fields
-
+    public static final String SelectedProfile_ID = "profile_id";
     public static final String Add_ID = "id";
     public static final String Profile = "profile";
     public static final String TounamentDowns = "tournament_down";

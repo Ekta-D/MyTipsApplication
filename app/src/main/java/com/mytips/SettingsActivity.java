@@ -19,42 +19,44 @@ import android.hardware.fingerprint.FingerprintManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.StrictMode;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
+import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveClient;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
@@ -62,9 +64,37 @@ import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
+import com.google.android.gms.drive.OpenFileActivityOptions;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
 import com.google.android.gms.drive.query.SearchableField;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.mytips.Adapter.AddTipeeAdapter;
+import com.mytips.Database.DatabaseOperations;
+import com.mytips.Database.DatabaseUtils;
+import com.mytips.Model.TipeeInfo;
+import com.mytips.Preferences.Preferences;
+import com.mytips.Utils.CommonMethods;
+import com.google.android.gms.drive.DriveResourceClient;
+import com.mytips.Utils.Constants;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import static android.content.ContentValues.TAG;
+
 //import com.google.android.gms.tasks.Task;
 //import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 //import com.google.api.client.http.HttpRequest;
@@ -75,49 +105,7 @@ import com.google.android.gms.drive.query.SearchableField;
 //import com.google.api.client.json.jackson2.JacksonFactory;
 //import com.google.api.services.drive.model.FileList;
 //import com.itextpdf.text.pdf.codec.Base64;
-import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
-import com.google.api.client.googleapis.compute.ComputeCredential;
-import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.http.HttpRequest;
-import com.google.api.client.http.HttpRequestInitializer;
-import com.google.api.client.http.HttpTransport;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.JsonFactory;
-import com.google.api.client.json.jackson2.JacksonFactory;
-import com.google.api.services.drive.model.FileList;
-import com.itextpdf.text.Meta;
-import com.mytips.Adapter.AddTipeeAdapter;
-import com.mytips.Database.DatabaseOperations;
-import com.mytips.Database.DatabaseUtils;
-import com.mytips.Model.TipeeInfo;
 //import com.google.api.services.drive.model.File;
-import com.mytips.Utils.CommonMethods;
-import com.mytips.Utils.Constants;
-import com.mytips.Preferences.Preferences;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.channels.FileChannel;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static android.content.ContentValues.TAG;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -130,7 +118,7 @@ import static android.content.ContentValues.TAG;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends AppCompatPreferenceActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class SettingsActivity extends BaseDemoActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener /*implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener */{
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -234,7 +222,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
         context = SettingsActivity.this;
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
 
-        mReceiver = new BroadcastReceiver() {
+        /*mReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 if (intent.getAction().equals(action)) {
@@ -242,7 +230,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
                     thread.start();
                 }
             }
-        };
+        };*/
         addPreferencesFromResource(R.xml.pref_general);
 //        setHasOptionsMenu(true);
         final EditTextPreference editTextPreference_name, editTextPreference_email;
@@ -672,7 +660,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 readFromGoogleDrive();
-
+                signIn();
                 return true;
             }
         });
@@ -728,14 +716,43 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
 //                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
-    @Override
+/*    @Override
     public void onConnected(@Nullable Bundle bundle) {
 
         if (mGoogleApiClient.isConnected()) {
-            String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
+           // searchFileInDrive();
+            *//*String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
             java.io.File fl = new java.io.File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
-            DownloadFile(DriveId.decodeFromString(driveID), fl);
+            DownloadFile(DriveId.decodeFromString(driveID), fl);*//*
         }
+    }*/
+
+    private void searchFileInDrive() {
+
+        Query query =
+                new Query.Builder().addFilter(Filters.and(Filters.eq(SearchableField.TITLE, "tipeesDB.db")))
+                        .build();
+
+        Drive.DriveApi.query(mGoogleApiClient, query).setResultCallback(new ResultCallback<DriveApi.MetadataBufferResult>() {
+            @Override
+            public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
+
+                if(metadataBufferResult.getStatus().isSuccess()){
+                    //metadataBufferResult.getMetadataBuffer().get
+                    System.out.println("Success: "+ metadataBufferResult.getMetadataBuffer().toString());
+
+                } else {
+                    System.out.println("Failure "+"not found");
+                }
+
+            }
+        });
+        //Task<DriveContents> openTask = getDriveResourceClient().openFile(file, DriveFile.MODE_READ_WRITE);
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
     }
 
     @Override
@@ -747,7 +764,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
     }
-
 
     /**
      * This fragment shows general preferences only. It is used when the
@@ -815,10 +831,10 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
 
         if (mGoogleApiClient.isConnected()) {
             //   mGoogleApiClient.connect();
-            DriveFile file = Drive.DriveApi.getFile(
+            /*DriveFile file = Drive.DriveApi.getFile(
                     mGoogleApiClient, driveId);
             file.getMetadata(mGoogleApiClient)
-                    .setResultCallback(metadataRetrievedCallback);
+                    .setResultCallback(metadataRetrievedCallback);*/
 
         } else {
             mGoogleApiClient.connect(GoogleApiClient.SIGN_IN_MODE_REQUIRED);
@@ -877,10 +893,112 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
 
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
         manager.registerReceiver(mReceiver, filter);
+
+
+    }
+
+    protected static final int REQUEST_CODE_SIGN_IN = 0;
+
+    @Override
+    protected void onDriveClientReady() {
+        pickTextFile()
+                .addOnSuccessListener(this,
+                        new OnSuccessListener<DriveId>() {
+                            @Override
+                            public void onSuccess(DriveId driveId) {
+                                retrieveContents(driveId.asDriveFile());
+                            }
+                        })
+                .addOnFailureListener(this, new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e(TAG, "No file selected", e);
+                        showMessage("nothing happened");
+                        finish();
+                    }
+                });
+    }
+
+    private void retrieveContents(DriveFile file) {
+
+        progressDialog.setMessage("Restoring Database!");
+        progressDialog.show();
+        Task<DriveContents> openFileTask =
+                getDriveResourceClient().openFile(file, DriveFile.MODE_READ_ONLY);
+        // [END open_file]
+        // [START read_contents]
+        openFileTask
+                .continueWithTask(new Continuation<DriveContents, Task<Void>>() {
+                    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                    @Override
+                    public Task<Void> then(@NonNull Task<DriveContents> task) throws Exception {
+                        DriveContents contents = task.getResult();
+                        InputStream inputstream = contents.getInputStream();
+                        try {
+                            f1 = new java.io.File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
+                            FileOutputStream fileOutput = new FileOutputStream(f1);
+
+                            byte[] buffer = new byte[1024];
+                            int bufferLength = 0;
+                            while ((bufferLength = inputstream.read(buffer)) > 0) {
+                                fileOutput.write(buffer, 0, bufferLength);
+                                isDone = true;
+
+                            }
+                            fileOutput.close();
+                            inputstream.close();
+                            if (isDone) {
+                                final java.io.File data = Environment.getDataDirectory();
+                                String currentDBPath = "/data/" + "com.mytips" + "/databases/" + DatabaseUtils.db_Name;
+                                java.io.File currentDB = new java.io.File(data, currentDBPath);
+                                try {
+                                    fileCopy(f1, currentDB);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                progressDialog.dismiss();
+                            }
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        // Process contents...
+                        // [START_EXCLUDE]
+                        // [START read_as_string]
+                        /*try (BufferedReader reader = new BufferedReader(
+                                new InputStreamReader(contents.getInputStream()))) {
+                            StringBuilder builder = new StringBuilder();
+                            String line;
+                            while ((line = reader.readLine()) != null) {
+                                builder.append(line).append("\n");
+                            }
+                            showMessage("File read success");
+                           // mFileContents.setText(builder.toString());
+                        }*/
+                        // [END read_as_string]
+                        // [END_EXCLUDE]
+                        // [START discard_contents]
+                        Task<Void> discardTask = getDriveResourceClient().discardContents(contents);
+                        // [END discard_contents]
+                        return discardTask;
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        // Handle failure
+                        // [START_EXCLUDE]
+                        Log.e(TAG, "Unable to read contents", e);
+                        showMessage("Unable to read contents");
+                        finish();
+                        // [END_EXCLUDE]
+                    }
+                });
+        // [END read_contents]
     }
 
     String driveID = "";
-    Runnable runnable = new Runnable() {
+    /*Runnable runnable = new Runnable() {
         @Override
         public void run() {
             if (is_done) {
@@ -930,7 +1048,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity implements Goo
 
             }
         }
-    };
+    };*/
 
     private void loadFile(String filename) {
         Query query = new Query.Builder()

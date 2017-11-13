@@ -57,6 +57,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.TotaTipOut + " TEXT, "
                 + DatabaseUtils.TounamentDowns + " INTEGER, "
 
+
                 + DatabaseUtils.GettingTips + " INTEGER, "
                 + DatabaseUtils.GettingTournamentDown + " INTEGER, "
 
@@ -74,6 +75,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 + DatabaseUtils.WagesPerHour + " TEXT, "
                 + DatabaseUtils.TotalEarnings + " TEXT, "
+                + DatabaseUtils.SelectedProfile_ID +  " INTEGER, "
                 + DatabaseUtils.ClockOut + " REAL " +
                 //  + DatabaseUtils.ClockOut + " TEXT " +
                 " );");

@@ -280,7 +280,7 @@ public class DatabaseOperations {
         return profilesList;
     }
 
-    public void insertAddDayInfo(String profile_name, String start_shift, long check_in,
+    public void insertAddDayInfo(String profile_name, int profile_id, String start_shift, long check_in,
                                  String end_shift, long check_out, String auto_calculatedhour, int holiday_pay,
                                  String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
@@ -289,6 +289,7 @@ public class DatabaseOperations {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
+        contentValues.put(DatabaseUtils.SelectedProfile_ID, profile_id);
         contentValues.put(DatabaseUtils.CalculatedHours, auto_calculatedhour);
         contentValues.put(DatabaseUtils.isHolidayPay, holiday_pay);
         contentValues.put(DatabaseUtils.IsDayOff, isDay_off);
@@ -506,8 +507,14 @@ public class DatabaseOperations {
         ArrayList<AddDay> daily_data = new ArrayList<>();
         AddDay addDay = null;
         Cursor cursor = null;
+        String query = "";
         //String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile=  '" + profile + "'";
-        String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile=  '" + profile + "'";
+        if (profile.equalsIgnoreCase("All")) {
+            query = "select * from  add_table where start_shift = '" + date + "'  ";
+        } else {
+            query = "select * from  add_table where start_shift = '" + date + "'  AND  profile=  '" + profile + "'";
+        }
+
         try {
             cursor = db.rawQuery(query, null);
         } catch (Exception e) {
@@ -564,8 +571,7 @@ public class DatabaseOperations {
         String query = "";
         if (profile.equalsIgnoreCase("All")) {
             query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%' Order By start_shift_long";
-        }
-        else{
+        } else {
             query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%'  AND  profile= '" + profile + "' Order By start_shift_long";
         }
 
