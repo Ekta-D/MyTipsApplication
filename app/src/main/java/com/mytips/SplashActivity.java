@@ -134,14 +134,12 @@ public class SplashActivity extends GoogleAuthorizationActivity/* implements Goo
             email.setText(email_id);
         }
 
-     /*   else {
-
+       else {
             if (email_id.equalsIgnoreCase("")) {
                 editor = sharedPreferences.edit();
                 signIn(editor);
             }
-
-        }*/
+        }
     }
 }
 
