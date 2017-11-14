@@ -1402,7 +1402,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public void onConnected(@Nullable Bundle bundle) {
 
         Log.i("drive", "connected called");
-        //  uploadToDrive();
+        if (mGoogleApiClient.isConnected()) {
+           uploadToDrive();
+        }
 
 
     }
@@ -1440,11 +1442,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (connectionResult.hasResolution()) {
             try {
                 connectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+                progressDialog.dismiss();
             } catch (IntentSender.SendIntentException e) {
                 // Unable to resolve, message user appropriately
             }
         } else {
             GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, 0).show();
+            progressDialog.dismiss();
         }
 
     }
@@ -1641,6 +1645,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                 }
                             } finally {
                                 oos.close();
+                                progressDialog.dismiss();
                             }
 
                             // content's COOL, create metadata
@@ -1665,16 +1670,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                                         editor.putString(Constants.SharedDriveId, mDriveId.encodeToString());
                                                         editor.commit();
                                                     }
+                                                    progressDialog.dismiss();
                                                     if (is_completed) {
                                                         progressDialog.dismiss();
                                                     }
                                                 }
                                             });
-                                            progressDialog.dismiss();
+
 
                                         }
                                     } else { /* report error */ }
                                 }
+
                             });
                         } catch (Exception e) {
                             e.printStackTrace();
