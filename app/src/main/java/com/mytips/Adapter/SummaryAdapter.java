@@ -112,7 +112,12 @@ public class SummaryAdapter extends BaseAdapter {
         }
 
         String totaltips = "";
-        totaltips = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_tips()));
+        double totaltips_double = 0;
+        if (!addDayArrayList.get(position).getTotal_tips().equalsIgnoreCase("")) {
+            totaltips_double = Double.parseDouble(addDayArrayList.get(position).getTotal_tips());
+            totaltips = String.format("%.2f", totaltips_double);
+        }
+
         if (totaltips.equalsIgnoreCase("")) {
             totaltips = "0";
         }
@@ -132,18 +137,31 @@ public class SummaryAdapter extends BaseAdapter {
         }
         String wH = "";
 
-        if (addDayArrayList.get(position).getWages_hourly() != null && !addDayArrayList.get(position).getWages_hourly().equalsIgnoreCase("")) {
+    /*    if (addDayArrayList.get(position).getWages_hourly() != null && !addDayArrayList.get(position).getWages_hourly().equalsIgnoreCase("")) {
             wH = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getWages_hourly()));
+        }*/
+        double wage_hourly_double = 0;
+        if (addDayArrayList.get(position).getWages_hourly() != null && !addDayArrayList.get(position).getWages_hourly().equalsIgnoreCase("")) {
+            wage_hourly_double = Double.parseDouble(addDayArrayList.get(position).getWages_hourly());
+            wH = String.format("%.2f", wage_hourly_double);
         } else if (wH.equalsIgnoreCase("")) {
             wH = "0";
         }
         String totalE = "";
+        double total_earnings_double = 0;
 
-        if (addDayArrayList.get(position).getTotal_earnings() != null && !addDayArrayList.get(position).getTotal_earnings().equalsIgnoreCase("")) {
+        /*if (addDayArrayList.get(position).getTotal_earnings() != null && !addDayArrayList.get(position).getTotal_earnings().equalsIgnoreCase("")) {
             totalE = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTotal_earnings()));
-        } else if (totalE.equalsIgnoreCase("")) {
+        }
+        */
+        if (addDayArrayList.get(position).getTotal_earnings() != null && !addDayArrayList.get(position).getTotal_earnings().equalsIgnoreCase("")) {
+            total_earnings_double = Double.parseDouble(addDayArrayList.get(position).getTotal_earnings());
+            totalE = String.format("%.2f", total_earnings_double);
+        }
+        else if (totalE.equalsIgnoreCase("")) {
             totalE = "0";
         }
+
 
         holder.textView_tips.setText(totaltips);
         holder.textView_tipout.setText(tipO);

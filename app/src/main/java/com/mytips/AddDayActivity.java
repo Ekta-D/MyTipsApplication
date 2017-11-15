@@ -948,7 +948,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 String currentDate = String.valueOf(startMonth) + "/"
                                         + String.valueOf(startDay) + "/"
                                         + String.valueOf(startYear);
-                               // startDateDb = currentDate;
+                                // startDateDb = currentDate;
 
 
                             } catch (IllegalArgumentException ex) {
@@ -1640,8 +1640,18 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         total_earnings.setText(addDay.getTotal_earnings());
 
 
-        int getting_tips = addDay.getGetting_tips();
+        //int getting_tips = addDay.getGetting_tips();
 
+
+        manually_added_tips = addDay.getManual_tips();
+        switch_value = addDay.getDollar_checked();
+        start_week = addDay.getStart_day_week();
+        getting_tournament = addDay.getGettingg_tournamnts();
+        getting_tips = addDay.getGetting_tips();
+        earns = addDay.getTotal_earnings();
+        calculated_wages_hourly = addDay.getWages_hourly();
+        day_off = addDay.getDay_off();
+        holidayPay = addDay.getIsHolidaypay();
 
         if (getting_tips == 0) {
             total_tipslabel.setVisibility(View.GONE);

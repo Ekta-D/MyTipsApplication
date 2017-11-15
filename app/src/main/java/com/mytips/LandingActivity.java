@@ -1605,7 +1605,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         }
 
-
     }
 
     private class BorderEvent implements PdfPTableEvent {
