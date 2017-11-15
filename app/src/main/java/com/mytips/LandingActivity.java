@@ -52,7 +52,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -169,9 +171,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (Build.VERSION.SDK_INT >= 23) {
             if (!grantedPermission) {
                 checkPermissions();
+
             }
             //only api 23 above
         }
+        if(mGoogleSignInClient==null)
+            mGoogleSignInClient = buildGoogleSignInClient();
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
 
@@ -670,6 +675,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             Toast.makeText(this, "DB Exported!", Toast.LENGTH_LONG).show();
 
 
+
                             if (mGoogleApiClient == null) {
                                 try {
                                     mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -700,7 +706,15 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    private GoogleSignInClient buildGoogleSignInClient() {
+        GoogleSignInOptions signInOptions =
+                new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestScopes(Drive.SCOPE_FILE)
+                        .build();
+        return GoogleSignIn.getClient(this, signInOptions);
+    }
 
+GoogleSignInClient mGoogleSignInClient;
     SummaryAdapter adapter;
     ArrayList<AddDay> selectedProfile;
 
@@ -1765,7 +1779,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         int storagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
         int camera_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        int finger_print = ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
+        int finger_print = 0;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            finger_print = ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
+        }
+
+        int accounts = ContextCompat.checkSelfPermission(this, Manifest.permission.GET_ACCOUNTS);
 
         List<String> listPermissionsNeeded = new ArrayList<>();
 
@@ -1781,6 +1800,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         if (finger_print != PackageManager.PERMISSION_GRANTED) {
             listPermissionsNeeded.add(Manifest.permission.USE_FINGERPRINT);
+        }
+
+        if (accounts != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.GET_ACCOUNTS);
         }
 
         if (!listPermissionsNeeded.isEmpty()) {
