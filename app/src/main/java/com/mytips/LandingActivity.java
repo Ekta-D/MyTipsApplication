@@ -157,6 +157,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingError = false;
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
+    boolean is_first = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -676,7 +678,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                             .addConnectionCallbacks(this)
                                             .addOnConnectionFailedListener(this)
                                             .build();
-
+                                    is_first = true;
                                 } catch (Exception e) {
                                     e.printStackTrace();
                                 }
@@ -1254,22 +1256,93 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             String iname = "Doc" + n + ".pdf";
             file_name = iname;
             File file = new File(myDir, iname);
-            Font font = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL, BaseColor.GRAY);
+
 
             try {
                 docWriter = PdfWriter.getInstance(document, new FileOutputStream(file));
-                docWriter.setPageEvent(event);
-                document.setMargins(36, 36, 36, 36);
+                // docWriter.setPageEvent(event);
                 document.open();
 
-                PdfPCell taskcell = null;
+                Font blackfont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD, BaseColor.BLACK);
+                Font font = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL, BaseColor.GRAY);
+
+                PdfPCell taskcell = new PdfPCell();
                 float[] taskcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
                 PdfPTable tasktable = new PdfPTable(taskcolumnWidths);
+
+                tasktable.setWidthPercentage(100);
+                tasktable.setExtendLastRow(true);
+                tasktable.setTableEvent(new BorderEvent());
+                tasktable.getDefaultCell().disableBorderSide(2);
+                tasktable.getDefaultCell().disableBorderSide(3);
+
+
+                PdfPCell cell = new PdfPCell();
+
+
+                taskcell = new PdfPCell(new Phrase("Date", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+                tasktable.addCell(taskcell);
+
+                taskcell = new PdfPCell(new Phrase("Profile", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+                tasktable.addCell(taskcell);
+                taskcell = new PdfPCell(new Phrase("Working hours", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+
+                tasktable.addCell(taskcell);
+
+
+                taskcell = new PdfPCell(new Phrase("Live Tips", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+
+                tasktable.addCell(taskcell);
+
+
+                taskcell = new PdfPCell(new Phrase("TD Count", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+
+                tasktable.addCell(taskcell);
+
+                taskcell = new PdfPCell(new Phrase("Tip Out", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+
+                tasktable.addCell(taskcell);
+
+                taskcell = new PdfPCell(new Phrase("Hourly Wage", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+
+                tasktable.addCell(taskcell);
+
+                taskcell = new PdfPCell(new Phrase("Total", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+
+                tasktable.addCell(taskcell);
+
                 if (addDayArrayList.size() > 0) {
                     try {
 
                         for (int i = 0; i < addDayArrayList.size(); i++) {
-                            PdfPCell cell = new PdfPCell();
+
                             Date d = new Date(addDayArrayList.get(i).getStart_long());
                             Calendar cal = Calendar.getInstance();
                             cal.setTime(d);
@@ -1282,96 +1355,152 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                                 date_format = "MMM dd,yyyy";
                             }
                             date = new SimpleDateFormat(date_format).format(date1);
+
+
                             cell = new PdfPCell(new Phrase(date, font));
 
 
                             cell.setPaddingTop(3);
-                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            cell.setFixedHeight(20f);
+                            cell.setNoWrap(false);
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                            cell.setBackgroundColor(BaseColor.WHITE);
                             cell.setPaddingBottom(3);
-                            cell.disableBorderSide(2);
-                            cell.disableBorderSide(3);
+
                             tasktable.addCell(cell);
 
 
                             cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getProfile(), font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                            taskcell.setBackgroundColor(BaseColor.WHITE);
-                            cell.disableBorderSide(2);
-                            cell.disableBorderSide(3);
+                            cell.setNoWrap(false);
+                            cell.setFixedHeight(20f);
+
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                            cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
+
 
                             cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getCalculated_hours(), font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                            taskcell.setBackgroundColor(BaseColor.WHITE);
-                            cell.disableBorderSide(2);
-                            cell.disableBorderSide(3);
+                            cell.setFixedHeight(20f);
+                            cell.setNoWrap(false);
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                            cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
-                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getTotal_tips(), font));
+
+                            String tips = addDayArrayList.get(i).getTotal_tips();
+                            if (tips.equalsIgnoreCase("")) {
+                                tips = "0";
+                            }
+                            cell = new PdfPCell(new Phrase(tips, font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
                             cell.disableBorderSide(2);
-                            cell.disableBorderSide(3);
-                            taskcell.setHorizontalAlignment(Element.ALIGN_LEFT);
-                            taskcell.setBackgroundColor(BaseColor.WHITE);
+                            cell.setNoWrap(false);
+                            cell.setFixedHeight(20f);
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                            cell.setBackgroundColor(BaseColor.WHITE);
+
                             tasktable.addCell(cell);
 
-                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getTounament_count(), font));
+
+                            String count = addDayArrayList.get(i).getTounament_count();
+                            if (count.equalsIgnoreCase("")) {
+                                count = "0";
+
+                            }
+                            cell = new PdfPCell(new Phrase(count, font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            cell.disableBorderSide(2);
-                            cell.disableBorderSide(3);
-                            taskcell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+                            cell.setNoWrap(false);
+                            cell.setFixedHeight(20f);
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                            cell.setBackgroundColor(BaseColor.WHITE);
+
                             tasktable.addCell(cell);
 
-                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getTip_out(), font));
+
+                            String tip_out = addDayArrayList.get(i).getTip_out();
+                            if (tip_out.equalsIgnoreCase("")) {
+                                tip_out = "0";
+
+                            }
+                            cell = new PdfPCell(new Phrase(tip_out, font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            cell.disableBorderSide(2);
-                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                            taskcell.setBackgroundColor(BaseColor.WHITE);
-                            cell.disableBorderSide(3);
+                            cell.setFixedHeight(20f);
+                            cell.setNoWrap(false);
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
 
-                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getWages_hourly(), font));
+                            String wages = addDayArrayList.get(i).getWages_hourly();
+                            if (wages.equalsIgnoreCase("")) {
+                                wages = "0";
+
+                            }
+
+                            cell = new PdfPCell(new Phrase(wages, font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            cell.disableBorderSide(2);
-                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                            taskcell.setBackgroundColor(BaseColor.WHITE);
-                            cell.disableBorderSide(3);
+                            cell.setNoWrap(false);
+
+                            cell.setFixedHeight(20f);
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                            cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
-                            cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getTotal_earnings(), font));
+
+                            String total_earns = addDayArrayList.get(i).getTotal_earnings();
+                            if (total_earns.equalsIgnoreCase("")) {
+                                total_earns = "0";
+
+                            }
+                            cell = new PdfPCell(new Phrase(total_earns, font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            cell.disableBorderSide(2);
-                            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                            taskcell.setBackgroundColor(BaseColor.WHITE);
-                            cell.disableBorderSide(3);
+                            cell.setNoWrap(false);
+                            cell.setFixedHeight(20f);
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
+
+
                         }
                     } catch (Exception e) {
+                        Log.i("pdf", e.toString());
                         e.printStackTrace();
                     }
                 }
-                document.newPage();
-                document.add(tasktable);
+                try {
+                    document.add(tasktable);
+                    document.close();
+
+                } catch (Exception e) {
+                    Log.i("pdf1", e.toString());
+
+                }
 
 
             } catch (FileNotFoundException e) {
+                Log.i("pdf2", e.toString());
                 e.printStackTrace();
             } catch (DocumentException e) {
+                Log.i("pdf3", e.toString());
                 e.printStackTrace();
             }
 
-            document.close();
+
             sendEmail();
 
         }
@@ -1403,9 +1532,27 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         Log.i("drive", "connected called");
         if (mGoogleApiClient.isConnected()) {
-           uploadToDrive();
-        }
+            if (!is_first) {
+                progressDialog.dismiss();
+                uploadToDrive();
+            }
 
+        } else {
+            if (mGoogleApiClient == null) {
+                try {
+                    mGoogleApiClient = new GoogleApiClient.Builder(this)
+                            .addApi(Drive.API)
+                            .addScope(Drive.SCOPE_FILE)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .build();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            mGoogleApiClient.connect();
+        }
 
     }
 
@@ -1458,90 +1605,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         }
 
-        @Override
-        public void onStartPage(PdfWriter writer, Document document) {
-//            super.onStartPage(writer, document);
 
-
-            Font blackfont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD, BaseColor.BLACK);
-
-
-            float[] taskcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
-            PdfPTable tasktable = new PdfPTable(taskcolumnWidths);
-            // set table width a percentage of the page width
-            tasktable.setWidthPercentage(100);
-            tasktable.setExtendLastRow(true);
-            tasktable.setTableEvent(new BorderEvent());
-            tasktable.getDefaultCell().disableBorderSide(2);
-            tasktable.getDefaultCell().disableBorderSide(3);
-
-            PdfPCell taskcell = new PdfPCell(new Phrase("Date", blackfont));
-            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-            taskcell.setBackgroundColor(BaseColor.WHITE);
-            taskcell.setFixedHeight(20f);
-            tasktable.addCell(taskcell);
-            taskcell = new PdfPCell(new Phrase("Profile", blackfont));
-            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-            taskcell.setBackgroundColor(BaseColor.WHITE);
-            taskcell.setFixedHeight(20f);
-            tasktable.addCell(taskcell);
-            taskcell = new PdfPCell(new Phrase("Working hours", blackfont));
-            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
-            taskcell.setBackgroundColor(BaseColor.WHITE);
-            taskcell.setFixedHeight(20f);
-
-            tasktable.addCell(taskcell);
-
-
-            taskcell = new PdfPCell(new Phrase("Live Tips", blackfont));
-            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            taskcell.setBackgroundColor(BaseColor.WHITE);
-            taskcell.setFixedHeight(20f);
-
-            tasktable.addCell(taskcell);
-
-
-            taskcell = new PdfPCell(new Phrase("TD Count", blackfont));
-            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            taskcell.setBackgroundColor(BaseColor.WHITE);
-            taskcell.setFixedHeight(20f);
-
-            tasktable.addCell(taskcell);
-
-            taskcell = new PdfPCell(new Phrase("Tip Out", blackfont));
-            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            taskcell.setBackgroundColor(BaseColor.WHITE);
-            taskcell.setFixedHeight(20f);
-
-            tasktable.addCell(taskcell);
-
-            taskcell = new PdfPCell(new Phrase("Hourly Wage", blackfont));
-            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            taskcell.setBackgroundColor(BaseColor.WHITE);
-            taskcell.setFixedHeight(20f);
-
-            tasktable.addCell(taskcell);
-
-            taskcell = new PdfPCell(new Phrase("Total", blackfont));
-            taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
-            taskcell.setBackgroundColor(BaseColor.WHITE);
-            taskcell.setFixedHeight(20f);
-
-            tasktable.addCell(taskcell);
-            try {
-                document.add(tasktable);
-            } catch (DocumentException e) {
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        public void onEndPage(PdfWriter writer, Document document) {
-            super.onEndPage(writer, document);
-        }
     }
 
     private class BorderEvent implements PdfPTableEvent {
