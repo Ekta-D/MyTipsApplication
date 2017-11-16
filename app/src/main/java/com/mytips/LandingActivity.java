@@ -355,8 +355,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         } else if (which == 1) {
                             deleteProfile(addDay);
                             addDayArrayList.remove(position);
+
                             setAdapter(addDayArrayList);
                             adapter.notifyDataSetChanged();
+                            updateBottom(addDayArrayList);
                         }
                     }
                 });

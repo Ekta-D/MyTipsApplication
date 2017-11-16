@@ -805,7 +805,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 Date parsedStartDate = null;
 
                 start_date = selectedDate;
-                startDateDb = currentDateString;
+
+//                startDateDb = currentDateString;
                 String date1 = new SimpleDateFormat(date_format).format(new Date(selectedDate));
                 end_date = date1;
                 try {
