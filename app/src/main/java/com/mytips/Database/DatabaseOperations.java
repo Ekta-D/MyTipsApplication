@@ -513,7 +513,7 @@ public class DatabaseOperations {
 
     }
 
-    public ArrayList<AddDay> fetchDailyData( String profile) {
+    public ArrayList<AddDay> fetchDailyData(String profile) {
         ArrayList<AddDay> daily_data = new ArrayList<>();
         AddDay addDay = null;
         Cursor cursor = null;
@@ -697,6 +697,39 @@ public class DatabaseOperations {
         }
 
         return counts;
+    }
+
+    public String getProfileEarning(String profile_id) {
+        String earns = "";
+
+        Cursor cursor = null;
+
+        String query = "select * from  add_table where profile_id = '" + profile_id + "'  ";
+        try {
+            cursor = db.rawQuery(query, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int cursor_count = 0;
+
+        if (cursor != null) {
+            cursor_count = cursor.getCount();
+            if (cursor_count != 0) {
+
+                if (cursor.moveToFirst()) {
+                    do {
+                        earns = cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings));
+                        if (earns.equalsIgnoreCase("")) {
+                            earns = "0";
+                        }
+
+                    } while (cursor.moveToNext());
+                }
+
+            }
+        }
+        return earns;
+
     }
 
 

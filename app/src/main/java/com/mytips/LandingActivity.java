@@ -125,7 +125,7 @@ import java.util.Random;
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private LinearLayout mRevealView;
     private boolean hidden = true;
-    private ImageButton add_day, profile, share, invite, preferences, backup, emailData;
+    private ImageButton  profile, share, invite, preferences, backup, emailData;
     Spinner spinnerProfile, spinnerReportType;
     ListView mListView;
     String[] reportTypeArray = new String[]{"Daily", "Weekly", "Bi-Weekly", "Monthly", "Yearly"};
@@ -148,7 +148,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     SharedPreferences sharedPreferences;
     String selected_summary_type = "Daily";
     int default_date_format = 0;
-    //    FloatingActionButton floatingActionButton;
+       FloatingActionButton floatingActionButton;
 //FloatingActionButton floatingActionButton;
 
     long start_shift_long, end_shift_long;
@@ -186,8 +186,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         default_date_format = sharedPreferences.getInt("selected_date", 2);
 
-//        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-//        floatingActionButton.setVisibility(View.VISIBLE);
+       floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton.setVisibility(View.VISIBLE);
         startcalendar = Calendar.getInstance();
         endcalendar = Calendar.getInstance();
 
@@ -211,8 +211,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         mRevealView = (LinearLayout) findViewById(R.id.reveal_items);
         mRevealView.setVisibility(View.INVISIBLE);
         dashboard_bottm = (RelativeLayout) findViewById(R.id.dashboard_total_earnings);
-        add_day = (ImageButton) findViewById(R.id.add_day);
-        add_day.setVisibility(View.VISIBLE);
+
         emailData = (ImageButton) findViewById(R.id.email_data);
         emailData.setOnClickListener(this);
         profile = (ImageButton) findViewById(R.id.profile);
@@ -232,7 +231,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         summery_tds_layout.setVisibility(View.VISIBLE);
         summery_tip_outLayout.setVisibility(View.VISIBLE);
-        add_day.setOnClickListener(this);
+
         profile.setOnClickListener(this);
         share.setOnClickListener(this);
         invite.setOnClickListener(this);
@@ -382,6 +381,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
+
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+            }
+        });
 
     }
 
@@ -592,9 +598,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View v) {
         hideRevealView();
         switch (v.getId()) {
-            case R.id.add_day:
-                startActivity(new Intent(getBaseContext(), AddDayActivity.class));
-                break;
+//            case R.id.add_day:
+//                startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+//                break;
             case R.id.profile:
                 startActivity(new Intent(getBaseContext(), ActiveProfiles.class));
                 break;
