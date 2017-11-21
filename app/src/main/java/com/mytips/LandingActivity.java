@@ -790,7 +790,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         textView_summaryTips.setText("Live Tips:$" + String.valueOf(String.format("%.2f", total_livetips)) + ", ");
         textView_summery_tds.setText("Tournament Downs:$" + String.valueOf(String.format("%.2f", tournament_totalTD)) + ", ");
         textView_summery_tip_out.setText("Tip-out:$" + String.valueOf(String.format("%.2f", totalOuts)) + ", ");
-        textView_hour_wage.setText("Hourly Wage:$" + String.valueOf(hrs));
+
+
+        textView_hour_wage.setText("Hourly Wage:$" + String.valueOf(String.format("%.2f", hrs)));
     }
 
 
