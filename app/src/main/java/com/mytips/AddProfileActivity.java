@@ -77,6 +77,7 @@ public class AddProfileActivity extends AppCompatActivity {
     Profiles profiles;
     FetchedTipeeAdapter adapter;
     TextView no_data;
+    int[] profile_colors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +88,7 @@ public class AddProfileActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(ISFIRST_TIME, true);
         editor.commit();
+        profile_colors = getResources().getIntArray(R.array.profile_colors);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
@@ -204,24 +206,24 @@ public class AddProfileActivity extends AppCompatActivity {
                     }
                     //only api 23 above
                 } else {*/
-                    AlertDialog.Builder alert = new AlertDialog.Builder(AddProfileActivity.this);
-                    alert.setTitle("Make your selecetion");
-                    final String names[] = {"Camera", "Gallery"};
-                    alert.setItems(names, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int item) {
-                            if (item == 0) {
-                                OpenCamera();
-                                dialog.dismiss();
-                            } else {
-                                openGallery();
-                                dialog.dismiss();
-                            }
+                AlertDialog.Builder alert = new AlertDialog.Builder(AddProfileActivity.this);
+                alert.setTitle("Make your selecetion");
+                final String names[] = {"Camera", "Gallery"};
+                alert.setItems(names, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (item == 0) {
+                            OpenCamera();
+                            dialog.dismiss();
+                        } else {
+                            openGallery();
+                            dialog.dismiss();
                         }
-                    });
+                    }
+                });
 
-                    AlertDialog al = alert.create();
-                    al.show();
+                AlertDialog al = alert.create();
+                al.show();
 //                }
 
             }
@@ -294,9 +296,12 @@ public class AddProfileActivity extends AppCompatActivity {
                         }
                         Log.i("insert_joinedString", joinedString.toString());
                         try {
+
+                            int color = getRandomColor(profile_colors);
+
                             dbOperations.insertProfileInfoIntoDatabase(profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString(), image_name);
+                                    joinedString.toString(), image_name, color);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -315,7 +320,7 @@ public class AddProfileActivity extends AppCompatActivity {
                         try {
                             dbOperations.updateProfileValues(id, profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString());
+                                    joinedString.toString(), profileColors);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -420,6 +425,8 @@ public class AddProfileActivity extends AppCompatActivity {
         });
     }
 
+    int profileColors;
+
     public void fillAllFields(Profiles profiles) {
         editText_profilename.setText(profiles.getProfile_name());
         if (profiles.getIs_supervisor() == 1) {
@@ -450,6 +457,7 @@ public class AddProfileActivity extends AppCompatActivity {
             }
 
         }
+        profileColors = profiles.getProfile_color();
     }
 
     public String convertArrayToString(List<String> selected_tipeesID) {
@@ -568,4 +576,10 @@ public class AddProfileActivity extends AppCompatActivity {
                 break;
         }
     }*/
+
+
+    public static int getRandomColor(int[] array) {
+        int rnd = new Random().nextInt(array.length);
+        return rnd;
+    }
 }

@@ -8,6 +8,17 @@ import java.io.Serializable;
 
 public class Profiles implements Serializable {
 
+    int profile_color;
+
+    public int getProfile_color() {
+        return profile_color;
+    }
+
+    public void setProfile_color(int profile_color) {
+        this.profile_color = profile_color;
+    }
+
+
     public int getId() {
         return id;
     }

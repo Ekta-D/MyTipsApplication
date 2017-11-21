@@ -125,7 +125,7 @@ import java.util.Random;
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private LinearLayout mRevealView;
     private boolean hidden = true;
-    private ImageButton add_day, profile, share, invite, preferences, backup;
+    private ImageButton add_day, profile, share, invite, preferences, backup, emailData;
     Spinner spinnerProfile, spinnerReportType;
     ListView mListView;
     String[] reportTypeArray = new String[]{"Daily", "Weekly", "Bi-Weekly", "Monthly", "Yearly"};
@@ -148,7 +148,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     SharedPreferences sharedPreferences;
     String selected_summary_type = "Daily";
     int default_date_format = 0;
-    FloatingActionButton floatingActionButton;
+    //    FloatingActionButton floatingActionButton;
+//FloatingActionButton floatingActionButton;
+
     long start_shift_long, end_shift_long;
     ArrayList<AddDay> data;
     SharedPreferences.Editor editor;
@@ -175,7 +177,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
             //only api 23 above
         }
-        if(mGoogleSignInClient==null)
+        if (mGoogleSignInClient == null)
             mGoogleSignInClient = buildGoogleSignInClient();
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
@@ -184,8 +186,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         default_date_format = sharedPreferences.getInt("selected_date", 2);
 
-        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-        floatingActionButton.setVisibility(View.VISIBLE);
+//        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+//        floatingActionButton.setVisibility(View.VISIBLE);
         startcalendar = Calendar.getInstance();
         endcalendar = Calendar.getInstance();
 
@@ -210,6 +212,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         mRevealView.setVisibility(View.INVISIBLE);
         dashboard_bottm = (RelativeLayout) findViewById(R.id.dashboard_total_earnings);
         add_day = (ImageButton) findViewById(R.id.add_day);
+        add_day.setVisibility(View.VISIBLE);
+        emailData = (ImageButton) findViewById(R.id.email_data);
+        emailData.setOnClickListener(this);
         profile = (ImageButton) findViewById(R.id.profile);
         share = (ImageButton) findViewById(R.id.share);
         invite = (ImageButton) findViewById(R.id.invite);
@@ -377,89 +382,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-        floatingActionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                final Dialog dialog1 = new Dialog(LandingActivity.this);
-                dialog1.setContentView(R.layout.search_dialog);
-                dialog1.setTitle("Filter");
-
-                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
-                lp.copyFrom(dialog1.getWindow().getAttributes());
-                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
-                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
-                dialog1.show();
-                dialog1.getWindow().setAttributes(lp);
-
-                Button btn, btn2;
-                final EditText editText1, editText2;
-
-                btn = (Button) dialog1.findViewById(R.id.btn_01);
-                btn2 = (Button) dialog1.findViewById(R.id.btn_02);
-
-                editText1 = (EditText) dialog1.findViewById(R.id.editText_01);
-                editText2 = (EditText) dialog1.findViewById(R.id.editText_02);
-
-
-                String string1 = sharedPreferences.getString(Constants.EditTextStart, "");
-                String string2 = sharedPreferences.getString(Constants.EditTextEnd, "");
-                editText1.setText(string1);
-                editText2.setText(string2);
-
-                editText1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        getDatePicker(default_date_format, R.id.editText_01, editText1);
-                    }
-                });
-
-
-                editText2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        getDatePicker(default_date_format, R.id.editText_02, editText2);
-                    }
-                });
-                btn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        data = new ArrayList<AddDay>();
-
-                        data = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
-                                getTimeInMillis(), selected_profileName);
-
-                        setAdapter(data);
-                        adapter.notifyDataSetChanged();
-
-                        dialog1.dismiss();
-
-                    }
-                });
-
-                btn2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-
-                        editor.remove(Constants.EditTextStart).commit();
-                        editor.remove(Constants.EditTextEnd).commit();
-
-                        editText1.setText("");
-                        editText2.setText("");
-                        if (data != null && data.size() > 0) {
-                            data.clear();
-                        }
-                        if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
-                            changeData(selected_summary_type, start_week, selected_profileName);
-                        }
-                        dialog1.dismiss();
-                    }
-                });
-                dialog1.show();
-            }
-
-
-        });
 
     }
 
@@ -483,6 +405,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
+
         Profiles profiles0 = new Profiles();
         profiles0.setProfile_name("All");
         profiles0.setStartday("Sunday");
@@ -584,16 +507,82 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 return true;
 
-            case R.id.email_data:
+            case R.id.fab:
+
+                final Dialog dialog1 = new Dialog(LandingActivity.this);
+                dialog1.setContentView(R.layout.search_dialog);
+                dialog1.setTitle("Filter");
+
+                WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+                lp.copyFrom(dialog1.getWindow().getAttributes());
+                lp.width = WindowManager.LayoutParams.MATCH_PARENT;
+                lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+                dialog1.show();
+                dialog1.getWindow().setAttributes(lp);
+
+                Button btn, btn2;
+                final EditText editText1, editText2;
+
+                btn = (Button) dialog1.findViewById(R.id.btn_01);
+                btn2 = (Button) dialog1.findViewById(R.id.btn_02);
+
+                editText1 = (EditText) dialog1.findViewById(R.id.editText_01);
+                editText2 = (EditText) dialog1.findViewById(R.id.editText_02);
 
 
-                if (addDayArrayList.size() > 0) {
-                    Thread run = new Thread(thread);
-                    run.start();
-                } else {
-                    Toast.makeText(LandingActivity.this, "No Data found", Toast.LENGTH_SHORT).show();
-                }
+                String string1 = sharedPreferences.getString(Constants.EditTextStart, "");
+                String string2 = sharedPreferences.getString(Constants.EditTextEnd, "");
+                editText1.setText(string1);
+                editText2.setText(string2);
+                editText1.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getDatePicker(default_date_format, R.id.editText_01, editText1);
+                    }
+                });
 
+
+                editText2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getDatePicker(default_date_format, R.id.editText_02, editText2);
+                    }
+                });
+                btn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        data = new ArrayList<AddDay>();
+
+                        data = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
+                                getTimeInMillis(), selected_profileName);
+
+                        setAdapter(data);
+                        adapter.notifyDataSetChanged();
+
+                        dialog1.dismiss();
+
+                    }
+                });
+
+                btn2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        editor.remove(Constants.EditTextStart).commit();
+                        editor.remove(Constants.EditTextEnd).commit();
+
+                        editText1.setText("");
+                        editText2.setText("");
+                        if (data != null && data.size() > 0) {
+                            data.clear();
+                        }
+                        if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
+                            changeData(selected_summary_type, start_week, selected_profileName);
+                        }
+                        dialog1.dismiss();
+                    }
+                });
+                dialog1.show();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -677,7 +666,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             Toast.makeText(this, "DB Exported!", Toast.LENGTH_LONG).show();
 
 
-
                             if (mGoogleApiClient == null) {
                                 try {
                                     mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -705,6 +693,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 }
                 break;
+
+            case R.id.email_data:
+
+
+                if (addDayArrayList.size() > 0) {
+                    Thread run = new Thread(thread);
+                    run.start();
+                } else {
+                    Toast.makeText(LandingActivity.this, "No Data found", Toast.LENGTH_SHORT).show();
+                }
+
+                break;
+
         }
     }
 
@@ -716,7 +717,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         return GoogleSignIn.getClient(this, signInOptions);
     }
 
-GoogleSignInClient mGoogleSignInClient;
+    GoogleSignInClient mGoogleSignInClient;
     SummaryAdapter adapter;
     ArrayList<AddDay> selectedProfile;
 
@@ -840,8 +841,8 @@ GoogleSignInClient mGoogleSignInClient;
             updateBottom(addDayArrayList);
 
         } else if (spinner_selected.equalsIgnoreCase("Weekly")) {
-            int start_day = CommonMethods.getDay(start_week);
-
+//            int start_day = CommonMethods.getDay(start_week);
+            int start_day = 1;// for sunday
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(Calendar.DAY_OF_WEEK, start_day);
             calendar1.set(Calendar.HOUR_OF_DAY, 0);
@@ -891,8 +892,8 @@ GoogleSignInClient mGoogleSignInClient;
 
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
 
-            int start_day = CommonMethods.getDay(start_week);
-
+            //   int start_day = CommonMethods.getDay(start_week);
+            int start_day = 1;//for sunday
             Calendar calendar1 = Calendar.getInstance();
             calendar1.set(Calendar.DAY_OF_WEEK, start_day);
 

@@ -35,7 +35,7 @@ public class DatabaseOperations {
 
     public void insertProfileInfoIntoDatabase(String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
                                               boolean isGetTips, String payPeriod, String startDay, double hourPay, String holidayPay
-            , String tipees, String profile_pic
+            , String tipees, String profile_pic, int profile_color
     ) {
 
         int supervisor = 0, tournamentTips = 0, getTips = 0;
@@ -59,6 +59,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.HolidayPay, holidayPay);
         contentValues.put(DatabaseUtils.Tipees, tipees);
         contentValues.put(DatabaseUtils.IsActive, 1);
+        contentValues.put(DatabaseUtils.ProfileColor, profile_color);
         contentValues.put(DatabaseUtils.ProfilePic, profile_pic);
         try {
             db.insert(DatabaseUtils.PROFILE_TABLE, null, contentValues);
@@ -83,7 +84,7 @@ public class DatabaseOperations {
 
     public void updateProfileValues(int id, String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
                                     boolean isGetTips, String payPeriod, String startDay, double hourPay, String holidayPay
-            , String tipees) {
+            , String tipees, int profile_color) {
 
         int supervisor = 0, tournamentTips = 0, getTips = 0;
         if (isSupervisor) {
@@ -104,6 +105,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.StartDayWeek, startDay);
         contentValues.put(DatabaseUtils.HourlyPay, hourPay);
         contentValues.put(DatabaseUtils.Tipees, tipees);
+        contentValues.put(DatabaseUtils.ProfileColor, profile_color);
         contentValues.put(DatabaseUtils.HolidayPay, holidayPay);
         try {
             int changedRecord = db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.Profile_ID + " =? ", new String[]{String.valueOf(id)});
@@ -211,7 +213,7 @@ public class DatabaseOperations {
     public ArrayList<Profiles> fetchAllProfile(Context context) {
         ArrayList<Profiles> profilesList;
         Cursor cursor = null;
-        String[] projections = new String[13];
+        String[] projections = new String[14];
         projections[0] = DatabaseUtils.ProfileID;
         projections[1] = DatabaseUtils.ProfileName;
         projections[2] = DatabaseUtils.IsSupervisor;
@@ -225,7 +227,7 @@ public class DatabaseOperations {
         projections[10] = DatabaseUtils.Tipees;
         projections[11] = DatabaseUtils.Profile_ID;
         projections[12] = DatabaseUtils.ProfilePic;
-
+        projections[13] = DatabaseUtils.ProfileColor;
 //        String selection[] = new String[]{"1"};
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.PROFILE_TABLE, projections,
@@ -271,6 +273,7 @@ public class DatabaseOperations {
                     profiles.setIs_active(isActive);
                     profiles.setTipees_name(tipees);
                     profiles.setProfile_pic(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfilePic)));
+                    profiles.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.ProfileColor)));
                     profilesList.add(profiles);
                 }
                 while (cursor.moveToNext());
@@ -285,7 +288,8 @@ public class DatabaseOperations {
                                  String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
                                  String wages_hourly, String earns, int getting_tips, int getting_tournaments, String start_day_week
-            , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar) {
+            , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar
+            , int profile_color) {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
@@ -313,6 +317,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.EndShiftLong, end_long);
         contentValues.put(DatabaseUtils.TipeeDollarChecked, is_dollar_checked);
         contentValues.put(DatabaseUtils.ManualTips, manual_tips_dollar);
+        contentValues.put(DatabaseUtils.SelectedProfileColor, profile_color);
 
         try {
             db.insert(DatabaseUtils.ADD_DAY_TABLE, null, contentValues);
@@ -325,7 +330,7 @@ public class DatabaseOperations {
         AddDay addDay;
         Cursor cursor = null;
         ArrayList<AddDay> addDayArrayList = new ArrayList<>();
-        String[] projections = new String[25];
+        String[] projections = new String[26];
         projections[0] = DatabaseUtils.Profile;
         projections[1] = DatabaseUtils.CalculatedHours;
         projections[2] = DatabaseUtils.isHolidayPay;
@@ -351,6 +356,7 @@ public class DatabaseOperations {
         projections[22] = DatabaseUtils.EndShiftLong;
         projections[23] = DatabaseUtils.TipeeDollarChecked;
         projections[24] = DatabaseUtils.ManualTips;
+        projections[25] = DatabaseUtils.SelectedProfileColor;
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, projections,
                     null, null, null);
@@ -392,6 +398,7 @@ public class DatabaseOperations {
                     addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
                     addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
                     addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
+                    addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
                     addDayArrayList.add(addDay);
                 }
                 while (cursor.moveToNext());
@@ -405,7 +412,8 @@ public class DatabaseOperations {
                                  String total_tips, String tipees, String tip_out_percentage, String total_tip_out,
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
                                  String wages_hourly, String earns, int getting_tips, int getting_tournaments, String start_day_week
-            , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar) {
+            , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar,
+                                 int profile_color) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
         contentValues.put(DatabaseUtils.CalculatedHours, auto_calculatedhour);
@@ -431,6 +439,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.EndShiftLong, end_long);
         contentValues.put(DatabaseUtils.TipeeDollarChecked, is_dollar_checked);
         contentValues.put(DatabaseUtils.ManualTips, manual_tips_dollar);
+        contentValues.put(DatabaseUtils.SelectedProfileColor, profile_color);
         try {
             int changedRecord = db.update(DatabaseUtils.ADD_DAY_TABLE, contentValues, DatabaseUtils.Add_ID + " =? ", new String[]{String.valueOf(id)});
             System.out.println("updated_add" + changedRecord);
@@ -491,6 +500,7 @@ public class DatabaseOperations {
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
                         addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
                         addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
+                        addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
                         fetched_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -555,6 +565,7 @@ public class DatabaseOperations {
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
                         addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
                         addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
+                        addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
                         daily_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -615,6 +626,7 @@ public class DatabaseOperations {
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
                         addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
                         addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
+                        addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
                         fetched_data.add(addDay);
                     }
                     while (cursor.moveToNext());

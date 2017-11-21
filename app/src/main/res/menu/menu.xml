@@ -5,8 +5,9 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/email_data"
-        android:title="Email"
+        android:id="@+id/fab"
+        android:icon="@drawable/filter"
+        android:title="Search"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_menu"

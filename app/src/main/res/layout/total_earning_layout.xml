@@ -85,14 +85,24 @@
 
         </RelativeLayout>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="70dp"
-            android:layout_height="70dp"
+
+        <ImageButton
+            android:id="@+id/add_day"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:layout_alignParentRight="true"
-            android:src="@drawable/filter"
-            android:visibility="gone"
-            app:backgroundTint="@color/blue_accent" />
+            android:background="@drawable/ic_calendar_today"
+            android:visibility="gone" />
+
+        <!-- <android.support.design.widget.FloatingActionButton
+             android:id="@+id/fab"
+             android:layout_width="70dp"
+             android:layout_height="70dp"
+             android:layout_alignParentRight="true"
+             android:src="@drawable/filter"
+             android:visibility="gone"
+             app:backgroundTint="@color/blue_accent" />-->
+
     </RelativeLayout>
 
 </android.support.constraint.ConstraintLayout>

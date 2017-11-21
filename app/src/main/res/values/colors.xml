@@ -30,5 +30,6 @@
     <color name="blue_icons">#FFFFFF</color>
     <color name="blue_divider">#BDBDBD</color>
 
-
+    <color name="red">#e20b12</color>
+    <color name="green">#4a795c</color>
 </resources>

@@ -33,6 +33,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.PayPeriod + " TEXT, "
                 + DatabaseUtils.StartDayWeek + " TEXT, "
                 + DatabaseUtils.HourlyPay + " INTEGER,  "
+                + DatabaseUtils.ProfileColor + " INTEGER,  "
                 + DatabaseUtils.HolidayPay + " TEXT, "
                 + DatabaseUtils.ProfilePic + " TEXT, "
                 + DatabaseUtils.Tipees + " TEXT );"
@@ -57,7 +58,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.TotaTipOut + " TEXT, "
                 + DatabaseUtils.TounamentDowns + " INTEGER, "
 
-
+                + DatabaseUtils.SelectedProfileColor + " INTEGER,  "
                 + DatabaseUtils.GettingTips + " INTEGER, "
                 + DatabaseUtils.GettingTournamentDown + " INTEGER, "
 
@@ -75,7 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 + DatabaseUtils.WagesPerHour + " TEXT, "
                 + DatabaseUtils.TotalEarnings + " TEXT, "
-                + DatabaseUtils.SelectedProfile_ID +  " INTEGER, "
+                + DatabaseUtils.SelectedProfile_ID + " INTEGER, "
                 + DatabaseUtils.ClockOut + " REAL " +
                 //  + DatabaseUtils.ClockOut + " TEXT " +
                 " );");

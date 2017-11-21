@@ -102,6 +102,12 @@ public class SummaryAdapter extends BaseAdapter {
         holder.start_month.setText(month);
 
         holder.profileName.setText(addDayArrayList.get(position).getProfile());
+        int index = addDayArrayList.get(position).getProfile_color();
+
+        int[] color_array = context.getResources().getIntArray(R.array.profile_colors);
+
+        int selected_color = color_array[index];
+        holder.profileName.setTextColor(selected_color);
         holder.working_hours.setText(addDayArrayList.get(position).getCalculated_hours());
 
         int dayOff = addDayArrayList.get(position).getDay_off();
@@ -123,7 +129,7 @@ public class SummaryAdapter extends BaseAdapter {
         }
         String total_TDs = "0";
         if (addDayArrayList.get(position).getTounament_count() != null && !addDayArrayList.get(position).getTounament_count().equalsIgnoreCase("")) {
-            total_TDs = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTounament_count()));
+            total_TDs = String.valueOf(Integer.parseInt(addDayArrayList.get(position).getTounament_count()));
         }
         if (total_TDs.equalsIgnoreCase("")) {
             total_TDs = "0";
@@ -157,8 +163,7 @@ public class SummaryAdapter extends BaseAdapter {
         if (addDayArrayList.get(position).getTotal_earnings() != null && !addDayArrayList.get(position).getTotal_earnings().equalsIgnoreCase("")) {
             total_earnings_double = Double.parseDouble(addDayArrayList.get(position).getTotal_earnings());
             totalE = String.format("%.2f", total_earnings_double);
-        }
-        else if (totalE.equalsIgnoreCase("")) {
+        } else if (totalE.equalsIgnoreCase("")) {
             totalE = "0";
         }
 

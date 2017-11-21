@@ -4,15 +4,14 @@
     android:layout_height="match_parent">
 
 
-
     <LinearLayout
-        android:visibility="invisible"
         android:id="@+id/reveal_items"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="?attr/actionBarSize"
         android:background="#f4f4f4"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="invisible">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -29,18 +28,32 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
+                <!--  <ImageButton
+                      android:id="@+id/add_day"
+                      android:layout_width="50dp"
+                      android:layout_height="50dp"
+                      android:background="@drawable/ic_calendar_today" />
+
+                  <TextView
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_marginTop="5dp"
+                      android:textSize="12sp"
+                      android:text="Add Day" />-->
+
+
                 <ImageButton
-                    android:id="@+id/add_day"
+                    android:id="@+id/email_data"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:background="@drawable/ic_calendar_today" />
+                    android:background="@drawable/ic_email" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="12sp"
-                    android:text="Add Day" />
+                    android:text="Email"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -61,8 +74,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="12sp"
-                    android:text="Profiles" />
+                    android:text="Profiles"
+                    android:textSize="12sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -83,8 +96,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="12sp"
-                    android:text="Preferences" />
+                    android:text="Preferences"
+                    android:textSize="12sp" />
             </LinearLayout>
 
         </LinearLayout>
@@ -114,8 +127,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="12sp"
-                    android:text="Share" />
+                    android:text="Share"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -137,8 +150,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="12sp"
-                    android:text="Invite" />
+                    android:text="Invite"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 
@@ -160,8 +173,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:textSize="12sp"
-                    android:text="Backup" />
+                    android:text="Backup"
+                    android:textSize="12sp" />
 
             </LinearLayout>
 

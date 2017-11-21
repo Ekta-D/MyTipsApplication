@@ -8,7 +8,15 @@ import java.io.Serializable;
 
 public class AddDay implements Serializable {
 
+    public int getProfile_color() {
+        return profile_color;
+    }
 
+    public void setProfile_color(int profile_color) {
+        this.profile_color = profile_color;
+    }
+
+    int profile_color;
     String start_day_week;
     String profile;
     String start_shift;

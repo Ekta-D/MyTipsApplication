@@ -29,6 +29,7 @@ public class DatabaseUtils {
     public static final String Tipees = "tipees";
     public static final String ProfilePic = "profile_pic";
     public static final String IsActive = "is_active";
+    public static final String ProfileColor = "profile_color";
 
 
     //tipees fields
@@ -63,5 +64,7 @@ public class DatabaseUtils {
     public static final String EndShiftLong = "end_shift_long";
     public static final String TipeeDollarChecked = "dollar_checked";
     public static final String ManualTips = "manual_tips";
+    public static final String SelectedProfileColor = "selected_profile_color";
+
 
 }

@@ -124,4 +124,12 @@
     <string name="confirm_pass">Confirm Password</string>
 
 <string name="select_file">tipeesDB.db</string>
+
+    <array name="profile_colors">
+      <item>@color/blue_primary_dark</item>
+        <item>@color/orange_accent</item>
+        <item>@color/orange_primary_dark</item>
+        <item>@color/red</item>
+        <item>@color/green</item>
+    </array>
 </resources>
