@@ -238,12 +238,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 }
 
-                /*else {
-                    if (count > 0) {
-                        count = count - new_count;
-                        edittext_count.setText(String.valueOf(count));
-                    }
-                }*/
             }
 
             @Override
