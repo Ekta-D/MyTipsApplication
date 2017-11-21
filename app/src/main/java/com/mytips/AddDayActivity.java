@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -58,7 +59,7 @@ import java.util.Locale;
 
 public class AddDayActivity extends AppCompatActivity implements View.OnClickListener {
 
-
+    boolean keyDel = false;
     ArrayList<Profiles> profilesArrayList;
     Spinner spinnerProfile;
     int startDay, startMonth, startYear, endDay, endMonth, endYear, startHour,
@@ -119,6 +120,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     String manually_added_tips = "";
     int selected_profile_id = 0;
     double manual_percentage_data = 0, manual_tips_data = 0;
+    TextView new_count_textview;
+    EditText editText_new_count;
+    int new_count = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -134,7 +138,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         end_calendar = Calendar.getInstance();
 
         total_earnings = (TextView) findViewById(R.id.total_earnings);
+        editText_new_count = (EditText) findViewById(R.id.editText_new_count);
+        new_count_textview = (TextView) findViewById(R.id.textViewnew_count);
 
+        editText_new_count.setVisibility(View.GONE);
+        new_count_textview.setVisibility(View.GONE);
         findViewByIds();
 
         selected_timeformatIndex = sharedPreferences.getInt("selected_time", 1);
@@ -185,6 +193,61 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 if (!str.equalsIgnoreCase("")) {
                     count = Integer.parseInt(str);
                 }
+
+            }
+        });
+
+        editText_new_count.setOnKeyListener(new View.OnKeyListener() {
+
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if (keyCode == KeyEvent.KEYCODE_DEL) {
+                    keyDel = true;
+                } else {
+                    keyDel = false;
+                }
+                return false;
+            }
+        });
+
+
+        editText_new_count.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count1) {
+                String str = s.toString();
+                int global_count = 0;
+                if (!str.equalsIgnoreCase("")) {
+                    new_count = Integer.parseInt(str);
+                    if (count > 0) {
+                        count = count + new_count;
+                        global_count = count;
+                        edittext_count.setText(String.valueOf(count));
+                    }
+                } else {
+
+
+                    if (count > 0) {
+                        count = count - new_count;
+                        edittext_count.setText(String.valueOf(Math.abs(count)));
+                    }
+                }
+
+                /*else {
+                    if (count > 0) {
+                        count = count - new_count;
+                        edittext_count.setText(String.valueOf(count));
+                    }
+                }*/
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
 
             }
         });
@@ -1487,6 +1550,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         selected_profile_color = addDay.getProfile_color();
 
+        editText_new_count.setVisibility(View.VISIBLE);
+        new_count_textview.setVisibility(View.VISIBLE);
         long start_format = 0;
         long end_format = 0;
         start_format = addDay.getCheck_in();
