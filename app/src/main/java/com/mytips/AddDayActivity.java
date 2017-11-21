@@ -222,6 +222,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             public void onTextChanged(CharSequence s, int start, int before, int count1) {
                 String str = s.toString();
                 int global_count = 0;
+
                 if (!str.equalsIgnoreCase("")) {
                     new_count = Integer.parseInt(str);
                     if (count > 0) {
@@ -230,8 +231,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         edittext_count.setText(String.valueOf(count));
                     }
                 } else {
-
-
                     if (count > 0) {
                         count = count - new_count;
                         edittext_count.setText(String.valueOf(Math.abs(count)));
