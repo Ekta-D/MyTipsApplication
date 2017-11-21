@@ -838,7 +838,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     + cal.get(Calendar.YEAR);
 
             //String current_date = String.valueOf(cal.getTimeInMillis());
-            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(currentDate, selected_profileName);
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(selected_profileName);
             setAdapter(addDayArrayList);
             updateBottom(addDayArrayList);
 

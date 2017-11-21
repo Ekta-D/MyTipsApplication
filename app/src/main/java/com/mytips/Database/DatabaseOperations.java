@@ -513,16 +513,16 @@ public class DatabaseOperations {
 
     }
 
-    public ArrayList<AddDay> fetchDailyData(String date, String profile) {
+    public ArrayList<AddDay> fetchDailyData( String profile) {
         ArrayList<AddDay> daily_data = new ArrayList<>();
         AddDay addDay = null;
         Cursor cursor = null;
         String query = "";
         //String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile=  '" + profile + "'";
         if (profile.equalsIgnoreCase("All")) {
-            query = "select * from  add_table where start_shift = '" + date + "'  ";
+            query = "select * from  add_table  ";
         } else {
-            query = "select * from  add_table where start_shift = '" + date + "'  AND  profile=  '" + profile + "'";
+            query = "select * from  add_table where  profile=  '" + profile + "'";
         }
 
         try {
