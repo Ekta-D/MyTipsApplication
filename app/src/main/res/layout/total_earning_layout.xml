@@ -86,14 +86,16 @@
         </RelativeLayout>
 
 
-         <android.support.design.widget.FloatingActionButton
+         <!--<android.support.design.widget.FloatingActionButton
              android:id="@+id/fab"
-             android:layout_width="70dp"
-             android:layout_height="70dp"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             app:layout_anchor="@id/summery_total"
              android:layout_alignParentRight="true"
+             android:layout_marginTop="-30dp"
              android:src="@drawable/ic_calendar_today"
              android:visibility="gone"
-             app:backgroundTint="@color/blue_accent" />
+             app:backgroundTint="@color/blue_accent" />-->
 
     </RelativeLayout>
 
