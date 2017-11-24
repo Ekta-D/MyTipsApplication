@@ -294,7 +294,8 @@
                             android:layout_alignParentRight="true"
                             android:layout_centerHorizontal="true"
                             android:layout_centerVertical="true"
-                            android:inputType="numberDecimal" />
+                            android:inputType="numberDecimal"
+                            android:maxLength="8" />
                     </RelativeLayout>
 
                     <EditText
@@ -306,6 +307,7 @@
                         android:layout_marginTop="10dp"
                         android:ems="10"
                         android:inputType="numberDecimal"
+                        android:maxLength="8"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tips_separator" />
 
@@ -405,7 +407,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        android:text="Count"
+
+                        android:text="Pay period total TD"
                         app:layout_constraintBottom_toBottomOf="@+id/editText_number_of_td"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/editText_number_of_td" />
@@ -419,11 +422,13 @@
                         android:layout_marginRight="16dp"
                         android:layout_marginTop="8dp"
                         android:ems="10"
-                        android:gravity="center"
                         android:hint="0"
+                        android:editable="false"
+                        android:focusable="false"
                         android:inputType="numberDecimal"
+                        android:maxLength="8"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView14" />
+                        app:layout_constraintTop_toBottomOf="@+id/textViewnew_count" />
 
 
                     <TextView
@@ -432,7 +437,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="8dp"
                         android:layout_marginStart="8dp"
-                        android:text="New Count"
+                        android:text="Today's TD"
                         app:layout_constraintBottom_toBottomOf="@+id/editText_new_count"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toTopOf="@+id/editText_new_count" />
@@ -446,11 +451,11 @@
                         android:layout_marginRight="16dp"
                         android:layout_marginTop="8dp"
                         android:ems="10"
-                        android:gravity="center"
                         android:hint="0"
                         android:inputType="numberDecimal"
+                        android:maxLength="8"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/textView21" />
+                        app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
 
                     <TextView
@@ -473,8 +478,9 @@
                         android:layout_marginRight="16dp"
                         android:ems="10"
                         android:inputType="numberDecimal"
+                        android:maxLength="8"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@+id/editText_new_count" />
+                        app:layout_constraintTop_toBottomOf="@+id/editText_number_of_td" />
 
 
                     <TextView
@@ -498,7 +504,9 @@
                         android:layout_marginRight="16dp"
                         android:editable="false"
                         android:ems="10"
+                        android:focusable="false"
                         android:inputType="number|numberDecimal"
+                        android:maxLength="8"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/editText_amount_per_td" />
 

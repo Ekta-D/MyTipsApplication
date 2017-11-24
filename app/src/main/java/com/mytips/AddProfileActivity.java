@@ -57,7 +57,7 @@ public class AddProfileActivity extends AppCompatActivity {
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
 
     ImageButton imageButton;
-    String profile_name;
+    String profile_name = "";
     double hourly_pay = 0;
     EditText editText_profilename, editText_hourly_pay;
     CheckBox checkBox_supervisor, checkBox_getTournament, checkBox_getTips;
@@ -274,8 +274,9 @@ public class AddProfileActivity extends AppCompatActivity {
                 break;
             case R.id.save_profile:
 
+                String name_profile = editText_profilename.getText().toString().trim();
 
-                profile_name = editText_profilename.getText().toString().trim();
+                profile_name = name_profile;
                 String hourPay = editText_hourly_pay.getText().toString().trim();
                 if (!hourPay.equalsIgnoreCase("")) {
                     hourly_pay = Double.parseDouble(hourPay);
@@ -289,13 +290,16 @@ public class AddProfileActivity extends AppCompatActivity {
                     if (b == null) {
 
                         StringBuilder joinedString = new StringBuilder();
-                        for (int i = 0; i < adapter.checkedItems.size(); i++) {
-                            if (adapter.checkedItems.get(i) == true) {
-                                joinedString.append(tipeeInfos.get(i).getId());
-                                joinedString.append(",");
+                        if (selected_tipeesID != null && selected_tipeesID.size() > 0) {
+                            for (int i = 0; i < adapter.checkedItems.size(); i++) {
+                                if (adapter.checkedItems.get(i) == true) {
+                                    joinedString.append(tipeeInfos.get(i).getId());
+                                    joinedString.append(",");
+                                }
                             }
+                            Log.i("insert_joinedString", joinedString.toString());
                         }
-                        Log.i("insert_joinedString", joinedString.toString());
+
                         try {
 
                             int color = getRandomColor(profile_colors);
@@ -307,16 +311,22 @@ public class AddProfileActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     } else {
+
+
                         int id = profiles.getId();
+
                         StringBuilder joinedString = new StringBuilder();
-                        for (int i = 0; i < adapter.checkedItems.size(); i++) {
+                        if (selected_tipeesID != null && selected_tipeesID.size() > 0) {
+                            for (int i = 0; i < adapter.checkedItems.size(); i++) {
 //                            if (adapter.checkedItems.get(i, false) == true) {
-                            if (adapter.checkedItems.get(i) == true) {
-                                joinedString.append(tipeeInfos.get(i).getId());
-                                joinedString.append(",");
+                                if (adapter.checkedItems.get(i) == true) {
+                                    joinedString.append(tipeeInfos.get(i).getId());
+                                    joinedString.append(",");
+                                }
                             }
+                            Log.i("update_joinedString", joinedString.toString());
                         }
-                        Log.i("update_joinedString", joinedString.toString());
+
 
                         try {
                             dbOperations.updateProfileValues(id, profile_id, profile_name, isSupervisor, isGettingTournament,
@@ -409,7 +419,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
 
         listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
-        if (tipeeInfos != null) {
+        if (tipeeInfos != null && tipeeInfos.size() > 0) {
             adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos, false, null);
             listView_fetched_tipees.setAdapter(adapter);
         } else {
@@ -475,8 +485,11 @@ public class AddProfileActivity extends AppCompatActivity {
     }
 
     public List<String> convertStringToArray(String joinedString) {
+        List<String> sellItems = new ArrayList<>();
+        if (!joinedString.equalsIgnoreCase("")) {
+            sellItems = Arrays.asList(joinedString.split(","));
+        }
 
-        List<String> sellItems = Arrays.asList(joinedString.split(","));
         return sellItems;
 
     }

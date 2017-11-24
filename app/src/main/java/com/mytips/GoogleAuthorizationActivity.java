@@ -70,6 +70,8 @@ public abstract class GoogleAuthorizationActivity extends AppCompatActivity {
     /**
      * Handles resolution callbacks.
      */
+    boolean is_first = false;
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -80,10 +82,10 @@ public abstract class GoogleAuthorizationActivity extends AppCompatActivity {
                     // required and is fatal. For apps where sign-in is optional, handle
                     // appropriately
                     Log.e(TAG, "Sign-in failed.");
+                    is_first = true;
                     //finish();
                     return;
                 }
-
                 Task<GoogleSignInAccount> getAccountTask =
                         GoogleSignIn.getSignedInAccountFromIntent(data);
                 String mEmail = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
@@ -108,7 +110,8 @@ public abstract class GoogleAuthorizationActivity extends AppCompatActivity {
                     initializeDriveClient(getAccountTask.getResult());
                 } else {
                     Log.e(TAG, "Sign-in failed.");
-                 //   finish();
+
+                    //   finish();
                 }
                 break;
             case REQUEST_CODE_OPEN_ITEM:
@@ -131,24 +134,30 @@ public abstract class GoogleAuthorizationActivity extends AppCompatActivity {
         Set<Scope> requiredScopes = new HashSet<>(2);
         requiredScopes.add(Drive.SCOPE_FILE);
         requiredScopes.add(Drive.SCOPE_APPFOLDER);
-        GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
-        if (signInAccount != null && signInAccount.getGrantedScopes().containsAll(requiredScopes)) {
-            initializeDriveClient(signInAccount);
-            String name = signInAccount.getDisplayName();
-            String email = signInAccount.getEmail();
-            editor.putString("user_name", name);
-            editor.putString("user_email", email);
-        } else {
-            GoogleSignInOptions signInOptions =
-                    new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                            .requestScopes(Drive.SCOPE_FILE)
-                            .requestScopes(Drive.SCOPE_APPFOLDER)
-                            .build();
-            // GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, signInOptions);
-            Intent intent = AccountManager.newChooseAccountIntent(null, null,
-                    new String[]{"com.google"}, true, null, null, null, null);
-            startActivityForResult(intent, REQUEST_CODE_SIGN_IN);
+
+        if (!is_first)
+        {
+            GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
+
+
+            if (signInAccount != null && signInAccount.getGrantedScopes().containsAll(requiredScopes)) {
+                initializeDriveClient(signInAccount);
+                String name = signInAccount.getDisplayName();
+                String email = signInAccount.getEmail();
+                editor.putString("user_name", name);
+                editor.putString("user_email", email);
+                is_first = true;
+            } else {
+
+                // GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, signInOptions);
+                Intent intent = AccountManager.newChooseAccountIntent(null, null,
+                        new String[]{"com.google"}, true, null, null, null, null);
+                startActivityForResult(intent, REQUEST_CODE_SIGN_IN);
+            }
         }
+
+
+
     }
 
     /**

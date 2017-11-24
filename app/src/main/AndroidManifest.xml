@@ -28,6 +28,7 @@
 
         <activity
             android:name=".SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -39,6 +40,7 @@
             android:name=".LandingActivity"
             android:label="@string/title_activity_landing"
             android:parentActivityName=".SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -47,18 +49,22 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".Settings"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme1" />
         <activity
             android:name=".AddDayActivity"
             android:label="@string/title_add_day"
+            android:screenOrientation="portrait"
             android:theme="@style/add_day"
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name=".AddProfileActivity"
             android:label="@string/label_add_profile"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ActiveProfiles"
@@ -67,20 +73,24 @@
         <activity
             android:name=".SetPasscode"
             android:label="Security"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".SetPassword"
             android:label="Security"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ConfirmPassword"
             android:label="Confirm Password"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
             android:name=".LockScreen"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize">
 

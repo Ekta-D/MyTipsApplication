@@ -64,10 +64,12 @@ public class SplashActivity extends GoogleAuthorizationActivity/* implements Goo
             public void onClick(View view) {
 
 
-                if (!name.getText().toString().trim().equals("") && !email.getText().toString().trim().equals("")) {
+                if (!name.getText().toString().trim().equalsIgnoreCase("") && name.getText().toString().equalsIgnoreCase(".")) {
+                    name.setError("Valid name is required");
+                } else if (!name.getText().toString().trim().equals("") && !email.getText().toString().trim().equals("")) {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
-                   editor.putString("user_name", name.getText().toString().trim());
-                   editor.putString("user_email", email.getText().toString().trim());
+                    editor.putString("user_name", name.getText().toString().trim());
+                    editor.putString("user_email", email.getText().toString().trim());
                     editor.commit();
                     startActivity(new Intent(getBaseContext(), LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
                     finish();
@@ -132,9 +134,7 @@ public class SplashActivity extends GoogleAuthorizationActivity/* implements Goo
         String email_id = sharedPreferences.getString("user_email", "");
         if (!email_id.equalsIgnoreCase("") && email_id != null) {
             email.setText(email_id);
-        }
-
-       else {
+        } else {
             if (email_id.equalsIgnoreCase("")) {
                 editor = sharedPreferences.edit();
                 signIn(editor);
