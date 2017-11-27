@@ -518,7 +518,6 @@ public class DatabaseOperations {
         AddDay addDay = null;
         Cursor cursor = null;
         String query = "";
-        //String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile=  '" + profile + "'";
         if (profile.equalsIgnoreCase("All")) {
             query = "select * from  add_table  ";
         } else {

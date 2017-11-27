@@ -58,6 +58,7 @@ import java.util.Locale;
 
 public class AddDayActivity extends AppCompatActivity implements View.OnClickListener {
 
+    boolean isStartDateChanged = false, isEndDateChanged = false;
     boolean keyDel = false;
     ArrayList<Profiles> profilesArrayList;
     Spinner spinnerProfile;
@@ -123,6 +124,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     EditText editText_new_count;
     int new_count = 0;
     int stable_count = 0;
+    TextView label_total_earnings;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -140,6 +142,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         total_earnings = (TextView) findViewById(R.id.total_earnings);
         editText_new_count = (EditText) findViewById(R.id.editText_new_count);
         new_count_textview = (TextView) findViewById(R.id.textViewnew_count);
+        label_total_earnings = (TextView) findViewById(R.id.lbl_total);
 
         editText_new_count.setVisibility(View.GONE);
         new_count_textview.setVisibility(View.GONE);
@@ -223,7 +226,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                             Integer.parseInt(m),
                             Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown
-                            , holiday_off_value);
+                            , holiday_off_value, b);
                     edittext_total.setText(String.valueOf(total_tournamentdown));
 
                 } else if (str.equalsIgnoreCase("") && total_tournamentdown != 0) {
@@ -249,7 +252,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                             Integer.parseInt(m),
                             Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown
-                            , holiday_off_value);
+                            , holiday_off_value, b);
                     edittext_total.setText(String.valueOf(total_tournamentdown));
                 } else if (str.equalsIgnoreCase("") && total_tournamentdown == 0) {
                     count = 0;
@@ -317,7 +320,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         edittext_count.setText(String.valueOf(Math.abs(manually_total_counting)));
                         //new_count = 0;
                     } else if (stable_count > 0 && s.length() == 0) {
-                        new_count=0;
+                        new_count = 0;
                         manually_total_counting = stable_count - new_count;
 
 //                        stable_count = stable_count - new_count;
@@ -365,7 +368,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                         Integer.parseInt(m),
                         Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown
-                        , holiday_off_value);
+                        , holiday_off_value
+                        , b);
                 edittext_total.setText(String.valueOf(total));
 
 
@@ -424,7 +428,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                         Integer.parseInt(m),
-                        Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value);
+                        Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value
+                        , b);
             }
 
             @Override
@@ -453,7 +458,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     }
                     calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                             Integer.parseInt(m),
-                            Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value);
+                            Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value
+                            , b);
 
                 } else {
                     holidayPay = 0;
@@ -472,7 +478,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     }
                     calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                             Integer.parseInt(m),
-                            Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value);
+                            Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value
+                            , b);
                 }
 
             }
@@ -547,7 +554,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                         Integer.parseInt(m),
-                        Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value);
+                        Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
 
             }
         });
@@ -628,7 +635,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                         Integer.parseInt(m),
-                        Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value);
+                        Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
             }
         });
     }
@@ -768,7 +775,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         }
                         calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                                 Integer.parseInt(m),
-                                Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value);
+                                Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value, b);
 
 //                        }
 
@@ -1013,6 +1020,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     todayPayDay(global_startday, global_payperiod);
                 }
                 if (viewId == R.id.editText_start_shift && startDay == 0) {
+                    isStartDateChanged = true;
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                     String d = sdf.format(new Date());
                     startYear = Integer.parseInt(d.substring(0, 4));
@@ -1036,16 +1044,18 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     editText_startShift.setText(date);
 
                 } else if (viewId == R.id.editText_end_shift && startDay == 0) {
+                    isEndDateChanged = true;
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                     String d = sdf.format(new Date());
                     endYear = Integer.parseInt(d.substring(0, 4));
                     endMonth = Integer.parseInt(d.substring(4, 6));
                     endDay = Integer.parseInt(d.substring(6));
+
+                    //  end_dateCalendar.set(endYear, endMonth, endDay);
+
                     System.out.println(sdf.format(new Date()) + endYear
                             + endMonth + endDay);
-//                    String currentDate = String.valueOf(endMonth) + "/"
-//                            + String.valueOf(endDay) + "/"
-//                            + String.valueOf(endYear);
+
                     selectedDate = String.valueOf(calEndDay.get(Calendar.MONTH) + 1) + "/"
                             + String.valueOf(calEndDay.get(Calendar.DAY_OF_MONTH)) + "/"
                             + String.valueOf(calEndDay.get(Calendar.YEAR));
@@ -1057,11 +1067,16 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     editText_endShift.setText(date);
 
                 } else if (viewId == R.id.editText_end_shift && startDay != 0) {
+                    isEndDateChanged = true;
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                     String d = sdf.format(new Date());
                     endYear = Integer.parseInt(d.substring(0, 4));
                     endMonth = Integer.parseInt(d.substring(4, 6));
                     endDay = Integer.parseInt(d.substring(6));
+
+
+                    //   end_dateCalendar.set(endYear, endMonth, endDay);
+
                     System.out.println(sdf.format(new Date()) + endYear
                             + endMonth + endDay);
 
@@ -1109,6 +1124,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         // Toast.LENGTH_SHORT).show();
 
                         if (viewId == R.id.editText_start_shift) {
+                            isStartDateChanged = true;
                             try {
                                 selectedDate = String.valueOf(calStartDay.get(Calendar.MONTH) + 1) + "/"
                                         + String.valueOf(calStartDay.get(Calendar.DAY_OF_MONTH)) + "/"
@@ -1124,6 +1140,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 startYear = Integer.parseInt(d.substring(0, 4));
                                 startMonth = Integer.parseInt(d.substring(4, 6));
                                 startDay = Integer.parseInt(d.substring(6));
+
+//                                calStartDay.set(Calendar.HOUR_OF_DAY, 0);
+//                                calStartDay.set(Calendar.MINUTE, 0);
+//                                calStartDay.set(Calendar.SECOND, 0);
+//                                calStartDay.set(Calendar.MILLISECOND, 0);
+
+                                //  start_dateCalendar.set(startYear, startMonth, startDay);
+
                                 System.out.println(sdf.format(new Date()) + startYear
                                         + startMonth + startDay);
                                 selectedDate = String.valueOf(calStartDay.get(Calendar.MONTH) + 1) + "/"
@@ -1148,6 +1172,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             editText_startShift.setText(date);
                         }
                         if (viewId == R.id.editText_end_shift) {
+                            isEndDateChanged = true;
                             try {
                                 selectedDate = String.valueOf(calEndDay.get(Calendar.MONTH) + 1) + "/"
                                         + String.valueOf(calEndDay.get(Calendar.DAY_OF_MONTH)) + "/"
@@ -1275,12 +1300,43 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     joinedString = convertArrayToString(selected_tipeesIDs);
                 }
                 try {
-                    new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
-                            d.getTime(), editText_endShift.getText().toString().trim(), d1.getTime(),
-                            texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
-                            total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
-                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                            switch_value, manually_added_tips, selected_profile_color);
+                    if (isStartDateChanged && isEndDateChanged) {
+
+                        new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
+                                start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
+                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
+                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
+                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
+                                switch_value, manually_added_tips, selected_profile_color);
+
+                        isStartDateChanged = false;
+                        isEndDateChanged = false;
+                    } else if (!isStartDateChanged && !isEndDateChanged) {
+                        new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
+                                updated_start_values, editText_endShift.getText().toString().trim(), updated_end_values,
+                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
+                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
+                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
+                                switch_value, manually_added_tips, selected_profile_color);
+                    } else if (!isStartDateChanged && isEndDateChanged) {
+                        new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
+                                d.getTime(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
+                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
+                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
+                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
+                                switch_value, manually_added_tips, selected_profile_color);
+                        isEndDateChanged = false;
+                    } else {
+                        new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
+                                start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), d1.getTime(),
+                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
+                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
+                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
+                                switch_value, manually_added_tips, selected_profile_color);
+                        isStartDateChanged = false;
+
+                    }
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1330,7 +1386,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             edittext_perTD.setVisibility(View.GONE);
             edittext_total.setVisibility(View.GONE);
             tournamentSeparator.setVisibility(View.GONE);
-        } else if (profile.getGet_tournamenttip() == 1) {
+        } else if (profile.getGet_tournamenttip() == 1 && day_off == 0) {
             tournamentSeparator.setVisibility(View.VISIBLE);
             tournament_downlabel.setVisibility(View.VISIBLE);
             cout_label.setVisibility(View.VISIBLE);
@@ -1360,7 +1416,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             type_switch.setVisibility(View.GONE);
             editext_manual_tips.setVisibility(View.GONE);
 
-        } else if (profile.getGet_tips() == 1) {
+        } else if (profile.getGet_tips() == 1 && day_off == 0) {
             tipSeparator.setVisibility(View.VISIBLE);
             tipee_layout.setVisibility(View.VISIBLE);
 
@@ -1471,7 +1527,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         }
                         calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                                 Integer.parseInt(m),
-                                Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value);
+                                Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
 
 
                     }
@@ -1522,6 +1578,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         label_per_sign.setVisibility(View.GONE);
         type_switch.setVisibility(View.GONE);
         editext_manual_tips.setVisibility(View.GONE);
+        editText_new_count.setVisibility(View.GONE);
+        new_count_textview.setVisibility(View.GONE);
+        total_earnings.setVisibility(View.GONE);
+        label_total_earnings.setText("");
+
+        //total_earnings.setText("$" + earns);
+
     }
 
     public List<String> convertStringToArray(String joinedString) {
@@ -1542,11 +1605,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         if (b == null) {
             tipee_nodata.setVisibility(View.VISIBLE);
-        } else {
+        } else if (fetched.size() > 0) {
             tipee_nodata.setVisibility(View.GONE);
         }
-
-
         tipSeparator.setVisibility(View.VISIBLE);
         tournamentSeparator.setVisibility(View.VISIBLE);
         editText_startShift.setHint("Start Shift");
@@ -1590,6 +1651,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         label_dollar_sign.setVisibility(View.VISIBLE);
         label_per_sign.setVisibility(View.VISIBLE);
         editext_manual_tips.setVisibility(View.VISIBLE);
+
+        editText_new_count.setVisibility(View.VISIBLE);
+        new_count_textview.setVisibility(View.VISIBLE);
+
+        total_earnings.setVisibility(View.VISIBLE);
     }
 
 
@@ -1609,7 +1675,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     String earns = "";
 
     public void calculateTotalEarnings(double earnings, int total_hours, int mins, int days, double tip_out_total,
-                                       double live_tip, double tounament_downs, String holiday_payoff_data) {
+                                       double live_tip, double tounament_downs, String holiday_payoff_data, Bundle bundle) {
         double minutes_01 = 0;
         if (mins != 0) {
             minutes_01 = Double.parseDouble(String.valueOf(mins));
@@ -1677,12 +1743,20 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         if (earns.contains("-")) {
             earns = earns.replace("-", "");
         }
-        total_earnings.setText("$" + earns);
+        if (bundle != null) {
+            addDay = (AddDay) b.getSerializable(Constants.AddDayProfile);
+            total_earnings.setText("$" + addDay.getTotal_earnings());
+        } else {
+            total_earnings.setText("$" + earns);
+        }
+
     }
 
     String addDayID;
     List<String> fetched = new ArrayList<>();
     Date d = null, d1 = null;
+    Calendar startDateTime, endDateTime;
+    long updated_start_values, updated_end_values;
 
     public void fillAllFields(AddDay addDay) {
         addDayID = addDay.getId();
@@ -1705,11 +1779,16 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             date_format = "MMM dd,yyyy";
         }
 
-        Calendar startDateTime = Calendar.getInstance();
+        startDateTime = Calendar.getInstance();
         startDateTime.setTimeInMillis(start_format);
 
-        Calendar endDateTime = Calendar.getInstance();
+        endDateTime = Calendar.getInstance();
         endDateTime.setTimeInMillis(end_format);
+
+//        if (addDay.getDay_off() == 1) {
+        calStartDay.setTimeInMillis(start_format);
+        calEndDay.setTimeInMillis(end_format);
+//        }
 
         if (selected_timeformatIndex == 0) {
             // edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
@@ -1728,6 +1807,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         d = new Date(start_format);
         d1 = new Date(end_format);
+        updated_start_values = d.getTime();
+        updated_end_values = d1.getTime();
 
         String start = new SimpleDateFormat(date_format).format(d);
         String end = new SimpleDateFormat(date_format).format(d1);
@@ -1831,8 +1912,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         for (int i = 0; i < profilesArrayList.size(); i++) {
             if (profilesArrayList.get(i).getProfile_name().equalsIgnoreCase(addDay.getProfile())) {
                 updateView(profilesArrayList.get(i), b);
-//                start_day_frombundle = profilesArrayList.get(i).getStartday();
-//                pay_period_frombundle = profilesArrayList.get(i).getPay_period();
 
                 spinnerProfile.setSelection(i);
             }
@@ -1883,7 +1962,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
             counts_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(current_date, selected_profile);
             is_todayPayDay = true;
-            ifPayDay(is_todayPayDay, counts_list,"Daily");
+            ifPayDay(is_todayPayDay, counts_list);
 
         }
         if (pay_period.equalsIgnoreCase("Weekly")) {
@@ -1916,8 +1995,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             counts_list = new ArrayList<>();
             counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
 
-//
-            Date today_date = calStartDay.getTime();
+
+            Date today_date = null;
+            if (b != null) {
+                today_date = startDateTime.getTime();
+            } else {
+                today_date = calStartDay.getTime();
+            }
+
 
             String str_date = dateFormat.format(today_date.getTime());
 
@@ -1927,7 +2012,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             } else {
                 is_todayPayDay = false;
             }
-            ifPayDay(is_todayPayDay, counts_list,"Weekly");
+            ifPayDay(is_todayPayDay, counts_list);
         }
         if (pay_period.equalsIgnoreCase("1st & 15th")) {
             counts_list = new ArrayList<>();
@@ -2036,7 +2121,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     is_todayPayDay = false;
                 }
             }
-            ifPayDay(is_todayPayDay, counts_list,"1st & 15th");
+            ifPayDay(is_todayPayDay, counts_list);
         }
         if (pay_period.equals("Every 2 Weeks ")) {
 
@@ -2070,7 +2155,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
 
 //
-            Date today_date = calStartDay.getTime();
+            Date today_date = null;
+            if (b != null) {
+                today_date = startDateTime.getTime();
+            } else {
+                today_date = calStartDay.getTime();
+            }
+
 
             String str_date = dateFormat.format(today_date.getTime());
 
@@ -2081,15 +2172,15 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 is_todayPayDay = false;
             }
 
-            ifPayDay(is_todayPayDay, counts_list,"Every 2 Weeks ");
+            ifPayDay(is_todayPayDay, counts_list);
         }
 
         return counts_list;
     }
 
-    public void ifPayDay(boolean isPayday, ArrayList<String> counts_list,String pay_periods) {
+    public void ifPayDay(boolean isPayday, ArrayList<String> counts_list) {
 
-        if (getTournamentTips) {
+        if (getTournamentTips && day_off == 0) {
             if (isPayday) {
 
                 perTd_label.setVisibility(View.VISIBLE);
@@ -2118,8 +2209,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 totalcount_label.setVisibility(View.GONE);
                 edittext_perTD.setVisibility(View.GONE);
                 edittext_total.setVisibility(View.GONE);
-
-
 
 
                 if (counts_list.size() > 0) {
@@ -2175,7 +2264,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             }
             calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                     Integer.parseInt(m),
-                    Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value);
+                    Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
         }
     }
 }

@@ -63,8 +63,10 @@ public class SplashActivity extends GoogleAuthorizationActivity/* implements Goo
             @Override
             public void onClick(View view) {
 
-
-                if (!name.getText().toString().trim().equalsIgnoreCase("") && name.getText().toString().equalsIgnoreCase(".")) {
+                if (!isValidWord(name.getText().toString().trim()))
+                   /* if (!name.getText().toString().trim().equalsIgnoreCase("") && name.getText().toString().equalsIgnoreCase(".")
+                            )
+*/ {
                     name.setError("Valid name is required");
                 } else if (!name.getText().toString().trim().equals("") && !email.getText().toString().trim().equals("")) {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -116,6 +118,10 @@ public class SplashActivity extends GoogleAuthorizationActivity/* implements Goo
         }
     }
 
+    public boolean isValidWord(String word) {
+
+        return word.matches("[A-Za-z][^.]*");
+    }
 
     private void hideViews() {
         findViewById(R.id.et_name).setVisibility(View.GONE);
@@ -141,6 +147,8 @@ public class SplashActivity extends GoogleAuthorizationActivity/* implements Goo
             }
         }
     }
+
 }
+
 
 
