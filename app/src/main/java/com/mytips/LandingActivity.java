@@ -125,7 +125,7 @@ import java.util.Random;
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private LinearLayout mRevealView;
     private boolean hidden = true;
-    private ImageButton  profile, share, invite, preferences, backup, emailData;
+    private ImageButton profile, share, invite, preferences, backup, emailData;
     Spinner spinnerProfile, spinnerReportType;
     ListView mListView;
     String[] reportTypeArray = new String[]{"Daily", "Weekly", "Bi-Weekly", "Monthly", "Yearly"};
@@ -148,7 +148,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     SharedPreferences sharedPreferences;
     String selected_summary_type = "Daily";
     int default_date_format = 0;
-       FloatingActionButton floatingActionButton;
+    FloatingActionButton floatingActionButton;
 //FloatingActionButton floatingActionButton;
 
     long start_shift_long, end_shift_long;
@@ -186,7 +186,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         default_date_format = sharedPreferences.getInt("selected_date", 2);
 
-       floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
+        floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
         floatingActionButton.setVisibility(View.VISIBLE);
         startcalendar = Calendar.getInstance();
         endcalendar = Calendar.getInstance();
@@ -899,43 +899,154 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 //            }
 
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
-
-            //   int start_day = CommonMethods.getDay(start_week);
-            int start_day = 1;//for sunday
             Calendar calendar1 = Calendar.getInstance();
-            calendar1.set(Calendar.DAY_OF_WEEK, start_day);
+//            int start_day = 1;//for sunday
+//            calendar1.set(Calendar.DAY_OF_WEEK, start_day);
+//            int start_day = 1;//for sunday
+//            Calendar calendar1 = Calendar.getInstance();
+//            calendar1.set(Calendar.DAY_OF_WEEK, start_day);
+//
+//            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+//            ArrayList<String> string_dates = new ArrayList<>();
+//            ArrayList<Long> dates = new ArrayList<>();
+//            for (int i = 0; i < 15; i++) {
+//
+//                String str_date = dateFormat.format(calendar1.getTime().getTime());
+//
+//                Date date = calendar1.getTime();
+//                long lon = date.getTime();
+//
+//                calendar1.add(Calendar.DATE, 1);
+//
+//                string_dates.add(str_date);
+//
+//
+//                dates.add(lon);
+//            }
+//            Log.i("string_dates", string_dates.toString());
 
-            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
-            ArrayList<String> string_dates = new ArrayList<>();
-            ArrayList<Long> dates = new ArrayList<>();
-            for (int i = 0; i < 15; i++) {
 
-                String str_date = dateFormat.format(calendar1.getTime().getTime());
+            int month = calendar1.get(Calendar.MONTH);
 
-                Date date = calendar1.getTime();
-                long lon = date.getTime();
+            int year = calendar1.get(Calendar.YEAR);
+            int days = CommonMethods.numDays(month, year);
 
-                calendar1.add(Calendar.DATE, 1);
+            Calendar start_day_monthly = Calendar.getInstance();
 
-                string_dates.add(str_date);
+            Calendar end_day_monthly = Calendar.getInstance();
+            start_day_monthly.set(Calendar.MONTH, month);
 
+            start_day_monthly.set(Calendar.HOUR, 0);
+            start_day_monthly.set(Calendar.MINUTE, 0);
+            start_day_monthly.set(Calendar.SECOND, 0);
 
-                dates.add(lon);
-            }
-            Log.i("string_dates", string_dates.toString());
+            end_day_monthly.set(Calendar.MONTH, month);
 
-            long reset_next_week = 0;
-            long reset_current = 0;
-            if (dates.size() > 0) {
+            end_day_monthly.set(Calendar.HOUR, 0);
+            end_day_monthly.set(Calendar.MINUTE, 0);
+            end_day_monthly.set(Calendar.SECOND, 0);
+            if (days == 28) {
+                int current_day = calendar1.get(Calendar.DAY_OF_MONTH);
+                if (current_day <= 14) {
+                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
+                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
+                } else if (current_day > 14) {
+                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
+                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 28);
+                }
 
-                reset_current = dates.get(0);
-                reset_next_week = dates.get(14);
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
+                Date d = start_day_monthly.getTime();
+                long start_l = d.getTime();
+
+                Date d2 = end_day_monthly.getTime();
+                long end_l = d2.getTime();
+
+                //counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
+
+         /*       reset_current = dates.get(0);
+                reset_next_week = dates.get(14);*/
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
 
                 setAdapter(addDayArrayList);
                 updateBottom(addDayArrayList);
-            }
 
+
+            } else if (days == 29) {
+                int current_day = calendar1.get(Calendar.DAY_OF_MONTH);
+
+                if (current_day <= 14) {
+                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
+                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
+                } else if (current_day > 14) {
+                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
+                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 29);
+                }
+                Date d = start_day_monthly.getTime();
+                long start_l = d.getTime();
+
+                Date d2 = end_day_monthly.getTime();
+                long end_l = d2.getTime();
+
+
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
+
+                setAdapter(addDayArrayList);
+                updateBottom(addDayArrayList);
+
+            } else if (days == 30) {
+                int current_day = calendar1.get(Calendar.DAY_OF_MONTH);
+
+                if (current_day <= 14) {
+                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
+                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
+                } else if (current_day > 14) {
+                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
+                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 30);
+                }
+                Date d = start_day_monthly.getTime();
+                long start_l = d.getTime();
+
+                Date d2 = end_day_monthly.getTime();
+                long end_l = d2.getTime();
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
+
+                setAdapter(addDayArrayList);
+                updateBottom(addDayArrayList);
+
+            } else {
+                int current_day = calendar1.get(Calendar.DAY_OF_MONTH);
+                if (current_day <= 14) {
+                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
+                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
+                } else if (current_day > 14) {
+                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
+                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 31);
+                }
+
+                Date d = start_day_monthly.getTime();
+                long start_l = d.getTime();
+
+                Date d2 = end_day_monthly.getTime();
+                long end_l = d2.getTime();
+
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
+
+                setAdapter(addDayArrayList);
+                updateBottom(addDayArrayList);
+
+               /* long reset_next_week = 0;
+                long reset_current = 0;
+                if (dates.size() > 0) {
+
+                    reset_current = dates.get(0);
+                    reset_next_week = dates.get(14);
+                    addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
+
+                    setAdapter(addDayArrayList);
+                    updateBottom(addDayArrayList);
+                }*/
+
+            }
         } else if (spinner_selected.equalsIgnoreCase("Monthly")) {
             Calendar cal = Calendar.getInstance();
             int month = cal.get(Calendar.MONTH);
@@ -952,6 +1063,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             Calendar start_calendar = Calendar.getInstance();
             start_calendar.set(Calendar.DAY_OF_MONTH, 1);
 
+            start_calendar.set(Calendar.HOUR, 0);
+            start_calendar.set(Calendar.MINUTE, 0);
+            start_calendar.set(Calendar.SECOND, 0);
 
             Calendar end_calendar = Calendar.getInstance();
             if (days == 28) {

@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.mytips.ActiveProfiles;
 import com.mytips.Model.AddDay;
@@ -136,7 +137,9 @@ public class DatabaseOperations {
         try {
             ContentValues contentValues = new ContentValues();
             contentValues.put(DatabaseUtils.IsActive, 0);
-            db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.ProfileID + " =? ", new String[]{profile_id});
+            long val = db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.Profile_ID + " =? ", new String[]{profile_id});
+
+            Log.i("updated", String.valueOf(val));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -230,8 +233,12 @@ public class DatabaseOperations {
         projections[13] = DatabaseUtils.ProfileColor;
 //        String selection[] = new String[]{"1"};
         try {
-            cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.PROFILE_TABLE, projections,
-                    null, null, null);
+            // only active profiles will show
+
+            String query = "select * from  profile where is_active = 1 ";
+            cursor = db.rawQuery(query, null);
+    /*        cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.PROFILE_TABLE, projections,
+                    null, null, null);*/
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -731,5 +738,84 @@ public class DatabaseOperations {
 
     }
 
+    public ArrayList<Profiles> fetchDeactiveProfiles() {
+        ArrayList<Profiles> deactivated_profiles = new ArrayList<>();
+
+        ArrayList<Profiles> profilesList;
+        Cursor cursor = null;
+        String[] projections = new String[14];
+        projections[0] = DatabaseUtils.ProfileID;
+        projections[1] = DatabaseUtils.ProfileName;
+        projections[2] = DatabaseUtils.IsSupervisor;
+        projections[3] = DatabaseUtils.IsActive;
+        projections[4] = DatabaseUtils.GetTournamentTip;
+        projections[5] = DatabaseUtils.GetTips;
+        projections[6] = DatabaseUtils.PayPeriod;
+        projections[7] = DatabaseUtils.StartDayWeek;
+        projections[8] = DatabaseUtils.HourlyPay;
+        projections[9] = DatabaseUtils.HolidayPay;
+        projections[10] = DatabaseUtils.Tipees;
+        projections[11] = DatabaseUtils.Profile_ID;
+        projections[12] = DatabaseUtils.ProfilePic;
+        projections[13] = DatabaseUtils.ProfileColor;
+//        String selection[] = new String[]{"1"};
+        try {
+            // only active profiles will show
+
+            String query = "select * from  profile where is_active = 0 ";
+            cursor = db.rawQuery(query, null);
+    /*        cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.PROFILE_TABLE, projections,
+                    null, null, null);*/
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int cursor_count = 0;
+        try {
+            cursor_count = cursor.getCount();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        profilesList = new ArrayList<>();
+        if (cursor_count != 0) {
+
+            if (cursor.moveToFirst()) {
+                do {
+                    Profiles profiles = new Profiles();
+                    String id = cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile_ID));
+                    String profileName = cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfileName));
+                    String payPeriod = cursor.getString(cursor.getColumnIndex(DatabaseUtils.PayPeriod));
+                    String hourlypay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HourlyPay));
+                    String profileId = cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfileID));
+                    int isActive = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsActive));
+                    int is_supervisor = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsSupervisor));
+                    int get_tournament = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GetTournamentTip));
+                    int get_tips = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GetTips));
+                    String startday = cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek));
+                    String holodayPay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay));
+                    String tipees = cursor.getString(cursor.getColumnIndex(DatabaseUtils.Tipees));
+
+                    profiles.setId(Integer.parseInt(id));
+                    profiles.setIs_supervisor(is_supervisor);
+                    profiles.setStartday(startday);
+                    profiles.setGet_tips(get_tips);
+                    profiles.setGet_tournamenttip(get_tournament);
+                    profiles.setHoliday_pay(holodayPay);
+                    profiles.setProfile_id(profileId);
+                    profiles.setProfile_name(profileName);
+                    profiles.setPay_period(payPeriod);
+                    profiles.setHourly_pay(hourlypay);
+                    profiles.setIs_active(isActive);
+                    profiles.setTipees_name(tipees);
+                    profiles.setProfile_pic(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfilePic)));
+                    profiles.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.ProfileColor)));
+                    deactivated_profiles.add(profiles);
+                }
+                while (cursor.moveToNext());
+            }
+
+        }
+
+        return deactivated_profiles;
+    }
 
 }

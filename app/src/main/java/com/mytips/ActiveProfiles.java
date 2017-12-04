@@ -80,7 +80,7 @@ public class ActiveProfiles extends AppCompatActivity {
                             if (profileDeactiveList.size() > 0) {
                                 deactiveAdater = new ActiveProfileAdapter(ActiveProfiles.this, profileDeactiveList);
                                 deactive.setAdapter(deactiveAdater);
-                                adapter.notifyDataSetChanged();
+                                deactiveAdater.notifyDataSetChanged();
                             }
 
                         }
@@ -95,6 +95,7 @@ public class ActiveProfiles extends AppCompatActivity {
 
 
         fetchProfiles();
+        updateDeactiveList();
 
     }
 
@@ -105,7 +106,7 @@ public class ActiveProfiles extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId()==android.R.id.home) {
+        if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
         }
@@ -118,6 +119,17 @@ public class ActiveProfiles extends AppCompatActivity {
             new DatabaseOperations(ActiveProfiles.this).delete_profile(String.valueOf(profiles.getId()));
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void updateDeactiveList() {
+        ArrayList<Profiles> deactive_list = new ArrayList<>();
+        deactive_list = new DatabaseOperations(ActiveProfiles.this).fetchDeactiveProfiles();
+        if (deactive_list.size() == 0 || deactive_list == null) {
+        } else if (deactive_list.size() > 0) {
+
+            deactiveAdater = new ActiveProfileAdapter(ActiveProfiles.this, deactive_list);
+            deactive.setAdapter(deactiveAdater);
         }
     }
 
