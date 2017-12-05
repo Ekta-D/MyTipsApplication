@@ -1944,6 +1944,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     public ArrayList<String> todayPayDay(String start_day, String pay_period) {
 
         ArrayList<String> counts_list = new ArrayList<>();
+        int day = CommonMethods.getDay(start_day);
         String date_format = "";
         if (default_date_format == 2) {
             date_format = "MM/dd/yyyy";
@@ -1954,7 +1955,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
 
 
-        int day = CommonMethods.getDay(start_day);
+
         if (pay_period.equalsIgnoreCase("Daily ")) {
 
             Calendar cal = Calendar.getInstance();
@@ -1971,11 +1972,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         if (pay_period.equalsIgnoreCase("Weekly")) {
             Calendar calendar1 = Calendar.getInstance();
 
-            int current_day = calStartDay.get(Calendar.DAY_OF_MONTH);
+           // int current_day = calStartDay.get(Calendar.DAY_OF_MONTH);
             int montth = calStartDay.get(Calendar.MONTH);
 
             calendar1.set(Calendar.MONTH, montth);
-            calendar1.set(Calendar.DAY_OF_MONTH, current_day);
+          //  calendar1.set(Calendar.DAY_OF_MONTH, current_day);
 
             calendar1.set(Calendar.DAY_OF_WEEK, day);
             calendar1.set(Calendar.HOUR_OF_DAY, 0);
@@ -2145,7 +2146,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             int montth = calStartDay.get(Calendar.MONTH);
 
             calendar1.set(Calendar.MONTH, montth);
-            calendar1.set(Calendar.DAY_OF_MONTH, current_day);
+            calendar1.set(Calendar.DAY_OF_WEEK, day);
 
             calendar1.set(Calendar.HOUR_OF_DAY, 0);
             calendar1.set(Calendar.MINUTE, 0);
