@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -17,6 +18,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
@@ -125,6 +127,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     int new_count = 0;
     int stable_count = 0;
     TextView label_total_earnings;
+    CheckBox checkBoxEndofPayPeriod;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -719,6 +722,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         label_manual_tips = (TextView) findViewById(R.id.view_type);
         label_dollar_sign = (TextView) findViewById(R.id.dollar);
         label_per_sign = (TextView) findViewById(R.id.percent);
+
+        checkBoxEndofPayPeriod = (CheckBox) findViewById(R.id.checkBox_end_of_pay_period);
 
     }
 
@@ -1565,14 +1570,16 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         edit_total_tips.setVisibility(View.GONE);
         total_tipout.setVisibility(View.GONE);
 
-        tournament_downlabel.setVisibility(View.GONE);
-        cout_label.setVisibility(View.GONE);
-        perTd_label.setVisibility(View.GONE);
-        totalcount_label.setVisibility(View.GONE);
+        tournament_downlabel.setVisibility(View.VISIBLE);
 
-        edittext_count.setVisibility(View.GONE);
-        edittext_perTD.setVisibility(View.GONE);
-        edittext_total.setVisibility(View.GONE);
+        cout_label.setVisibility(View.VISIBLE);
+        perTd_label.setVisibility(View.VISIBLE);
+        totalcount_label.setVisibility(View.VISIBLE);
+
+        edittext_count.setVisibility(View.VISIBLE);
+        edittext_perTD.setVisibility(View.VISIBLE);
+        edittext_total.setVisibility(View.VISIBLE);
+
         text_tip_out_percent.setVisibility(View.GONE);
         total_tipoutlabel.setVisibility(View.GONE);
         fetchedTipees.setVisibility(View.GONE);

@@ -537,11 +537,22 @@
                         android:id="@+id/day_off_timer"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_marginTop="40dp"
                         android:visibility="gone"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/editText_start_shift"
                         app:srcCompat="@drawable/ic_timer_icon" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox_end_of_pay_period"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="9dp"
+                        android:layout_marginTop="12dp"
+                        android:text="End of Pay Period"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
                 </android.support.constraint.ConstraintLayout>
 
