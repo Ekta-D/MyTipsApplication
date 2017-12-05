@@ -1970,6 +1970,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
         if (pay_period.equalsIgnoreCase("Weekly")) {
             Calendar calendar1 = Calendar.getInstance();
+
+            int current_day = calStartDay.get(Calendar.DAY_OF_MONTH);
+            int montth = calStartDay.get(Calendar.MONTH);
+
+            calendar1.set(Calendar.MONTH, montth);
+            calendar1.set(Calendar.DAY_OF_MONTH, current_day);
+
             calendar1.set(Calendar.DAY_OF_WEEK, day);
             calendar1.set(Calendar.HOUR_OF_DAY, 0);
             calendar1.set(Calendar.MINUTE, 0);
