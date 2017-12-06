@@ -51,6 +51,8 @@ public class DatabaseUtils {
     public static final String TipOutTipees = "tip_out_tipees";
     public static final String CalculatedHours = "calculated_hours";
     public static final String isHolidayPay = "holiday_pay";
+    public static final String isEndDay = "end_day";
+
     public static final String StartShift = "start_shift";
     public static final String EndShift = "end_shift";
     public static final String ClockIn = "clock_in";

@@ -16,6 +16,8 @@ public class AddDay implements Serializable {
         this.profile_color = profile_color;
     }
 
+
+    int isEndPay;
     int profile_color;
     String start_day_week;
     String profile;
@@ -34,7 +36,15 @@ public class AddDay implements Serializable {
     String total_tournament_downs;
     int getting_tips;
     long start_long;
+
     int dollar_checked;
+    public int getIsEndPay() {
+        return isEndPay;
+    }
+
+    public void setIsEndPay(int isEndPay) {
+        this.isEndPay = isEndPay;
+    }
 
     public int getDollar_checked() {
         return dollar_checked;

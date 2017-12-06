@@ -129,6 +129,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     TextView label_total_earnings;
     CheckBox checkBoxEndofPayPeriod;
 
+    int isEndDay = 0;
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,8 +149,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         new_count_textview = (TextView) findViewById(R.id.textViewnew_count);
         label_total_earnings = (TextView) findViewById(R.id.lbl_total);
 
-        editText_new_count.setVisibility(View.GONE);
-        new_count_textview.setVisibility(View.GONE);
         findViewByIds();
 
         selected_timeformatIndex = sharedPreferences.getInt("selected_time", 1);
@@ -725,6 +725,18 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         checkBoxEndofPayPeriod = (CheckBox) findViewById(R.id.checkBox_end_of_pay_period);
 
+        checkBoxEndofPayPeriod.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    isEndDay = 1;
+                    todayPayDay(isEndDay, global_startday, global_payperiod);
+                } else {
+                    isEndDay = 0;
+                    todayPayDay(isEndDay, global_startday, global_payperiod);
+                }
+            }
+        });
     }
 
 
@@ -1025,7 +1037,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     if (selected_profile.equalsIgnoreCase("Select Profile")) {
                         global_payperiod = "";
                     }
-                    todayPayDay(global_startday, global_payperiod);
+//                    todayPayDay(global_startday, global_payperiod);
                 }
                 if (viewId == R.id.editText_start_shift && startDay == 0) {
                     isStartDateChanged = true;
@@ -1295,7 +1307,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                             total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                             day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTimeInMillis(), calEndDay.getTimeInMillis(),
-                            switch_value, manually_added_tips, selected_profile_color);
+                            switch_value, manually_added_tips, selected_profile_color, isEndDay);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1315,7 +1327,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                                 total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                                 day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color);
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay);
 
                         isStartDateChanged = false;
                         isEndDateChanged = false;
@@ -1325,14 +1337,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                                 total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                                 day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color);
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay);
                     } else if (!isStartDateChanged && isEndDateChanged) {
                         new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
                                 d.getTime(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
                                 texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                                 total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                                 day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color);
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay);
                         isEndDateChanged = false;
                     } else {
                         new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
@@ -1340,7 +1352,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString, text_tip_out_percent.getText().toString().trim(),
                                 total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                                 day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color);
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay);
                         isStartDateChanged = false;
 
                     }
@@ -1374,13 +1386,16 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     List<String> selectedTipeesID;
 
     public void updateView(Profiles profile, Bundle b) {
-
-
         if (b != null) {
             String total_profile_earning = new DatabaseOperations(AddDayActivity.this).getProfileEarning(String.valueOf(profile.getId()));
             total_earnings.setText("$" + total_profile_earning);
+            isEndDay = addDay.getIsEndPay();
         }
 
+
+        if (isEndDay == 1) {
+            todayPayDay(isEndDay, addDay.getStart_day_week(), profile.getPay_period());
+        }
 
         String start_day = profile.getStartday();
         selectedTipeesID = new ArrayList<>();
@@ -1400,7 +1415,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             cout_label.setVisibility(View.VISIBLE);
             edittext_count.setVisibility(View.VISIBLE);
 
-            todayPayDay(start_day, profile.getPay_period());
+            //  todayPayDay(start_day, profile.getPay_period());
 
 
         }
@@ -1800,6 +1815,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         calEndDay.setTimeInMillis(end_format);
 //        }
 
+
+        if (addDay.getIsEndPay() == 1) {
+            checkBoxEndofPayPeriod.setChecked(true);
+        }
         if (selected_timeformatIndex == 0) {
             // edittext_clockOut.setText(String.format("%02d:%02d", endDateTime.get(Calendar.HOUR_OF_DAY), endDateTime.get(Calendar.MINUTE)));
             edittext_clockIn.setText(String.format("%02d:%02d %s", startDateTime.get(Calendar.HOUR), startDateTime.get(Calendar.MINUTE), (startDateTime.get(Calendar.AM_PM) == 0) ? "AM" : "PM"));
@@ -1826,6 +1845,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         editText_startShift.setText(start);
         editText_endShift.setText(end);
+
 
         texview_hours.setText(addDay.getCalculated_hours());
 
@@ -1947,43 +1967,62 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     boolean is_todayPayDay = false;
+    int day;
+    ArrayList<String> counts_list;
 
-    public ArrayList<String> todayPayDay(String start_day, String pay_period) {
+    public ArrayList<String> todayPayDay(int end_payperiod, String start_day, String pay_period) {
+        counts_list = new ArrayList<>();
+        if (end_payperiod == 1) {
 
-        ArrayList<String> counts_list = new ArrayList<>();
-        int day = CommonMethods.getDay(start_day);
-        String date_format = "";
-        if (default_date_format == 2) {
-            date_format = "MM/dd/yyyy";
-        } else if (default_date_format == 1) {
-            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
-        } else {
-            date_format = "MMM dd,yyyy";
-        }
-
-
-
-        if (pay_period.equalsIgnoreCase("Daily ")) {
-
+            day = CommonMethods.getDay(start_day);
+            String date_format = "";
+            if (default_date_format == 2) {
+                date_format = "MM/dd/yyyy";
+            } else if (default_date_format == 1) {
+                date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+            } else {
+                date_format = "MMM dd,yyyy";
+            }
+//new End of Pay period
             Calendar cal = Calendar.getInstance();
-            Date date = cal.getTime();
+            int montth = calStartDay.get(Calendar.MONTH);
+            int day1 = calStartDay.get(Calendar.DAY_OF_MONTH);
 
-            String current_date = new SimpleDateFormat(date_format).format(date);
+            int dat = calStartDay.get(Calendar.DATE);
+            cal.set(Calendar.DATE, calStartDay.get(Calendar.DATE));
+            cal.set(Calendar.DAY_OF_MONTH, day1);
+            cal.set(Calendar.MONTH, montth);
+            //   cal.set(Calendar.DAY_OF_WEEK, day);
+            // cal.set(Calendar.DATE, d);
 
 
-            counts_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(current_date, selected_profile);
-            is_todayPayDay = true;
-            ifPayDay(is_todayPayDay, counts_list);
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
 
-        }
-        if (pay_period.equalsIgnoreCase("Weekly")) {
-            Calendar calendar1 = Calendar.getInstance();
 
-           // int current_day = calStartDay.get(Calendar.DAY_OF_MONTH);
+            if (pay_period.equalsIgnoreCase("Daily ")) {
+
+                //   Calendar cal = Calendar.getInstance();
+                Date date = cal.getTime();
+
+                String current_date = new SimpleDateFormat(date_format).format(date);
+
+
+                counts_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(current_date, selected_profile);
+                is_todayPayDay = true;
+                ifPayDay(is_todayPayDay, counts_list);
+
+            }
+            if (pay_period.equalsIgnoreCase("Weekly")) {
+           /* Calendar calendar1 = Calendar.getInstance();
+
+            // int current_day = calStartDay.get(Calendar.DAY_OF_MONTH);
             int montth = calStartDay.get(Calendar.MONTH);
 
             calendar1.set(Calendar.MONTH, montth);
-          //  calendar1.set(Calendar.DAY_OF_MONTH, current_day);
+            //  calendar1.set(Calendar.DAY_OF_MONTH, current_day);
 
             calendar1.set(Calendar.DAY_OF_WEEK, day);
             calendar1.set(Calendar.HOUR_OF_DAY, 0);
@@ -2035,120 +2074,165 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             } else {
                 is_todayPayDay = false;
             }
-            ifPayDay(is_todayPayDay, counts_list);
-        }
-        if (pay_period.equalsIgnoreCase("1st & 15th")) {
-            counts_list = new ArrayList<>();
+            ifPayDay(is_todayPayDay, counts_list);*/
 
-            int month = start_calendar.get(Calendar.MONTH);
+                DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+                ArrayList<String> string_dates = new ArrayList<>();
+                ArrayList<Long> dates = new ArrayList<>();
+                for (int i = 0; i < 7; i++) {
 
-            int year = start_calendar.get(Calendar.YEAR);
-            int days = CommonMethods.numDays(month, year);
+                    String str_date = dateFormat.format(cal.getTime().getTime());
 
-            Calendar start_day_monthly = Calendar.getInstance();
-            Calendar end_day_monthly = Calendar.getInstance();
-            start_day_monthly.set(Calendar.MONTH, month);
-            end_day_monthly.set(Calendar.MONTH, month);
-            if (days == 28) {
-                int current_day = start_calendar.get(Calendar.DAY_OF_MONTH);
-                if (current_day <= 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
-                } else if (current_day > 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 28);
+                    Date date = cal.getTime();
+                    long lon = date.getTime();
+
+                    cal.add(Calendar.DATE, -1);
+
+                    string_dates.add(str_date);
+
+
+                    dates.add(lon);
                 }
+                long reset_next_week = 0;
+                long reset_current = 0;
+                if (dates.size() > 0) {
 
-                Date d = start_day_monthly.getTime();
-                long start_l = d.getTime();
-
-                Date d2 = end_day_monthly.getTime();
-                long end_l = d2.getTime();
-
-                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
-
-
-                if (current_day == 14 || current_day == 28) {
-                    is_todayPayDay = true;
-                } else {
-                    is_todayPayDay = false;
+                    reset_current = dates.get(6);
+                    reset_next_week = dates.get(0);
                 }
-            } else if (days == 29) {
-                int current_day = start_calendar.get(Calendar.DAY_OF_MONTH);
+                counts_list = new ArrayList<>();
+                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
 
-                if (current_day <= 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
-                } else if (current_day > 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 29);
-                }
-                Date d = start_day_monthly.getTime();
-                long start_l = d.getTime();
+                ifPayDay(true, counts_list);
 
-                Date d2 = end_day_monthly.getTime();
-                long end_l = d2.getTime();
-
-                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
-
-
-                if (current_day == 14 || current_day == 29) {
-                    is_todayPayDay = true;
-                } else {
-                    is_todayPayDay = false;
-                }
-            } else if (days == 30) {
-                int current_day = start_calendar.get(Calendar.DAY_OF_MONTH);
-
-                if (current_day <= 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
-                } else if (current_day > 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 30);
-                }
-                Date d = start_day_monthly.getTime();
-                long start_l = d.getTime();
-
-                Date d2 = end_day_monthly.getTime();
-                long end_l = d2.getTime();
-
-                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
-
-
-                if (current_day == 14 || current_day == 30) {
-                    is_todayPayDay = true;
-                } else {
-                    is_todayPayDay = false;
-                }
-            } else {
-                int current_day = start_calendar.get(Calendar.DAY_OF_MONTH);
-                if (current_day <= 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
-                } else if (current_day > 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 31);
-                }
-
-                Date d = start_day_monthly.getTime();
-                long start_l = d.getTime();
-
-                Date d2 = end_day_monthly.getTime();
-                long end_l = d2.getTime();
-
-                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
-                if (current_day == 14 || current_day == 31) {
-                    is_todayPayDay = true;
-                } else {
-                    is_todayPayDay = false;
-                }
             }
-            ifPayDay(is_todayPayDay, counts_list);
-        }
-        if (pay_period.equals("Every 2 Weeks ")) {
+            if (pay_period.equalsIgnoreCase("1st & 15th")) {
+                counts_list = new ArrayList<>();
 
-            Calendar calendar1 = Calendar.getInstance();
+                int month = start_calendar.get(Calendar.MONTH);
+
+                int year = start_calendar.get(Calendar.YEAR);
+                int days = CommonMethods.numDays(month, year);
+
+                Calendar start_day_monthly = Calendar.getInstance();
+                Calendar end_day_monthly = Calendar.getInstance();
+                start_day_monthly.set(Calendar.MONTH, month);
+                end_day_monthly.set(Calendar.MONTH, month);
+                if (days == 28) {
+                    int current_day = start_calendar.get(Calendar.DAY_OF_MONTH);
+                    if (current_day <= 14) {
+                        start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
+                        end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
+                    } else if (current_day > 14) {
+                        start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
+                        end_day_monthly.set(Calendar.DAY_OF_MONTH, 28);
+                    }
+
+                    Date d = start_day_monthly.getTime();
+                    long start_l = d.getTime();
+
+                    Date d2 = end_day_monthly.getTime();
+                    long end_l = d2.getTime();
+
+                    counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
+
+
+                    if (current_day == 14 || current_day == 28) {
+                        is_todayPayDay = true;
+                    } else {
+                        is_todayPayDay = false;
+                    }
+                } else if (days == 29) {
+                    int current_day = start_calendar.get(Calendar.DAY_OF_MONTH);
+
+                    if (current_day <= 14) {
+                        start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
+                        end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
+                    } else if (current_day > 14) {
+                        start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
+                        end_day_monthly.set(Calendar.DAY_OF_MONTH, 29);
+                    }
+                    Date d = start_day_monthly.getTime();
+                    long start_l = d.getTime();
+
+                    Date d2 = end_day_monthly.getTime();
+                    long end_l = d2.getTime();
+
+                    counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
+
+
+                    if (current_day == 14 || current_day == 29) {
+                        is_todayPayDay = true;
+                    } else {
+                        is_todayPayDay = false;
+                    }
+                } else if (days == 30) {
+                    int current_day = start_calendar.get(Calendar.DAY_OF_MONTH);
+
+                    if (current_day <= 14) {
+                        start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
+                        end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
+                    } else if (current_day > 14) {
+                        start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
+                        end_day_monthly.set(Calendar.DAY_OF_MONTH, 30);
+                    }
+                    Date d = start_day_monthly.getTime();
+                    long start_l = d.getTime();
+
+                    Date d2 = end_day_monthly.getTime();
+                    long end_l = d2.getTime();
+
+                    counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
+
+
+                    if (current_day == 14 || current_day == 30) {
+                        is_todayPayDay = true;
+                    } else {
+                        is_todayPayDay = false;
+                    }
+                } else {
+                    int current_day = start_calendar.get(Calendar.DAY_OF_MONTH);
+                    if (current_day <= 14) {
+                        start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
+                        end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
+                    } else if (current_day > 14) {
+                        start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
+                        end_day_monthly.set(Calendar.DAY_OF_MONTH, 31);
+                    }
+
+                    Date d = start_day_monthly.getTime();
+                    long start_l = d.getTime();
+
+                    Date d2 = end_day_monthly.getTime();
+                    long end_l = d2.getTime();
+
+                    counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
+                    if (current_day == 14 || current_day == 31) {
+                        is_todayPayDay = true;
+                    } else {
+                        is_todayPayDay = false;
+                    }
+                }
+                ifPayDay(is_todayPayDay, counts_list);
+            }
+            if (pay_period.equals("Every 2 Weeks ")) {
+
+                Calendar cal1 = Calendar.getInstance();
+                int montth1 = calStartDay.get(Calendar.MONTH);
+                int day11 = calStartDay.get(Calendar.DAY_OF_MONTH);
+
+                cal1.set(Calendar.DATE, calStartDay.get(Calendar.DATE));
+                cal1.set(Calendar.DAY_OF_MONTH, day11);
+                cal1.set(Calendar.MONTH, montth1);
+                //   cal.set(Calendar.DAY_OF_WEEK, day);
+                // cal.set(Calendar.DATE, d);
+
+
+                cal1.set(Calendar.HOUR_OF_DAY, 0);
+                cal1.set(Calendar.MINUTE, 0);
+                cal1.set(Calendar.SECOND, 0);
+                cal1.set(Calendar.MILLISECOND, 0);
+            /*Calendar calendar1 = Calendar.getInstance();
             int current_day = calStartDay.get(Calendar.DAY_OF_MONTH);
             int montth = calStartDay.get(Calendar.MONTH);
 
@@ -2205,8 +2289,40 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 is_todayPayDay = false;
             }
 
-            ifPayDay(is_todayPayDay, counts_list);
+            ifPayDay(is_todayPayDay, counts_list);*/
+                DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+                ArrayList<String> string_dates = new ArrayList<>();
+                ArrayList<Long> dates = new ArrayList<>();
+                for (int i = 0; i < 14; i++) {
+
+                    String str_date = dateFormat.format(cal1.getTime().getTime());
+
+                    Date date = cal1.getTime();
+                    long lon = date.getTime();
+
+                    cal1.add(Calendar.DATE, -1);
+
+                    string_dates.add(str_date);
+
+
+                    dates.add(lon);
+                }
+                long reset_next_week = 0;
+                long reset_current = 0;
+                if (dates.size() > 0) {
+
+                    reset_current = dates.get(13);
+                    reset_next_week = dates.get(0);
+                }
+                counts_list = new ArrayList<>();
+                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
+
+                ifPayDay(true, counts_list);
+            }
+        } else {
+            ifPayDay(false, counts_list);
         }
+
 
         return counts_list;
     }
@@ -2300,6 +2416,97 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
         }
     }
+
+
+  /*  public void updateViewOnEndPayDay(int end_day, String global_payperiod) {
+        if (end_day == 1) {
+
+            Calendar cal = Calendar.getInstance();
+            int montth = calStartDay.get(Calendar.MONTH);
+            int day1 = calStartDay.get(Calendar.DAY_OF_MONTH);
+
+            int dat = calStartDay.get(Calendar.DATE);
+            cal.set(Calendar.DATE, calStartDay.get(Calendar.DATE));
+            cal.set(Calendar.DAY_OF_MONTH, day1);
+            cal.set(Calendar.MONTH, montth);
+            //   cal.set(Calendar.DAY_OF_WEEK, day);
+            // cal.set(Calendar.DATE, d);
+
+
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+
+
+            if (global_payperiod.equalsIgnoreCase("Every 2 Weeks ")) {
+                DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+                ArrayList<String> string_dates = new ArrayList<>();
+                ArrayList<Long> dates = new ArrayList<>();
+                for (int i = 0; i < 14; i++) {
+
+                    String str_date = dateFormat.format(cal.getTime().getTime());
+
+                    Date date = cal.getTime();
+                    long lon = date.getTime();
+
+                    cal.add(Calendar.DATE, -1);
+
+                    string_dates.add(str_date);
+
+
+                    dates.add(lon);
+                }
+                long reset_next_week = 0;
+                long reset_current = 0;
+                if (dates.size() > 0) {
+
+                    reset_current = dates.get(0);
+                    reset_next_week = dates.get(13);
+                }
+                counts_list = new ArrayList<>();
+                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
+
+                ifPayDay(true, counts_list);
+
+            } else if (global_payperiod.equalsIgnoreCase("Weekly")) {
+
+
+                DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+                ArrayList<String> string_dates = new ArrayList<>();
+                ArrayList<Long> dates = new ArrayList<>();
+                for (int i = 0; i < 7; i++) {
+
+                    String str_date = dateFormat.format(cal.getTime().getTime());
+
+                    Date date = cal.getTime();
+                    long lon = date.getTime();
+
+                    cal.add(Calendar.DATE, -1);
+
+                    string_dates.add(str_date);
+
+
+                    dates.add(lon);
+                }
+                long reset_next_week = 0;
+                long reset_current = 0;
+                if (dates.size() > 0) {
+
+                    reset_current = dates.get(0);
+                    reset_next_week = dates.get(6);
+                }
+                counts_list = new ArrayList<>();
+                counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
+
+                ifPayDay(true, counts_list);
+
+
+            } else if (global_payperiod.equalsIgnoreCase("Daily")) {
+
+            }
+        }
+    }*/
 }
 
 

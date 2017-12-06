@@ -49,6 +49,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.Profile + " TEXT, "
                 + DatabaseUtils.CalculatedHours + " TEXT, "
                 + DatabaseUtils.isHolidayPay + " INTEGER, "
+
+                + DatabaseUtils.isEndDay + " INTEGER, "
+
                 + DatabaseUtils.IsDayOff + " INTEGER, "
                 + DatabaseUtils.TotalTips + " TEXT, "
                 + DatabaseUtils.TipOutTipees + " TEXT, "
