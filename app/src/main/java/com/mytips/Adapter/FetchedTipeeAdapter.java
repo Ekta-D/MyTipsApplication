@@ -62,6 +62,7 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
 
     }
 
+
     public void toggle(int position) {
         setChecked(position, !isChecked(position));
 

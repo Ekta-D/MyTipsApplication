@@ -292,8 +292,7 @@ public class AddProfileActivity extends AppCompatActivity {
                         StringBuilder joinedString = new StringBuilder();
 
 //                        if (selected_tipeesID != null && selected_tipeesID.size() > 0) {
-                        if (adapter!=null)
-                        {
+                        if (adapter != null) {
                             if (adapter.checkedItems == null) {
 
                             } else if (adapter.checkedItems != null && adapter.checkedItems.size() > 0) {
@@ -307,7 +306,6 @@ public class AddProfileActivity extends AppCompatActivity {
                                 }
                             }
                         }
-
 
 
                         try {
@@ -335,8 +333,7 @@ public class AddProfileActivity extends AppCompatActivity {
                             }
 
                         }
-                        if (adapter!=null)
-                        {
+                        if (adapter != null) {
                             if (adapter.checkedItems == null) {
 
                             } else if (adapter.checkedItems != null && adapter.checkedItems.size() > 0) {
@@ -346,6 +343,8 @@ public class AddProfileActivity extends AppCompatActivity {
                                     if (adapter.checkedItems.get(i) == true) {
                                         joinedString.append(tipeeInfos.get(i).getId());
                                         joinedString.append(",");
+                                    } else {
+                                        tipeeInfos.remove(i);
                                     }
                                 }
                                 Log.i("update_joinedString", joinedString.toString());
@@ -504,7 +503,9 @@ public class AddProfileActivity extends AppCompatActivity {
 
         if (tipeeInfos != null && tipeeInfos.size() > 0) {
             if (selected.size() > 0) {
+
                 adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected, tipeeInfos, false, null);
+
                 listView_fetched_tipees.setAdapter(adapter);
             }
         }
