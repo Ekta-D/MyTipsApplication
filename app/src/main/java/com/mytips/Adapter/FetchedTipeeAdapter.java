@@ -15,6 +15,7 @@ import com.mytips.Model.TipeeInfo;
 import com.mytips.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -59,13 +60,6 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
 
     public void setChecked(int position, boolean isChecked) {
         checkedItems.put(position, isChecked);
-
-    }
-
-
-    public void toggle(int position) {
-        setChecked(position, !isChecked(position));
-
     }
 
     @Override
@@ -106,9 +100,9 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                     if (isChecked) {
-                        tipeeChecked.OnTipeeChange(true, tipeeInfo);
+                        tipeeChecked.OnTipeeChange(true, tipeeInfo, position);
                     } else {
-                        tipeeChecked.OnTipeeChange(false, tipeeInfo);
+                        tipeeChecked.OnTipeeChange(false, tipeeInfo, position);
                     }
                 }
             });
@@ -116,9 +110,33 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
         } else {
             if (selected_tipeesIds.contains(tipeeInfo.getId())) {
                 viewHolder.checkBox.setChecked(checkedItems.get(position, true));
+                viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                        if (!isChecked) {
+                            checkedItems.put(position, false);
+                            tipeeChecked.OnTipeeChange(false, tipeeInfo, position);
+                        } else {
+                            checkedItems.put(position, true);
+                            tipeeChecked.OnTipeeChange(true, tipeeInfo, position);
+                        }
+                    }
+                });
             } else {
                 viewHolder.checkBox.setChecked(checkedItems.get(position, false));
-                viewHolder.checkBox.setOnCheckedChangeListener(this);
+                viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (!isChecked) {
+                            checkedItems.put(position, false);
+                            tipeeChecked.OnTipeeChange(false, tipeeInfo,position);
+                        } else {
+                            checkedItems.put(position, true);
+                            tipeeChecked.OnTipeeChange(true, tipeeInfo,position);
+                        }
+                    }
+                });
             }
 
         }

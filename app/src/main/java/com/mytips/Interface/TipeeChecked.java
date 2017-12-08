@@ -8,5 +8,5 @@ import com.mytips.Model.TipeeInfo;
 
 public interface TipeeChecked {
 
-    void OnTipeeChange(boolean isChecked,TipeeInfo tipeeInfo);
+    void OnTipeeChange(boolean isChecked,TipeeInfo tipeeInfo,int position);
 }

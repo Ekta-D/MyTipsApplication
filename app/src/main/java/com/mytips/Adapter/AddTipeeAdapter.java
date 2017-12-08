@@ -131,9 +131,10 @@ public class AddTipeeAdapter extends BaseAdapter {
                 al.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        new DatabaseOperations(context).deleteTipee(arrayList.get(position).getId());
                         arrayList.remove(position);
                         notifyDataSetChanged();
-                        new DatabaseOperations(context).deleteTipee(arrayList.get(position).getId());
+
                         dialog.dismiss();
                     }
                 });

@@ -19,6 +19,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,6 +39,7 @@ import android.widget.Toast;
 
 import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
+import com.mytips.Interface.TipeeChecked;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.Utils.CommonMethods;
@@ -49,7 +51,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 
@@ -79,6 +83,8 @@ public class AddProfileActivity extends AppCompatActivity {
     FetchedTipeeAdapter adapter;
     TextView no_data;
     int[] profile_colors;
+    ArrayList<Integer> clicked_positions;
+    HashMap<String, Boolean>  temp_arraylist = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +98,7 @@ public class AddProfileActivity extends AppCompatActivity {
         profile_colors = getResources().getIntArray(R.array.profile_colors);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_close);
+        getSupportActionBar().setHomeAsUpIndicator(R.drawable.arrow_left);
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
         CommonMethods.setTheme(getSupportActionBar(), AddProfileActivity.this);
@@ -106,10 +112,22 @@ public class AddProfileActivity extends AppCompatActivity {
 
             profiles = (Profiles) b.getSerializable(Constants.ProfileData);
 
-            selected_tipeesID = convertStringToArray(String.valueOf(profiles.getTipees_name()));
+            selected_tipeesID = new ArrayList<>(Arrays.asList(convertStringToArray(String.valueOf(profiles.getTipees_name()))).get(0));
             fillAllFields(profiles, selected_tipeesID);
         }
         getAllTipees();
+
+        if (b != null) {
+            clicked_positions = new ArrayList<>();
+        }
+      /*  listView_fetched_tipees.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                int pos = parent.getSelectedItemPosition();
+                clicked_positions.add(pos);
+                System.out.println("size" + String.valueOf(clicked_positions.size()));
+            }
+        });*/
 
     }
 
@@ -319,21 +337,66 @@ public class AddProfileActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     } else {
-
-
-                        int id = profiles.getId();
+                        ArrayList<HashMap<Object, Object>> positions = new ArrayList<>();
 
                         StringBuilder joinedString = new StringBuilder();
+                        int id = profiles.getId();
+
+                        //StringBuilder joinedString = new StringBuilder();
 //                        if (selected_tipeesID != null && selected_tipeesID.size() > 0)
-                        if (selected_tipeesID != null && selected_tipeesID.size() > 0) {
+                        String joinedStringToString = "";
+                        if (temp_arraylist != null && temp_arraylist.size() > 0) {
 
-                            for (int j = 0; j < selected_tipeesID.size(); j++) {
-                                joinedString.append(tipeeInfos.get(j).getId());
-                                joinedString.append(",");
+                            if (tipeeInfos.size() > 0) {
+                                //if selected comes again
+                                for (int j = 0; j < selected_tipeesID.size(); j++) {
+                                    if(temp_arraylist.containsKey(selected_tipeesID.get(j))){
+                                        if(temp_arraylist.get(selected_tipeesID.get(j))==true){
+                                            joinedString.append(temp_arraylist.get(selected_tipeesID.get(j)));
+                                            joinedString.append(",");
+                                        }
+                                    }
+                                }
+                                List<String> unselectedTipees = new ArrayList<>();
+                                //if a new tippee is selected
+                                for(Map.Entry<String, Boolean> newTippee: temp_arraylist.entrySet()){
+                                    if(newTippee.getValue()==true){
+                                        if(!selected_tipeesID.contains(newTippee.getKey()))
+                                            selected_tipeesID.add(newTippee.getKey());
+
+                                    } else {
+                                        selected_tipeesID.remove(newTippee.getKey());
+                                        //unselectedTipees.add(newTippee.getKey());
+                                    }
+                                }
+
+                                if(selected_tipeesID.size()>0){
+                                    for (int i = 0; i<selected_tipeesID.size(); i++) {
+                                        joinedString.append(selected_tipeesID.get(i));
+                                        joinedString.append(",");
+                                    }
+                                    /*if(joinedString.length()>0){
+                                        joinedStringToString = joinedString.toString();
+                                        for(int i = 0; i<unselectedTipees.size(); i++){
+
+                                            if(convertStringToArray(joinedString.toString()).contains(unselectedTipees.get(i))){
+                                                joinedStringToString = joinedStringToString.replace(unselectedTipees.get(i), " ");
+                                            }
+                                        }
+                                    }*/
+                                }
+
+
+
+
+                                /*for (int j = 0; j < temp_arraylist.size(); j++) {
+                                    int pos = temp_arraylist.get(j);
+                                    selected_tipeesID.add(tipeeInfos.get(pos).getId());
+                                }*/
                             }
-
                         }
-                        if (adapter != null) {
+
+                       /* if (adapter != null) {
                             if (adapter.checkedItems == null) {
 
                             } else if (adapter.checkedItems != null && adapter.checkedItems.size() > 0) {
@@ -350,7 +413,7 @@ public class AddProfileActivity extends AppCompatActivity {
                                 Log.i("update_joinedString", joinedString.toString());
                             }
 
-                        }
+                        }*/
 
 
                         try {
@@ -439,12 +502,16 @@ public class AddProfileActivity extends AppCompatActivity {
         if (selected_tipeesID == null)
             selected_tipeesID = new ArrayList<>();
         tipeeInfos = new ArrayList<>();
-
         tipeeInfos = new DatabaseOperations(AddProfileActivity.this).fetchTipeeList(AddProfileActivity.this);
 
 
         if (tipeeInfos != null && tipeeInfos.size() > 0) {
-            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos, false, null);
+            adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected_tipeesID, tipeeInfos, false, new TipeeChecked() {
+                @Override
+                public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo, int position) {
+                    temp_arraylist.put(tipeeInfo.getId(), isChecked);
+                }
+            });
             listView_fetched_tipees.setAdapter(adapter);
         } else {
             no_data.setVisibility(View.VISIBLE);
@@ -462,7 +529,7 @@ public class AddProfileActivity extends AppCompatActivity {
 
     int profileColors;
 
-    public void fillAllFields(Profiles profiles, List<String> selected) {
+    public void fillAllFields(Profiles profiles, final List<String> selected) {
         editText_profilename.setText(profiles.getProfile_name());
         if (profiles.getIs_supervisor() == 1) {
             checkBox_supervisor.setChecked(true);
@@ -504,9 +571,18 @@ public class AddProfileActivity extends AppCompatActivity {
         if (tipeeInfos != null && tipeeInfos.size() > 0) {
             if (selected.size() > 0) {
 
-                adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected, tipeeInfos, false, null);
+                adapter = new FetchedTipeeAdapter(AddProfileActivity.this, selected, tipeeInfos, false, new TipeeChecked() {
+                    @Override
+                    public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo, int position) {
+                        System.out.println(tipeeInfo);
+                        temp_arraylist.put(tipeeInfo.getId(), isChecked);
+
+                    }
+                });
 
                 listView_fetched_tipees.setAdapter(adapter);
+
+//                adapter.set
             }
         }
     }

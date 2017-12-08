@@ -118,7 +118,7 @@ import static android.content.ContentValues.TAG;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends BaseDemoActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener /*implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener */{
+public class SettingsActivity extends BaseDemoActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener /*implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener */ {
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -512,27 +512,35 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                                 final String name = editText_tipeename.getText().toString().trim();
                                 final String percent = editText_tipee_out.getText().toString().trim();
 
-                                if (!percent.equalsIgnoreCase("")) {
-                                    tipee_percent = Double.parseDouble(percent);
+                                if (name.equalsIgnoreCase(" ") || percent.equalsIgnoreCase("")) {
+                                    Toast.makeText(SettingsActivity.this, "Please enter details of tippee!", Toast.LENGTH_SHORT).show();
+                                    return;
                                 }
-                                tipee_name_tipout = name + " " + percent + "%";
+                                else{
+                                    if (!percent.equalsIgnoreCase("")) {
+                                        tipee_percent = Double.parseDouble(percent);
+                                    }
+                                    tipee_name_tipout = name + " " + percent + "%";
 
-                                String tipee_id = UUID.randomUUID().toString();
+                                    String tipee_id = UUID.randomUUID().toString();
 
-                                TipeeInfo tipeeInfo = new TipeeInfo();
-                                tipeeInfo.setName(name);
-                                tipeeInfo.setId(tipee_id);
-                                tipeeInfo.setPercentage(percent);
-                                tippess_infolist.add(tipeeInfo);
+                                    TipeeInfo tipeeInfo = new TipeeInfo();
+                                    tipeeInfo.setName(name);
+                                    tipeeInfo.setId(tipee_id);
+                                    tipeeInfo.setPercentage(percent);
+                                    tippess_infolist.add(tipeeInfo);
 
-                                new DatabaseOperations(SettingsActivity.this).insertTipeeInfo(tipee_id, name, tipee_percent);
-                                if (tippess_infolist.size() > 0) {
-                                    AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
-                                            tippess_infolist);
+                                    new DatabaseOperations(SettingsActivity.this).insertTipeeInfo(tipee_id, name, tipee_percent);
+                                    if (tippess_infolist.size() > 0) {
+                                        AddTipeeAdapter adapter = new AddTipeeAdapter(SettingsActivity.this,
+                                                tippess_infolist);
 //
 //                                    Preferences.getInstance(SettingsActivity.this).save_list(Constants.TipeeListKey, tippess_infolist);
-                                    tipees_list.setAdapter(adapter);
+                                        tipees_list.setAdapter(adapter);
+                                    }
                                 }
+
+
                                 dialog.dismiss();
                             }
                         });
@@ -737,12 +745,12 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
             @Override
             public void onResult(@NonNull DriveApi.MetadataBufferResult metadataBufferResult) {
 
-                if(metadataBufferResult.getStatus().isSuccess()){
+                if (metadataBufferResult.getStatus().isSuccess()) {
                     //metadataBufferResult.getMetadataBuffer().get
-                    System.out.println("Success: "+ metadataBufferResult.getMetadataBuffer().toString());
+                    System.out.println("Success: " + metadataBufferResult.getMetadataBuffer().toString());
 
                 } else {
-                    System.out.println("Failure "+"not found");
+                    System.out.println("Failure " + "not found");
                 }
 
             }

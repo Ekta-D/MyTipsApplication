@@ -7,6 +7,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -29,6 +31,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
@@ -101,7 +104,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     double result_tip_outpercentage = 0;
     double total_tournamentdown = 0;
     SpinnerAdapter spinnerAdapter;
-    int getting_tips = 0, getting_tournament = 0;
+    int getting_tips = 0, getting_tournament = 0, is_supervisor = 0;
     Bundle b;
     AddDay addDay;
     String holiday_off_value = "";
@@ -128,7 +131,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     int stable_count = 0;
     TextView label_total_earnings;
     CheckBox checkBoxEndofPayPeriod;
-
     int isEndDay = 0;
     int tempEndDay = 0;
 
@@ -522,11 +524,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 //                    wage_hourly = Integer.parseInt(wage);
                     wage_hourly = Double.parseDouble(wage);
                 }
+                profile.getIs_supervisor();
                 getting_tips = profile.getGet_tips();
+
                 getting_tournament = profile.getGet_tournamenttip();
                 global_startday = profile.getStartday();
                 global_payperiod = profile.getPay_period();
-
+                is_supervisor = profile.getIs_supervisor();
                 selected_profile = profile.getProfile_name();
                 selected_profile_color = profile.getProfile_color();
                 selected_profile_id = profile.getId();
@@ -655,7 +659,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void findViewByIds() {
-
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
         type_switch = (Switch) findViewById(R.id.type_switch);
         editext_manual_tips = (EditText) findViewById(R.id.manual_tip);
@@ -1413,7 +1416,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             tempEndDay = 0;
         }
 
-
+        if (is_supervisor == 1 && getting_tournament == 0) {
+            editText_new_count.setVisibility(View.GONE);
+            new_count_textview.setVisibility(View.GONE);
+        } else {
+            editText_new_count.setVisibility(View.VISIBLE);
+            new_count_textview.setVisibility(View.VISIBLE);
+        }
         selectedTipeesID = new ArrayList<>();
         selectedTipeesID = convertStringToArray(String.valueOf(profile.getTipees_name()));
         if (profile.getGet_tournamenttip() == 0) {
@@ -1531,7 +1540,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             final List<String> finalSelectedTipeesID = selectedTipeesID;
             adapter = new FetchedTipeeAdapter(AddDayActivity.this, selectedTipeesID, info, true, new TipeeChecked() {
                 @Override
-                public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo) {
+                public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo,int position) {
                     if (isChecked) {
                         checkedTipeeCalculations(tipeeInfo);
 
@@ -1575,6 +1584,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         from_label.setText("Select Day");
 
+
         day_off_timer.setVisibility(View.VISIBLE);
 
         tipee_nodata.setVisibility(View.GONE);
@@ -1595,7 +1605,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         edit_total_tips.setVisibility(View.GONE);
         total_tipout.setVisibility(View.GONE);
 
-        tournament_downlabel.setVisibility(View.VISIBLE);
+        if (getting_tournament == 1) {
+            tournament_downlabel.setVisibility(View.VISIBLE);
+        }
+
 
 //        cout_label.setVisibility(View.VISIBLE);
         // perTd_label.setVisibility(View.VISIBLE);
@@ -1624,7 +1637,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         label_total_earnings.setText("");
         total_earnings.setText("");
 
-        if (isEndDay == 1) {
+        if (isEndDay == 1 || getting_tournament == 1) {
             todayPayDay(isEndDay, global_startday, global_payperiod);
         }
         //total_earnings.setText("$" + earns);
@@ -1652,8 +1665,49 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         } else if (fetched.size() > 0) {
             tipee_nodata.setVisibility(View.GONE);
         }
-        tipSeparator.setVisibility(View.VISIBLE);
-        tournamentSeparator.setVisibility(View.VISIBLE);
+
+        if (is_supervisor == 0 && (getting_tips == 1 || getting_tournament == 1)) {
+            tipSeparator.setVisibility(View.VISIBLE);
+            tournamentSeparator.setVisibility(View.VISIBLE);
+            total_tipslabel.setVisibility(View.VISIBLE);
+            tipout_tipees_label.setVisibility(View.VISIBLE);
+            total_tipoutPer.setVisibility(View.VISIBLE);
+            edit_total_tips.setVisibility(View.VISIBLE);
+            total_tipout.setVisibility(View.VISIBLE);
+            if (b != null) {
+                if (addDay.getGetting_tips() == 1) {
+                    getTournamentTips = true;
+                }
+
+            }
+            if (getTournamentTips) {
+                if (is_todayPayDay) {
+
+                    perTd_label.setVisibility(View.VISIBLE);
+                    totalcount_label.setVisibility(View.VISIBLE);
+                    edittext_perTD.setVisibility(View.VISIBLE);
+                    edittext_total.setVisibility(View.VISIBLE);
+                } else {
+                    perTd_label.setVisibility(View.GONE);
+                    totalcount_label.setVisibility(View.GONE);
+                    edittext_perTD.setVisibility(View.GONE);
+                    edittext_total.setVisibility(View.GONE);
+                }
+            }
+            tournament_downlabel.setVisibility(View.VISIBLE);
+            text_tip_out_percent.setVisibility(View.VISIBLE);
+            total_tipoutlabel.setVisibility(View.VISIBLE);
+            fetchedTipees.setVisibility(View.VISIBLE);
+            type_switch.setVisibility(View.VISIBLE);
+            label_manual_tips.setVisibility(View.VISIBLE);
+            label_dollar_sign.setVisibility(View.VISIBLE);
+            label_per_sign.setVisibility(View.VISIBLE);
+            editext_manual_tips.setVisibility(View.VISIBLE);
+
+            editText_new_count.setVisibility(View.VISIBLE);
+            new_count_textview.setVisibility(View.VISIBLE);
+        }
+
         editText_startShift.setHint("Start Shift");
         edittext_clockIn.setVisibility(View.VISIBLE);
         editText_endShift.setVisibility(View.VISIBLE);
@@ -1662,51 +1716,17 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         label_to.setVisibility(View.VISIBLE);
         image_to.setVisibility(View.VISIBLE);
         holiday_pay.setVisibility(View.VISIBLE);
-        total_tipslabel.setVisibility(View.VISIBLE);
-        tipout_tipees_label.setVisibility(View.VISIBLE);
-        total_tipoutPer.setVisibility(View.VISIBLE);
-        edit_total_tips.setVisibility(View.VISIBLE);
-        total_tipout.setVisibility(View.VISIBLE);
 
-        if (b != null) {
-            if (addDay.getGetting_tips() == 1) {
-                getTournamentTips = true;
-            }
 
-        }
-        if (getTournamentTips) {
-            if (is_todayPayDay) {
-
-                perTd_label.setVisibility(View.VISIBLE);
-                totalcount_label.setVisibility(View.VISIBLE);
-                edittext_perTD.setVisibility(View.VISIBLE);
-                edittext_total.setVisibility(View.VISIBLE);
-            } else {
-                perTd_label.setVisibility(View.GONE);
-                totalcount_label.setVisibility(View.GONE);
-                edittext_perTD.setVisibility(View.GONE);
-                edittext_total.setVisibility(View.GONE);
-            }
-        }
-        tournament_downlabel.setVisibility(View.VISIBLE);
         //  cout_label.setVisibility(View.VISIBLE);
 
         //   edittext_count.setVisibility(View.VISIBLE);
 
-        text_tip_out_percent.setVisibility(View.VISIBLE);
-        total_tipoutlabel.setVisibility(View.VISIBLE);
-        fetchedTipees.setVisibility(View.VISIBLE);
-        type_switch.setVisibility(View.VISIBLE);
-        label_manual_tips.setVisibility(View.VISIBLE);
-        label_dollar_sign.setVisibility(View.VISIBLE);
-        label_per_sign.setVisibility(View.VISIBLE);
-        editext_manual_tips.setVisibility(View.VISIBLE);
-
-        editText_new_count.setVisibility(View.VISIBLE);
-        new_count_textview.setVisibility(View.VISIBLE);
 
         label_total_earnings.setText("Total Earnings: ");
         total_earnings.setVisibility(View.VISIBLE);
+
+
     }
 
 
@@ -2328,17 +2348,17 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     total_counts_till_now = 0;
                 } else {
                     stable_count = 0;
-                  //  edittext_count.setText("0");
+                    //  edittext_count.setText("0");
                     edittext_count.setText(editText_new_count.getText().toString().trim());
                 }
             }
-            if (day_off == 1) {
+           /* if (day_off == 1) {
                 editText_new_count.setVisibility(View.GONE);
                 new_count_textview.setVisibility(View.GONE);
-            } else {
+            } else {*/
                 editText_new_count.setVisibility(View.VISIBLE);
                 new_count_textview.setVisibility(View.VISIBLE);
-            }
+//            }
 
         }
     }
