@@ -398,8 +398,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         , holiday_off_value
                         , b);
                 edittext_total.setText(String.valueOf(total));
-
-
             }
         });
 
@@ -1445,9 +1443,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         if (is_supervisor == 1 && getting_tournament == 0) {
+            checkBoxEndofPayPeriod.setVisibility(View.GONE);
             editText_new_count.setVisibility(View.GONE);
             new_count_textview.setVisibility(View.GONE);
         } else {
+            checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
             editText_new_count.setVisibility(View.VISIBLE);
             new_count_textview.setVisibility(View.VISIBLE);
         }
@@ -1667,6 +1667,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         if (getting_tournament == 1) {
             tournament_downlabel.setVisibility(View.VISIBLE);
+            checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
         }
 
 
@@ -1733,6 +1734,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
         texview_hours.setVisibility(View.VISIBLE); // visible calculated hours
         if (is_supervisor == 0 && (getting_tips == 1 || getting_tournament == 1)) {
+            checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
             tipSeparator.setVisibility(View.VISIBLE);
             tournamentSeparator.setVisibility(View.VISIBLE);
             total_tipslabel.setVisibility(View.VISIBLE);
@@ -1776,6 +1778,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         if (is_supervisor == 1 && (getting_tips == 1 || getting_tournament == 1)) {
             tipSeparator.setVisibility(View.VISIBLE);
+            checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
             tournamentSeparator.setVisibility(View.VISIBLE);
             total_tipslabel.setVisibility(View.VISIBLE);
             tipout_tipees_label.setVisibility(View.VISIBLE);
@@ -1816,6 +1819,12 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             new_count_textview.setVisibility(View.VISIBLE);
         }
 
+        if (getting_tournament==0)
+        {
+            checkBoxEndofPayPeriod.setVisibility(View.GONE);
+        }else{
+            checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
+        }
         editText_startShift.setHint("Start Shift");
         edittext_clockIn.setVisibility(View.VISIBLE);
         editText_endShift.setVisibility(View.VISIBLE);
@@ -1836,8 +1845,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         tipee_layout.setVisibility(View.VISIBLE);
         label_total_earnings.setText("Total Earnings: ");
         total_earnings.setVisibility(View.VISIBLE);
-
-
     }
 
 
