@@ -12,7 +12,7 @@
     <string name="menu_day_off">Day Off</string>
     <string name="title_add_day">Add Day</string>
     <string name="label_add_profile">Add Profile</string>
-    <string name="add_tipee_title">Add Tipee Info</string>
+    <string name="add_tipee_title">Add Tippee Info</string>
     <string name="tipee_title">Tipee</string>
     <!-- Strings related to Settings -->
     <string name="api_key">AIzaSyDH6Oyg2S100M4Hu8jZ6lFb_QzBWMzjRKA</string>
@@ -134,4 +134,6 @@
         <item>@color/black</item>
 
     </array>
+
+    <string name="no_data_text">No Data found \n You may add Tippees under Settings from top menu \n then Start adding profiles \n and Add your days using the bottom button.</string>
 </resources>

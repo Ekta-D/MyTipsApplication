@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.mytips.ActiveProfiles;
 import com.mytips.Model.AddDay;
+import com.mytips.Model.CountList;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
 import com.mytips.SettingsActivity;
@@ -365,7 +366,7 @@ public class DatabaseOperations {
         projections[23] = DatabaseUtils.TipeeDollarChecked;
         projections[24] = DatabaseUtils.ManualTips;
         projections[25] = DatabaseUtils.SelectedProfileColor;
-        projections[26]=DatabaseUtils.isEndDay;
+        projections[26] = DatabaseUtils.isEndDay;
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, projections,
                     null, null, null);
@@ -423,7 +424,7 @@ public class DatabaseOperations {
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
                                  String wages_hourly, String earns, int getting_tips, int getting_tournaments, String start_day_week
             , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar,
-                                 int profile_color,int end_day) {
+                                 int profile_color, int end_day) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
         contentValues.put(DatabaseUtils.CalculatedHours, auto_calculatedhour);
@@ -531,9 +532,9 @@ public class DatabaseOperations {
         Cursor cursor = null;
         String query = "";
         if (profile.equalsIgnoreCase("All")) {
-            query = "select * from  add_table  ";
+            query = "select * from  add_table  Order By start_shift_long";
         } else {
-            query = "select * from  add_table where  profile=  '" + profile + "'";
+            query = "select * from  add_table where  profile=  '" + profile + "'  Order By start_shift_long";
         }
 
         try {
@@ -649,11 +650,12 @@ public class DatabaseOperations {
         return fetched_data;
     }
 
-    public ArrayList<String> tournamentCountPerDay(long reset_from, long reset_to, String profile) {
+    public ArrayList<CountList> tournamentCountPerDay(long reset_from, long reset_to, String profile) {
 
-        ArrayList<String> counts = new ArrayList<>();
+        ArrayList<CountList> counts = new ArrayList<>();
         String string = "";
         Cursor cursor = null;
+        CountList countList;
         String query = "select * from  add_table where start_shift_long >= '" + reset_from + "' AND   start_shift_long<='" + reset_to + "'   AND  profile= '" + profile + "' ";
         try {
             cursor = db.rawQuery(query, null);
@@ -668,8 +670,17 @@ public class DatabaseOperations {
 
                 if (cursor.moveToFirst()) {
                     do {
+                     /*   string = cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount));
+                        counts.add(string);*/
+                        countList = new CountList();
                         string = cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount));
-                        counts.add(string);
+                        if (string.equalsIgnoreCase("")) {
+                            string = "0";
+                        }
+                        int id = cursor.getInt(cursor.getColumnIndex("id"));
+                        countList.setCount(string);
+                        countList.setId(id);
+                        counts.add(countList);
                     } while (cursor.moveToNext());
                 }
 
@@ -680,10 +691,11 @@ public class DatabaseOperations {
 
     }
 
-    public ArrayList<String> dailyCounts(String date, String profile) {
-        ArrayList<String> counts = new ArrayList<>();
+    public ArrayList<CountList> dailyCounts(String date, String profile) {
+        ArrayList<CountList> counts = new ArrayList<>();
         Cursor cursor = null;
         String string = "";
+        CountList countList;
         String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile= '" + profile + "' ";
         try {
             cursor = db.rawQuery(query, null);
@@ -698,11 +710,16 @@ public class DatabaseOperations {
 
                 if (cursor.moveToFirst()) {
                     do {
+                        countList = new CountList();
                         string = cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount));
                         if (string.equalsIgnoreCase("")) {
                             string = "0";
                         }
-                        counts.add(string);
+                        int id = cursor.getInt(cursor.getColumnIndex("id"));
+                        countList.setCount(string);
+                        countList.setId(id);
+                        counts.add(countList);
+                        //  counts.add(string);
                     } while (cursor.moveToNext());
                 }
 
@@ -823,6 +840,47 @@ public class DatabaseOperations {
         }
 
         return deactivated_profiles;
+    }
+
+    public ArrayList<CountList> tournamentCountTillToday(long reset_to, String profile) {
+
+        ArrayList<CountList> counts = new ArrayList<>();
+        String string = "";
+        Cursor cursor = null;
+        CountList countList;
+        String query = "select * from  add_table where  start_shift_long<='" + reset_to + "'   AND  profile= '" + profile + "' ";
+        try {
+            cursor = db.rawQuery(query, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int cursor_count = 0;
+
+        if (cursor != null) {
+            cursor_count = cursor.getCount();
+            if (cursor_count != 0) {
+
+                if (cursor.moveToFirst()) {
+                    do {
+                     /*   string = cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount));
+                        counts.add(string);*/
+                        countList = new CountList();
+                        string = cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount));
+                        if (string.equalsIgnoreCase("")) {
+                            string = "0";
+                        }
+                        int id = cursor.getInt(cursor.getColumnIndex("id"));
+                        countList.setCount(string);
+                        countList.setId(id);
+                        counts.add(countList);
+                    } while (cursor.moveToNext());
+                }
+
+            }
+        }
+
+        return counts;
+
     }
 
 }

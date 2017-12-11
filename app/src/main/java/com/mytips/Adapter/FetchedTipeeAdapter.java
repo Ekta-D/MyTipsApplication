@@ -31,14 +31,16 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
     List<String> selected_tipeesIds;
     boolean fromAddDay;
     TipeeChecked tipeeChecked;
+    List<String> add_day_checked;
 
     public FetchedTipeeAdapter(Context context, List<String> selected_tipeesIds, ArrayList<TipeeInfo> tipeeInfoArrayList,
-                               boolean fromAddDay, TipeeChecked tipeeChecked) {
+                               boolean fromAddDay, TipeeChecked tipeeChecked, List<String> add_day_checked) {
         super(context, 0);
 
         this.tipeeChecked = tipeeChecked;
         this.fromAddDay = fromAddDay;
         this.context = context;
+        this.add_day_checked = add_day_checked;
         this.tipeeInfoArrayList = tipeeInfoArrayList;
         this.checkedItems = new SparseBooleanArray(tipeeInfoArrayList.size());
         this.selected_tipeesIds = selected_tipeesIds;
@@ -95,7 +97,7 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
         viewHolder.checkBox.setTag(position);
 
         if (fromAddDay) {
-            viewHolder.checkBox.setChecked(checkedItems.get(position, false));
+           /* viewHolder.checkBox.setChecked(checkedItems.get(position, false));
             viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -105,7 +107,39 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
                         tipeeChecked.OnTipeeChange(false, tipeeInfo, position);
                     }
                 }
-            });
+            });*/
+
+            if (add_day_checked.contains(tipeeInfo.getId())) {
+                viewHolder.checkBox.setChecked(checkedItems.get(position, true));
+                viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                        if (!isChecked) {
+                            checkedItems.put(position, false);
+                            tipeeChecked.OnTipeeChange(false, tipeeInfo, position);
+                        } else {
+                            checkedItems.put(position, true);
+                            tipeeChecked.OnTipeeChange(true, tipeeInfo, position);
+                        }
+                    }
+                });
+            } else {
+                viewHolder.checkBox.setChecked(checkedItems.get(position, false));
+                viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if (!isChecked) {
+                            checkedItems.put(position, false);
+                            tipeeChecked.OnTipeeChange(false, tipeeInfo, position);
+                        } else {
+                            checkedItems.put(position, true);
+                            tipeeChecked.OnTipeeChange(true, tipeeInfo, position);
+                        }
+                    }
+                });
+            }
+
 
         } else {
             if (selected_tipeesIds.contains(tipeeInfo.getId())) {
@@ -130,10 +164,10 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         if (!isChecked) {
                             checkedItems.put(position, false);
-                            tipeeChecked.OnTipeeChange(false, tipeeInfo,position);
+                            tipeeChecked.OnTipeeChange(false, tipeeInfo, position);
                         } else {
                             checkedItems.put(position, true);
-                            tipeeChecked.OnTipeeChange(true, tipeeInfo,position);
+                            tipeeChecked.OnTipeeChange(true, tipeeInfo, position);
                         }
                     }
                 });

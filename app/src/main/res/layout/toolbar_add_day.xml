@@ -4,8 +4,8 @@
     android:id="@+id/toolbar"
     android:layout_width="match_parent"
     android:layout_height="55dp"
-    android:maxHeight="?actionBarSize"
     android:background="@color/colorPrimary"
+    android:maxHeight="?actionBarSize"
     android:minHeight="?attr/actionBarSize"
     local:popupTheme="@style/ThemeOverlay.AppCompat.Light"
     local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
@@ -18,11 +18,11 @@
             android:id="@+id/close_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="15dp"
-            android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:padding="10dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/ic_close" />
+            android:src="@drawable/arrow_left" />
 
 
         <TextView
@@ -35,7 +35,7 @@
             android:text="Add Day"
             android:textColor="#fff"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/save_add_day"
@@ -43,22 +43,22 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:text="SAVE"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:textSize="14sp"
-            android:textColor="#fff" />
-
-<!--        <TextView
-            android:id="@+id/dayoff_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="16dp"
-            android:layout_toLeftOf="@+id/save_add_day"
-            android:text="Day off"
+            android:text="SAVE"
             android:textColor="#fff"
-            android:textSize="17dp" />-->
+            android:textSize="14sp" />
+
+        <!--        <TextView
+                    android:id="@+id/dayoff_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_toLeftOf="@+id/save_add_day"
+                    android:text="Day off"
+                    android:textColor="#fff"
+                    android:textSize="17dp" />-->
 
         <CheckBox
             android:id="@+id/checkbox_dayoff"
@@ -68,9 +68,8 @@
             android:layout_toLeftOf="@+id/save_add_day"
             android:buttonTint="#fff"
             android:text="DAY OFF"
-            android:textSize="14sp"
             android:textColor="@android:color/white"
-       />
+            android:textSize="14sp" />
     </RelativeLayout>
 </android.support.v7.widget.Toolbar>
 

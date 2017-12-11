@@ -375,45 +375,12 @@ public class AddProfileActivity extends AppCompatActivity {
                                         joinedString.append(selected_tipeesID.get(i));
                                         joinedString.append(",");
                                     }
-                                    /*if(joinedString.length()>0){
-                                        joinedStringToString = joinedString.toString();
-                                        for(int i = 0; i<unselectedTipees.size(); i++){
 
-                                            if(convertStringToArray(joinedString.toString()).contains(unselectedTipees.get(i))){
-                                                joinedStringToString = joinedStringToString.replace(unselectedTipees.get(i), " ");
-                                            }
-                                        }
-                                    }*/
                                 }
 
-
-
-
-                                /*for (int j = 0; j < temp_arraylist.size(); j++) {
-                                    int pos = temp_arraylist.get(j);
-                                    selected_tipeesID.add(tipeeInfos.get(pos).getId());
-                                }*/
                             }
                         }
 
-                       /* if (adapter != null) {
-                            if (adapter.checkedItems == null) {
-
-                            } else if (adapter.checkedItems != null && adapter.checkedItems.size() > 0) {
-
-                                for (int i = 0; i < adapter.checkedItems.size(); i++) {
-//                            if (adapter.checkedItems.get(i, false) == true) {
-                                    if (adapter.checkedItems.get(i) == true) {
-                                        joinedString.append(tipeeInfos.get(i).getId());
-                                        joinedString.append(",");
-                                    } else {
-                                        tipeeInfos.remove(i);
-                                    }
-                                }
-                                Log.i("update_joinedString", joinedString.toString());
-                            }
-
-                        }*/
 
 
                         try {
@@ -511,7 +478,7 @@ public class AddProfileActivity extends AppCompatActivity {
                 public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo, int position) {
                     temp_arraylist.put(tipeeInfo.getId(), isChecked);
                 }
-            });
+            },null);
             listView_fetched_tipees.setAdapter(adapter);
         } else {
             no_data.setVisibility(View.VISIBLE);
@@ -578,7 +545,7 @@ public class AddProfileActivity extends AppCompatActivity {
                         temp_arraylist.put(tipeeInfo.getId(), isChecked);
 
                     }
-                });
+                },null);
 
                 listView_fetched_tipees.setAdapter(adapter);
 
