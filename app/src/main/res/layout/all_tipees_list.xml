@@ -20,9 +20,22 @@
         android:id="@+id/checkBox_fetch_tipee"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:checked="false"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
+        android:checked="false" />
+
+    <TextView
+        android:id="@+id/deleted_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:checked="false"
+        android:text="deleted"
+        android:textSize="18dp"
+        android:textStyle="italic" />
 </RelativeLayout>

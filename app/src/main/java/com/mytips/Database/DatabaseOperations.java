@@ -151,6 +151,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.TipeeID, tipee_id);
         contentValues.put(DatabaseUtils.TipeeName, tipee_name);
         contentValues.put(DatabaseUtils.TipeeOut, tipee_out);
+        contentValues.put(DatabaseUtils.IsDeleted, 0);
 
         try {
             db.insert(DatabaseUtils.TIPEE_TABLE, null, contentValues);
@@ -172,7 +173,10 @@ public class DatabaseOperations {
 
     public void deleteTipee(String tipee_id) {
         try {
-            db.delete(DatabaseUtils.TIPEE_TABLE, DatabaseUtils.TipeeID + "=?", new String[]{tipee_id});
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(DatabaseUtils.IsDeleted, 1);
+            db.update(DatabaseUtils.TIPEE_TABLE, contentValues, DatabaseUtils.TipeeID + "=?", new String[]{tipee_id});
+            // db.delete(DatabaseUtils.TIPEE_TABLE, DatabaseUtils.TipeeID + "=?", new String[]{tipee_id});
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -182,13 +186,15 @@ public class DatabaseOperations {
         ArrayList<TipeeInfo> tippess_infolist;
         tippess_infolist = new ArrayList<>();
         Cursor cursor = null;
-        String[] projections = new String[3];
+        String[] projections = new String[4];
         projections[0] = DatabaseUtils.TipeeID;
         projections[1] = DatabaseUtils.TipeeName;
         projections[2] = DatabaseUtils.TipeeOut;
+        projections[3]=DatabaseUtils.IsDeleted;
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.TIPEE_TABLE, projections,
                     null, null, null);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -202,7 +208,12 @@ public class DatabaseOperations {
                         tipeeInfo.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeID)));
                         tipeeInfo.setName(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeName)));
                         tipeeInfo.setPercentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipeeOut)));
-
+                        int del = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDeleted));
+                        boolean deleted = false;
+                        if (del == 1) {
+                            deleted = true;
+                        }
+                        tipeeInfo.setIs_deleted(deleted);
                         tippess_infolist.add(tipeeInfo);
                     } while (cursor.moveToNext());
                 }

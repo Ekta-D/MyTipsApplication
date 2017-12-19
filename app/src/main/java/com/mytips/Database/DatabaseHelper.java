@@ -42,6 +42,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(DatabaseUtils.CREATE_TABLE + DatabaseUtils.TIPEE_TABLE + " (id INTEGER PRIMARY KEY AUTOINCREMENT,  " +
                 DatabaseUtils.TipeeID + " INTEGER,  "
                 + DatabaseUtils.TipeeName + " TEXT, "
+                + DatabaseUtils.IsDeleted + " INTEGER,  "
                 + DatabaseUtils.TipeeOut + " TEXT );");
 
 

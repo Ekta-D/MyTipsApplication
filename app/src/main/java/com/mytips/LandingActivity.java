@@ -3,22 +3,16 @@ package com.mytips;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -38,7 +32,6 @@ import android.view.ViewAnimationUtils;
 import android.view.Window;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -53,7 +46,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
@@ -67,30 +59,22 @@ import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
-import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataChangeSet;
-import com.google.android.gms.drive.OpenFileActivityBuilder;
-import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.Query;
-import com.google.android.gms.drive.query.SearchableField;
-import com.google.api.client.json.gson.GsonFactory;
 import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfPTableEvent;
 import com.itextpdf.text.pdf.PdfPageEventHelper;
 import com.itextpdf.text.pdf.PdfWriter;
-import com.itextpdf.text.pdf.codec.Base64;
 import com.mytips.Adapter.SpinnerProfile;
 import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Database.DatabaseOperations;
@@ -103,10 +87,7 @@ import com.mytips.Utils.Constants;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.text.DateFormat;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -162,7 +143,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     private boolean mResolvingError = false;
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
     boolean is_first = false;
-
+    String pdfDates = "";
+    String totalEarningPdf = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -409,6 +391,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         //Connect the client. Once connected, the camera is launched.
         mGoogleApiClient.connect();*/
 
+        default_date_format = sharedPreferences.getInt("selected_date", 2);
 
         profiles = new DatabaseOperations(LandingActivity.this).fetchAllProfile(LandingActivity.this);
 
@@ -538,6 +521,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 String string1 = sharedPreferences.getString(Constants.EditTextStart, "");
                 String string2 = sharedPreferences.getString(Constants.EditTextEnd, "");
+                final String longstart = sharedPreferences.getString(Constants.StartLong, "");
+                final String longend = sharedPreferences.getString(Constants.EndLong, "");
+                if (!longstart.equalsIgnoreCase("") && !longend.equalsIgnoreCase("")) {
+                    Date date = new Date(Long.parseLong(longstart));
+
+                    string1 = new SimpleDateFormat(date_format).format(date);
+                    string2 = new SimpleDateFormat(date_format).format(new Date(Long.parseLong(longend)));
+
+
+                }
+
+
                 editText1.setText(string1);
                 editText2.setText(string2);
                 editText1.setOnClickListener(new View.OnClickListener() {
@@ -557,12 +552,34 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        data = new ArrayList<AddDay>();
 
-                        data = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
+
+                        if (addDayArrayList.size() > 0) {
+                            addDayArrayList.clear();
+                        }
+                        addDayArrayList = new ArrayList<>();
+
+                        addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
                                 getTimeInMillis(), selected_profileName);
 
-                        setAdapter(data);
+                        String dateFormat0 = "", dateFormatLast = "";
+                        String reset0 = "", resetLast = "";
+                        if (!longstart.equalsIgnoreCase("") && !longend.equalsIgnoreCase("")) {
+                            dateFormat0 = getDateFormatForPdf(date_format, Long.parseLong(longstart));
+                            dateFormatLast = getDateFormatForPdf(date_format, Long.parseLong(longend));
+
+
+                            reset0 = new SimpleDateFormat(dateFormat0).format(new Date(Long.parseLong(longstart)));
+                            resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(Long.parseLong(longend)));
+
+
+                            pdfDates = reset0 + " " + "-" + " " + resetLast;
+                        }
+
+
+                        filter_search = true;
+                        setAdapter(addDayArrayList);
+                        updateBottom(addDayArrayList);
                         adapter.notifyDataSetChanged();
 
                         dialog1.dismiss();
@@ -576,6 +593,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                         editor.remove(Constants.EditTextStart).commit();
                         editor.remove(Constants.EditTextEnd).commit();
+                        editor.remove(Constants.StartLong).commit();
+                        editor.remove(Constants.EndLong).commit();
 
                         editText1.setText("");
                         editText2.setText("");
@@ -704,7 +723,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
                 if (addDayArrayList.size() > 0) {
-                    Thread run = new Thread(thread);
+                    Thread run = new Thread(PdfThread);
                     run.start();
                 } else {
                     Toast.makeText(LandingActivity.this, "No Data found", Toast.LENGTH_SHORT).show();
@@ -792,6 +811,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 hrs = hrs + t;
             }
         }
+        totalEarningPdf = String.valueOf(String.format("%.2f", totalEarnings));
+
         textView_total_earnings.setText("$" + String.valueOf(String.format("%.2f", totalEarnings)));
         textView_summaryTips.setText("Live Tips:$" + String.valueOf(String.format("%.2f", total_livetips)) + ", ");
         textView_summery_tds.setText("Tournament Downs:$" + String.valueOf(String.format("%.2f", tournament_totalTD)) + ", ");
@@ -831,9 +852,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (default_date_format == 2) {
             date_format = "MM/dd/yyyy";
         } else if (default_date_format == 1) {
-            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+            date_format = "E, MMM d yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
         } else {
-            date_format = "MMM dd,yyyy";
+            date_format = "MMM d,yyyy";
         }
         if (spinner_selected.equalsIgnoreCase("Daily")) {
 
@@ -842,6 +863,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             String currentDate = (cal.get(Calendar.MONTH) + 1) + "/"
                     + cal.get(Calendar.DAY_OF_MONTH) + "/"
                     + cal.get(Calendar.YEAR);
+
+
+            pdfDates = new SimpleDateFormat(date_format).format(new Date(currentDate));
 
             //String current_date = String.valueOf(cal.getTimeInMillis());
             addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(selected_profileName);
@@ -877,26 +901,30 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
             long reset_next_week = 0;
             long reset_current = 0;
+            String reset0 = "", reset6 = "";
             if (dates.size() > 0) {
 
                 reset_current = dates.get(0);
+
                 reset_next_week = dates.get(6);
+
+
+                String dateFormat0 = "", dateFormatLast = "";
+
+                dateFormat0 = getDateFormatForPdf(date_format, reset_current);
+                dateFormatLast = getDateFormatForPdf(date_format, reset_next_week);
+
+
+                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(reset_current));
+                reset6 = new SimpleDateFormat(dateFormatLast).format(new Date(reset_next_week));
+
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
 
+                pdfDates = reset0 + " " + "-" + " " + reset6;
                 setAdapter(addDayArrayList);
                 updateBottom(addDayArrayList);
             }
 
-//            if (string_dates.size() > 0) {
-//                for (int i = 0; i < string_dates.size(); i++) {
-//                    String j = string_dates.get(i);
-//                    ArrayList<AddDay> list = new ArrayList<>();
-//                    list = new DatabaseOperations(LandingActivity.this).fetchDailyData(j, selected_profileName);
-//                    addDayArrayList.addAll(list);
-//                }
-//                setAdapter(addDayArrayList);
-//                updateBottom(addDayArrayList);
-//            }
 
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
             Calendar calendar1 = Calendar.getInstance();
@@ -961,10 +989,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 Date d2 = end_day_monthly.getTime();
                 long end_l = d2.getTime();
 
-                //counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(start_l, end_l, selected_profile);
 
-         /*       reset_current = dates.get(0);
-                reset_next_week = dates.get(14);*/
+                String dateFormat0 = "", dateFormatLast = "";
+
+                dateFormat0 = getDateFormatForPdf(date_format, start_l);
+                dateFormatLast = getDateFormatForPdf(date_format, end_l);
+
+                String reset0 = "", resetLast = "";
+                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(start_l));
+                resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(end_l));
+
+                pdfDates = reset0 + " " + "-" + " " + resetLast;
+
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
 
                 setAdapter(addDayArrayList);
@@ -988,6 +1024,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 long end_l = d2.getTime();
 
 
+                String dateFormat0 = "", dateFormatLast = "";
+
+                dateFormat0 = getDateFormatForPdf(date_format, start_l);
+                dateFormatLast = getDateFormatForPdf(date_format, end_l);
+
+
+                String reset0 = "", resetLast = "";
+                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(start_l));
+                resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(end_l));
+
+                pdfDates = reset0 + " " + "-" + " " + resetLast;
+
+
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
 
                 setAdapter(addDayArrayList);
@@ -1008,6 +1057,21 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 Date d2 = end_day_monthly.getTime();
                 long end_l = d2.getTime();
+
+
+                String dateFormat0 = "", dateFormatLast = "";
+
+                dateFormat0 = getDateFormatForPdf(date_format, start_l);
+                dateFormatLast = getDateFormatForPdf(date_format, end_l);
+
+
+                String reset0 = "", resetLast = "";
+                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(start_l));
+                resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(end_l));
+
+                pdfDates = reset0 + " " + "-" + " " + resetLast;
+
+
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
 
                 setAdapter(addDayArrayList);
@@ -1028,6 +1092,20 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 Date d2 = end_day_monthly.getTime();
                 long end_l = d2.getTime();
+
+
+                String dateFormat0 = "", dateFormatLast = "";
+
+                dateFormat0 = getDateFormatForPdf(date_format, start_l);
+                dateFormatLast = getDateFormatForPdf(date_format, end_l);
+
+
+                String reset0 = "", resetLast = "";
+                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(start_l));
+                resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(end_l));
+
+                pdfDates = reset0 + " " + "-" + " " + resetLast;
+
 
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
 
@@ -1085,6 +1163,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             Date end_date = end_calendar.getTime();
             long end_date_long = end_date.getTime();
 
+            String reset0 = "", resetLast = "";
+            reset0 = new SimpleDateFormat("MMMM d'st'").format(new Date(start_date_long));
+            resetLast = new SimpleDateFormat("d'st' yyyy").format(new Date(end_date_long));
+
+            pdfDates = reset0 + " " + "-" + " " + resetLast;
+
 
             addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
             setAdapter(addDayArrayList);
@@ -1094,6 +1178,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             Calendar cal = Calendar.getInstance();
             int year = cal.get(Calendar.YEAR);
             String years = String.valueOf(year);
+
 
             addDayArrayList = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName);
             setAdapter(addDayArrayList);
@@ -1134,9 +1219,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (format_index == 2) {
             date_format = "MM/dd/yyyy";
         } else if (format_index == 1) {
-            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+            date_format = "E, MMM d yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
         } else {
-            date_format = "MMM dd,yyyy";
+            date_format = "MMM d,yyyy";
         }
 
         // Getting date from Calendar View
@@ -1215,6 +1300,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 if (viewId == R.id.editText_01) {
                     start_date = selectedDate;
                     editText.setText(selectedDate);
+
+                    editor.putString(Constants.StartLong, String.valueOf(startcalendar.getTimeInMillis()));
+
                     editor.putString(Constants.EditTextStart, selectedDate);
                     editor.commit();
                 } else if (viewId == R.id.editText_02) {
@@ -1222,6 +1310,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     end_date = date1;
 //                        end_date = date;
                     editText.setText(date);
+                    editor.putString(Constants.EndLong, String.valueOf(endcalendar.getTimeInMillis()));
                     editor.putString(Constants.EditTextEnd, date);
                     editor.commit();
                 }
@@ -1258,6 +1347,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     date = new SimpleDateFormat(date_format)
                             .format(dates);
 
+                    editor.putString(Constants.StartLong, String.valueOf(startcalendar.getTimeInMillis()));
                     editor.putString(Constants.EditTextStart, selectedDate);
                     editor.commit();
                     editText.setText(date);
@@ -1315,6 +1405,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             } catch (IllegalArgumentException ex) {
                                 ex.printStackTrace();
                             }
+                            editor.putString(Constants.StartLong, String.valueOf(startcalendar.getTimeInMillis()));
                             editor.putString(Constants.EditTextStart, date);
                             editor.commit();
                             editText.setText(date);
@@ -1328,6 +1419,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             } catch (IllegalArgumentException ex) {
                                 ex.printStackTrace();
                             }
+                            editor.putString(Constants.EndLong, String.valueOf(endcalendar.getTimeInMillis()));
                             editor.putString(Constants.EditTextEnd, date);
                             editor.commit();
 
@@ -1366,17 +1458,17 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     PdfWriter docWriter;
     String file_name;
-    Runnable thread = new Runnable() {
+    Runnable PdfThread = new Runnable() {
         @Override
         public void run() {
 
-            HeaderTable event = new HeaderTable();
+            HeaderFooterTable event = new HeaderFooterTable();
 
 
             Document document = null;
 
 
-            document = new Document(PageSize.A4, 36, 36, 36, 36);
+            document = new Document(PageSize.A4, 36, 36, 160, 120);
 
             String root = Environment.getExternalStorageDirectory()
                     .toString();
@@ -1399,7 +1491,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             try {
                 docWriter = PdfWriter.getInstance(document, new FileOutputStream(file));
-                // docWriter.setPageEvent(event);
+                try {
+                    docWriter.setPageEvent(event);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 document.open();
 
                 Font blackfont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD, BaseColor.BLACK);
@@ -1500,10 +1597,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
                             cell.setPaddingTop(3);
-                            cell.setFixedHeight(20f);
+                            cell.setFixedHeight(40f);
                             cell.setNoWrap(false);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             cell.setPaddingBottom(3);
 
@@ -1514,10 +1611,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
                             cell.setNoWrap(false);
-                            cell.setFixedHeight(20f);
+                            cell.setFixedHeight(40f);
 
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
@@ -1525,10 +1622,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getCalculated_hours(), font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            cell.setFixedHeight(20f);
+                            cell.setFixedHeight(40f);
                             cell.setNoWrap(false);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
@@ -1542,9 +1639,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingBottom(3);
                             cell.disableBorderSide(2);
                             cell.setNoWrap(false);
-                            cell.setFixedHeight(20f);
+                            cell.setFixedHeight(40f);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
 
                             tasktable.addCell(cell);
@@ -1561,7 +1658,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setNoWrap(false);
                             cell.setFixedHeight(20f);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
 
                             tasktable.addCell(cell);
@@ -1575,9 +1672,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell = new PdfPCell(new Phrase(tip_out, font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            cell.setFixedHeight(20f);
+                            cell.setFixedHeight(40f);
                             cell.setNoWrap(false);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
@@ -1593,9 +1691,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingBottom(3);
                             cell.setNoWrap(false);
 
-                            cell.setFixedHeight(20f);
+                            cell.setFixedHeight(40f);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
@@ -1611,6 +1709,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setNoWrap(false);
                             cell.setFixedHeight(20f);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
@@ -1640,7 +1739,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
 
 
-            sendEmail();
+          //  sendEmail();
 
         }
 
@@ -1706,24 +1805,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
         Log.i("drive", "connected failed");
-//        Log.i(TAG, "GoogleApiClient connection failed: " + connectionResult.toString());
-//
-//        if (mResolvingError) { // If already in resolution state, just return.
-//            return;
-//        } else if (connectionResult.hasResolution()) { // Error can be resolved by starting an intent with user interaction
-//            mResolvingError = true;
-//            try {
-//                connectionResult.startResolutionForResult(this, DIALOG_ERROR_CODE);
-//            } catch (IntentSender.SendIntentException e) {
-//                e.printStackTrace();
-//            }
-//        } else { // Error cannot be resolved. Display Error Dialog stating the reason if possible.
-//            ErrorDialogFragment fragment = new ErrorDialogFragment();
-//            Bundle args = new Bundle();
-//            args.putInt("error", connectionResult.getErrorCode());
-//            fragment.setArguments(args);
-//            fragment.show(getFragmentManager(), "errordialog");
-//        }
 
         if (connectionResult.hasResolution()) {
             try {
@@ -1739,11 +1820,84 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    private class HeaderTable extends PdfPageEventHelper {
-        private HeaderTable() {
+    private class HeaderFooterTable extends PdfPageEventHelper {
+        private HeaderFooterTable() {
 
         }
 
+        @Override
+        public void onStartPage(PdfWriter writer, Document document) {
+            super.onStartPage(writer, document);
+
+            try {
+
+
+                Font redFont = FontFactory.getFont(FontFactory.HELVETICA, 25, Font.BOLD, BaseColor.RED);
+
+                PdfPTable summaryType = new PdfPTable(1);
+
+                summaryType.setTotalWidth(500f);
+                summaryType.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+                PdfPCell summaryCell = new PdfPCell();
+                if (filter_search) {
+                    summaryCell = new PdfPCell(new Phrase("Custom Summary", redFont));
+                    filter_search = false;
+                } else {
+                    summaryCell = new PdfPCell(new Phrase(selected_summary_type, redFont));
+                }
+
+                summaryCell.setFixedHeight(40f);
+                summaryCell.setBorder(Rectangle.NO_BORDER);
+                summaryCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                summaryType.addCell(summaryCell);
+                summaryType.writeSelectedRows(0, -1, 36, 800, writer.getDirectContent());
+
+
+                PdfPTable payPeriodTable = new PdfPTable(1);
+
+                payPeriodTable.setTotalWidth(500f);
+                payPeriodTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+
+
+                PdfPCell payCell = new PdfPCell(new Phrase(pdfDates, redFont));
+                payCell.setFixedHeight(40f);
+                payCell.setBorder(Rectangle.NO_BORDER);
+                payCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                payPeriodTable.addCell(payCell);
+                payPeriodTable.writeSelectedRows(0, -1, 36, 750, writer.getDirectContent());
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        @Override
+        public void onEndPage(PdfWriter writer, Document document) {
+            super.onEndPage(writer, document);
+
+            Font redFont = FontFactory.getFont(FontFactory.HELVETICA, 20, Font.BOLD, BaseColor.RED);
+            PdfPTable payPeriodTable = new PdfPTable(1);
+
+            payPeriodTable.setTotalWidth(500f);
+            payPeriodTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
+
+
+            PdfPCell payCell = new PdfPCell(new Phrase("Totals: $" + totalEarningPdf, redFont));
+            payCell.setFixedHeight(40f);
+            payCell.setPaddingLeft(20f);
+            payCell.setBorder(Rectangle.NO_BORDER);
+
+            payCell.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+            payPeriodTable.addCell(payCell);
+            payPeriodTable.writeSelectedRows(0, -1, 10, 100, writer.getDirectContent());
+
+
+        }
     }
 
     private class BorderEvent implements PdfPTableEvent {
@@ -1811,7 +1965,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     boolean is_completed = false;
-
+    boolean filter_search = false;
 
     void saveToDrive(final DriveFolder pFldr, final String titl,
                      final String mime, final java.io.File file, DriveApi.DriveContentsResult driveContentsResult) {
@@ -1952,6 +2106,54 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 break;
         }
+    }
+
+
+    private String getDayNumberSuffix(int day) {
+        if (day >= 11 && day <= 13) {
+            return "th";
+        }
+        switch (day % 10) {
+            case 1:
+                return "st";
+            case 2:
+                return "nd";
+            case 3:
+                return "rd";
+            default:
+                return "th";
+        }
+    }
+
+    public String getDate(long date) {
+
+        Date d = new Date(date);
+        //  Date d = new SimpleDateFormat(date_format, Locale.ENGLISH).parse(date);
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(d);
+        String dateNum = new SimpleDateFormat("dd").format(cal.getTime());
+
+
+        return dateNum;
+    }
+
+
+    public String getDateFormatForPdf(String dateformat, long resetCurrent) {
+        String dateFormat = "";
+        String dayCurrent = "0";
+
+
+        dayCurrent = getDate(resetCurrent);
+        if (dateformat.equalsIgnoreCase("E, MMM d yyyy")) {
+            dateFormat = "E, MMM d'" + getDayNumberSuffix(Integer.parseInt(dayCurrent)) + "' yyyy";
+        } else if (dateformat.equalsIgnoreCase("MMM d,yyyy")) {
+            dateFormat = "MMM d'" + getDayNumberSuffix(Integer.parseInt(dayCurrent)) + "',yyyy";
+        } else {
+            dateFormat = "MM/dd/yyyy";
+        }
+
+        return dateFormat;
     }
 
 }

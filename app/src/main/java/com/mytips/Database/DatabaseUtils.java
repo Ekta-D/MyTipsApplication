@@ -36,6 +36,7 @@ public class DatabaseUtils {
     public static final String TipeeID = "tipee_id";
     public static final String TipeeName = "tipee_name";
     public static final String TipeeOut = "tip_out";
+    public static final String IsDeleted="is_deleted";
 
 
     //add day fields

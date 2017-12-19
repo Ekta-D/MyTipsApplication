@@ -69,13 +69,18 @@ public class AddTipeeAdapter extends BaseAdapter {
         } else {
             viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewHolder.textView.setText(arrayList.get(position).getName() + " " + arrayList.get(position).getPercentage() + "%");
-        viewHolder.edit_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-            }
-        });
+
+        viewHolder.textView.setText(arrayList.get(position).getName() + " " + arrayList.get(position).getPercentage() + "%");
+        if (arrayList.get(position).isIs_deleted()) {
+            viewHolder.textView.setVisibility(View.GONE);
+            viewHolder.edit_btn.setVisibility(View.GONE);
+            viewHolder.delete_btn.setVisibility(View.GONE);
+        } else {
+            viewHolder.textView.setVisibility(View.VISIBLE);
+            viewHolder.edit_btn.setVisibility(View.VISIBLE);
+            viewHolder.delete_btn.setVisibility(View.VISIBLE);
+        }
 
         viewHolder.edit_btn.setOnClickListener(new View.OnClickListener() {
             @Override

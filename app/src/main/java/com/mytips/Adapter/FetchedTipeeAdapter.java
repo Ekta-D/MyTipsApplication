@@ -1,6 +1,7 @@
 package com.mytips.Adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,7 +71,7 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
     }
 
     static class ViewHolder {
-        TextView textView;
+        TextView textView, deleted;
         CheckBox checkBox;
     }
 
@@ -83,6 +84,7 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
             inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.all_tipees_list, null);
 
+            viewHolder.deleted = (TextView) convertView.findViewById(R.id.deleted_textview);
             viewHolder.textView = (TextView) convertView.findViewById(R.id.fetched_tipee_text);
             viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.checkBox_fetch_tipee);
             convertView.setTag(viewHolder);
@@ -92,6 +94,16 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
 
 
         final TipeeInfo tipeeInfo = tipeeInfoArrayList.get(position);
+
+        if (tipeeInfo.isIs_deleted()) {
+            viewHolder.deleted.setVisibility(View.VISIBLE);
+            viewHolder.textView.setTextColor(context.getResources().getColor(R.color.grey));
+            viewHolder.checkBox.setVisibility(View.GONE);
+        } else {
+            viewHolder.deleted.setVisibility(View.GONE);
+            viewHolder.textView.setTextColor(context.getResources().getColor(R.color.black));
+            viewHolder.checkBox.setVisibility(View.VISIBLE);
+        }
         viewHolder.textView.setText(tipeeInfo.getName() + " " + tipeeInfo.getPercentage() + "%");
 
         viewHolder.checkBox.setTag(position);
