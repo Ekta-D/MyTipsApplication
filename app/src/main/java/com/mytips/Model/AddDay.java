@@ -36,8 +36,29 @@ public class AddDay implements Serializable {
     String total_tournament_downs;
     int getting_tips;
     long start_long;
+    int total_hours;
+    int total_minutes;
 
     int dollar_checked;
+
+
+    public int getTotal_hours() {
+        return total_hours;
+    }
+
+    public void setTotal_hours(int total_hours) {
+        this.total_hours = total_hours;
+    }
+
+    public int getTotal_minutes() {
+        return total_minutes;
+    }
+
+    public void setTotal_minutes(int total_minutes) {
+        this.total_minutes = total_minutes;
+    }
+
+
     public int getIsEndPay() {
         return isEndPay;
     }

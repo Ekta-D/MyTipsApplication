@@ -81,7 +81,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.WagesPerHour + " TEXT, "
                 + DatabaseUtils.TotalEarnings + " TEXT, "
                 + DatabaseUtils.SelectedProfile_ID + " INTEGER, "
-                + DatabaseUtils.ClockOut + " REAL " +
+                + DatabaseUtils.ClockOut + " REAL, " +
+                DatabaseUtils.TotalHr + " REAL, " +
+                DatabaseUtils.TotalMin + " REAL " +
                 //  + DatabaseUtils.ClockOut + " TEXT " +
                 " );");
 

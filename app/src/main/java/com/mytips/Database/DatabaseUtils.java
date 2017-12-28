@@ -36,7 +36,7 @@ public class DatabaseUtils {
     public static final String TipeeID = "tipee_id";
     public static final String TipeeName = "tipee_name";
     public static final String TipeeOut = "tip_out";
-    public static final String IsDeleted="is_deleted";
+    public static final String IsDeleted = "is_deleted";
 
 
     //add day fields
@@ -68,6 +68,9 @@ public class DatabaseUtils {
     public static final String TipeeDollarChecked = "dollar_checked";
     public static final String ManualTips = "manual_tips";
     public static final String SelectedProfileColor = "selected_profile_color";
+    public static final String TotalHr = "total_hours";
+    public static final String TotalMin = "total_mins";
+
 
 
 }

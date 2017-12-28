@@ -190,7 +190,7 @@ public class DatabaseOperations {
         projections[0] = DatabaseUtils.TipeeID;
         projections[1] = DatabaseUtils.TipeeName;
         projections[2] = DatabaseUtils.TipeeOut;
-        projections[3]=DatabaseUtils.IsDeleted;
+        projections[3] = DatabaseUtils.IsDeleted;
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.TIPEE_TABLE, projections,
                     null, null, null);
@@ -308,7 +308,7 @@ public class DatabaseOperations {
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
                                  String wages_hourly, String earns, int getting_tips, int getting_tournaments, String start_day_week
             , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar
-            , int profile_color, int end_day) {
+            , int profile_color, int end_day, int calculatedTotalHr, int calculatedMins) {
 
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
@@ -338,6 +338,8 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.ManualTips, manual_tips_dollar);
         contentValues.put(DatabaseUtils.SelectedProfileColor, profile_color);
         contentValues.put(DatabaseUtils.isEndDay, end_day);
+        contentValues.put(DatabaseUtils.TotalHr, calculatedTotalHr);
+        contentValues.put(DatabaseUtils.TotalMin, calculatedMins);
 
         try {
             db.insert(DatabaseUtils.ADD_DAY_TABLE, null, contentValues);
@@ -350,7 +352,7 @@ public class DatabaseOperations {
         AddDay addDay;
         Cursor cursor = null;
         ArrayList<AddDay> addDayArrayList = new ArrayList<>();
-        String[] projections = new String[27];
+        String[] projections = new String[29];
         projections[0] = DatabaseUtils.Profile;
         projections[1] = DatabaseUtils.CalculatedHours;
         projections[2] = DatabaseUtils.isHolidayPay;
@@ -378,6 +380,8 @@ public class DatabaseOperations {
         projections[24] = DatabaseUtils.ManualTips;
         projections[25] = DatabaseUtils.SelectedProfileColor;
         projections[26] = DatabaseUtils.isEndDay;
+        projections[27] = DatabaseUtils.TotalHr;
+        projections[28] = DatabaseUtils.TotalMin;
         try {
             cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, projections,
                     null, null, null);
@@ -421,6 +425,9 @@ public class DatabaseOperations {
                     addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
                     addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
                     addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
+                    addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
+                    addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
+
                     addDayArrayList.add(addDay);
                 }
                 while (cursor.moveToNext());
@@ -435,7 +442,8 @@ public class DatabaseOperations {
                                  String tournament_count, String tounament_perday, String tournament_total, int isDay_off,
                                  String wages_hourly, String earns, int getting_tips, int getting_tournaments, String start_day_week
             , long start_long, long end_long, int is_dollar_checked, String manual_tips_dollar,
-                                 int profile_color, int end_day) {
+                                 int profile_color, int end_day
+            , int calculatedTotalHr, int calculatedMins) {
         ContentValues contentValues = new ContentValues();
         contentValues.put(DatabaseUtils.Profile, profile_name);
         contentValues.put(DatabaseUtils.CalculatedHours, auto_calculatedhour);
@@ -463,6 +471,9 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.ManualTips, manual_tips_dollar);
         contentValues.put(DatabaseUtils.SelectedProfileColor, profile_color);
         contentValues.put(DatabaseUtils.isEndDay, end_day);
+        contentValues.put(DatabaseUtils.TotalHr, calculatedTotalHr);
+        contentValues.put(DatabaseUtils.TotalMin, calculatedMins);
+
         try {
             int changedRecord = db.update(DatabaseUtils.ADD_DAY_TABLE, contentValues, DatabaseUtils.Add_ID + " =? ", new String[]{String.valueOf(id)});
             System.out.println("updated_add" + changedRecord);
@@ -525,6 +536,9 @@ public class DatabaseOperations {
                         addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
                         addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
                         addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
+                        addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
+                        addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
+
                         fetched_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -590,6 +604,9 @@ public class DatabaseOperations {
                         addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
                         addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
                         addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
+                        addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
+                        addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
+
                         daily_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -652,6 +669,9 @@ public class DatabaseOperations {
                         addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
                         addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
                         addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
+                        addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
+                        addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
+
                         fetched_data.add(addDay);
                     }
                     while (cursor.moveToNext());

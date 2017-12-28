@@ -145,6 +145,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     boolean is_first = false;
     String pdfDates = "";
     String totalEarningPdf = "";
+    String totalDays = "", totalhours = "", totalLibetips = "0", totalTDcount = "0", totalTipOut = "0", totalHourlywage = "0", subTotalEarnings = "0";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1507,6 +1508,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 PdfPTable tasktable = new PdfPTable(taskcolumnWidths);
 
                 tasktable.setWidthPercentage(100);
+
                 tasktable.setExtendLastRow(true);
                 tasktable.setTableEvent(new BorderEvent());
                 tasktable.getDefaultCell().disableBorderSide(2);
@@ -1681,9 +1683,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
                             String wages = addDayArrayList.get(i).getWages_hourly();
+
                             if (wages.equalsIgnoreCase("")) {
                                 wages = "0";
 
+                            } else {
+                                double wageHr = Double.parseDouble(wages);
+                                wages = String.format("%.2f", wageHr);
                             }
 
                             cell = new PdfPCell(new Phrase(wages, font));
@@ -1707,7 +1713,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
                             cell.setNoWrap(false);
-                            cell.setFixedHeight(20f);
+                            cell.setFixedHeight(40f);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
@@ -1720,13 +1726,105 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         e.printStackTrace();
                     }
                 }
+
+                PdfPCell bottomCell = new PdfPCell();
+                float[] bottomcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
+                PdfPTable bottomTable = new PdfPTable(bottomcolumnWidths);
+
+                //  bottomTable.setWidthPercentage(100);
+                bottomTable.setTotalWidth(524f);
+                bottomTable.setExtendLastRow(false);
+                bottomTable.setTableEvent(new BorderEvent());
+                // bottomTable.getDefaultCell().setBorder(Rectangle.BOTTOM | Rectangle.LEFT | Rectangle.RIGHT);
+                bottomTable.getDefaultCell().disableBorderSide(1);
+                bottomTable.getDefaultCell().disableBorderSide(3);
+
+                Font redFont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.NORMAL, BaseColor.RED);
+
+                totalDays = String.valueOf(addDayArrayList.size());
+
+                bottomCell = new PdfPCell(new Phrase(totalDays + "days", redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                bottomCell.setVerticalAlignment(Element.ALIGN_CENTER);
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+
+
+                bottomTable.addCell(bottomCell);
+
+                bottomCell = new PdfPCell(new Phrase("", redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+                bottomTable.addCell(bottomCell);
+
+                String hrs = getTotalCalculatedhr(addDayArrayList);
+                System.out.println("Working hr " + hrs);
+
+                bottomCell = new PdfPCell(new Phrase(hrs, redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+                bottomTable.addCell(bottomCell);
+
+                String liveTip = calculateTotalLiveTips(addDayArrayList);
+
+                bottomCell = new PdfPCell(new Phrase("$" + liveTip, redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+
+                bottomTable.addCell(bottomCell);
+
+
+                String totalTD = calculatedTdCount(addDayArrayList);
+
+                bottomCell = new PdfPCell(new Phrase(totalTD, redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+                bottomTable.addCell(bottomCell);
+
+                String tipsOut = calculatTotatTipOut(addDayArrayList);
+
+
+                bottomCell = new PdfPCell(new Phrase("$" + tipsOut, redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+                bottomTable.addCell(bottomCell);
+
+                String hrWages = calculatedTotalHourlyWages(addDayArrayList);
+
+
+                bottomCell = new PdfPCell(new Phrase("$" + hrWages, redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+                bottomTable.addCell(bottomCell);
+
+                bottomCell = new PdfPCell(new Phrase("$" + totalEarningPdf, redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+                bottomTable.addCell(bottomCell);
+
+                bottomTable.writeSelectedRows(0, -1, 36, 119, docWriter.getDirectContent());
                 try {
                     document.add(tasktable);
-                    document.close();
 
                 } catch (Exception e) {
                     Log.i("pdf1", e.toString());
 
+                }
+
+                try {
+                    //  document.add(bottomTable);
+                    document.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
 
@@ -1739,7 +1837,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
 
 
-          //  sendEmail();
+            //  sendEmail();
 
         }
 
@@ -1894,7 +1992,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             payCell.setHorizontalAlignment(Element.ALIGN_LEFT);
 
             payPeriodTable.addCell(payCell);
-            payPeriodTable.writeSelectedRows(0, -1, 10, 100, writer.getDirectContent());
+            payPeriodTable.writeSelectedRows(0, -1, 10, 60, writer.getDirectContent());
 
 
         }
@@ -2156,4 +2254,92 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         return dateFormat;
     }
 
+    public String getTotalCalculatedhr(ArrayList<AddDay> addDays) {
+        String totalhr = "";
+        int hr = 0, min = 0;
+        for (int i = 0; i < addDays.size(); i++) {
+            int h = addDays.get(i).getTotal_hours();
+            hr = hr + h;
+
+
+            int m = addDays.get(i).getTotal_minutes();
+            min = min + m;
+        }
+
+        long hrToMin = hr * 60;
+        long totalMins = hrToMin + min;
+        double duration = totalMins / 60;
+        int mins = (int) (totalMins % 60);
+
+      /*  if (dur.contains(".")) {
+            dur = dur.replace(".", "hr");
+
+        }*/
+        long hrDuration = Math.round(duration);
+        String dur = String.valueOf(hrDuration);
+        totalhr = dur + "hr" + String.valueOf(mins) + "min";
+        return totalhr;
+
+    }
+
+    public String calculateTotalLiveTips(ArrayList<AddDay> addDays) {
+        String totalLiveTips = "";
+        double totalTips = 0;
+        for (int i = 0; i < addDays.size(); i++) {
+            String str = addDays.get(i).getTotal_tips();
+            totalTips = totalTips + Double.parseDouble(str);
+        }
+        totalLiveTips = String.valueOf(totalTips);
+        return totalLiveTips;
+    }
+
+    public String calculatedTdCount(ArrayList<AddDay> addDays) {
+        String totalTDCount = "";
+        int td = 0;
+        int tds = 0;
+        for (int i = 0; i < addDays.size(); i++) {
+            if (!addDays.get(i).getTounament_count().equalsIgnoreCase("")) {
+                tds = Integer.parseInt(addDays.get(i).getTounament_count());
+            }
+
+            td = td + tds;
+
+        }
+        totalTDCount = String.valueOf(td);
+        return totalTDCount;
+    }
+
+    public String calculatTotatTipOut(ArrayList<AddDay> addDays) {
+        String tip_outs = "";
+        double d = 0;
+        double d0 = 0;
+
+        for (int i = 0; i < addDays.size(); i++) {
+            if (!addDays.get(i).getTip_out().equalsIgnoreCase("")) {
+                d0 = Double.parseDouble(addDays.get(i).getTip_out());
+                d = d + d0;
+            }
+
+            d = d + d0;
+
+        }
+        tip_outs = String.valueOf(d);
+        return tip_outs;
+    }
+
+    public String calculatedTotalHourlyWages(ArrayList<AddDay> addDays) {
+        double d = 0;
+        String total = "";
+        double wage = 0;
+        for (int i = 0; i < addDays.size(); i++) {
+            if (!addDays.get(i).getWages_hourly().equalsIgnoreCase("")) {
+
+            }
+            d = d + Double.parseDouble(addDays.get(i).getWages_hourly());
+
+        }
+        total = String.valueOf(String.format("%.2f", d));
+        return total;
+
+    }
 }

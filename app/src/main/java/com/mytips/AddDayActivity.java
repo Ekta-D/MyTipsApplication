@@ -138,6 +138,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     int tempEndDay = 0;
     HashMap<String, Boolean> temp_arraylist = new HashMap<>();
     List<String> checked;
+    int totalsHours = 0, totalMinutes = 0;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
@@ -1281,6 +1282,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             result = hours + "h" + min + "m";
         }
+        hours = hours.trim();
+        min = min.trim();
+        if (!hours.equalsIgnoreCase("") || !min.equalsIgnoreCase("")) {
+            totalsHours = Integer.parseInt(hours);
+            totalMinutes = Integer.parseInt(min);
+        }
+
 
         return result;
     }
@@ -1347,7 +1355,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
                             total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                             day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTimeInMillis(), calEndDay.getTimeInMillis(),
-                            switch_value, manually_added_tips, selected_profile_color, isEndDay);
+                            switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes);
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -1367,7 +1375,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
                                 total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                                 day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color, isEndDay);
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes);
 
                         isStartDateChanged = false;
                         isEndDateChanged = false;
@@ -1377,14 +1385,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
                                 total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                                 day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color, isEndDay);
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes);
                     } else if (!isStartDateChanged && isEndDateChanged) {
                         new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
                                 d.getTime(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
                                 texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
                                 total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                                 day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color, isEndDay);
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes);
                         isEndDateChanged = false;
                     } else {
                         new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
@@ -1392,7 +1400,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
                                 total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_total.getText().toString().trim(),
                                 day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color, isEndDay);
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes);
                         isStartDateChanged = false;
 
                     }
@@ -1819,10 +1827,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             new_count_textview.setVisibility(View.VISIBLE);
         }
 
-        if (getting_tournament==0)
-        {
+        if (getting_tournament == 0) {
             checkBoxEndofPayPeriod.setVisibility(View.GONE);
-        }else{
+        } else {
             checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
         }
         editText_startShift.setHint("Start Shift");
