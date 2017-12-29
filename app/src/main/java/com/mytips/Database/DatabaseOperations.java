@@ -483,7 +483,7 @@ public class DatabaseOperations {
 
     }
 
-    public ArrayList<AddDay> fetchDataBetweenDates(long resetfrom, long resetTo, String profile) {
+    public ArrayList<AddDay> fetchDataBetweenDates(long resetfrom, long resetTo, String profile, int profileID) {
         ArrayList<AddDay> fetched_data = new ArrayList<>();
 
         AddDay addDay = null;
@@ -492,7 +492,7 @@ public class DatabaseOperations {
         if (profile.equalsIgnoreCase("All")) {
             query = "select * from  add_table where start_shift_long >= '" + resetfrom + "' AND   start_shift_long<='" + resetTo + "'  Order By start_shift_long";
         } else {
-            query = "select * from  add_table where start_shift_long >= '" + resetfrom + "' AND   start_shift_long<='" + resetTo + "' AND  profile= '" + profile + "'  Order By start_shift_long";
+            query = "select * from  add_table where start_shift_long >= '" + resetfrom + "' AND   start_shift_long<='" + resetTo + "' AND  id= '" + profileID + "'  Order By start_shift_long";
         }
 
         try {
@@ -551,7 +551,7 @@ public class DatabaseOperations {
 
     }
 
-    public ArrayList<AddDay> fetchDailyData(String profile) {
+    public ArrayList<AddDay> fetchDailyData(String profile, int profileID) {
         ArrayList<AddDay> daily_data = new ArrayList<>();
         AddDay addDay = null;
         Cursor cursor = null;
@@ -559,7 +559,7 @@ public class DatabaseOperations {
         if (profile.equalsIgnoreCase("All")) {
             query = "select * from  add_table  Order By start_shift_long";
         } else {
-            query = "select * from  add_table where  profile=  '" + profile + "'  Order By start_shift_long";
+            query = "select * from  add_table where  id=  '" + profileID + "'  Order By start_shift_long";
         }
 
         try {
@@ -616,7 +616,8 @@ public class DatabaseOperations {
         return daily_data;
     }
 
-    public ArrayList<AddDay> yearlyData(String year, String profile) {
+    //    public ArrayList<AddDay> yearlyData(String year, String profile)
+    public ArrayList<AddDay> yearlyData(String year, String profile, int profileId) {
         ArrayList<AddDay> fetched_data = new ArrayList<>();
         AddDay addDay = null;
         Cursor cursor = null;
@@ -624,7 +625,7 @@ public class DatabaseOperations {
         if (profile.equalsIgnoreCase("All")) {
             query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%' Order By start_shift_long";
         } else {
-            query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%'  AND  profile= '" + profile + "' Order By start_shift_long";
+            query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%'  AND  id= '" + profileId + "' Order By start_shift_long";
         }
 
         try {
@@ -911,6 +912,106 @@ public class DatabaseOperations {
         }
 
         return counts;
+
+    }
+
+    public ArrayList<AddDay> fetchAddDayForProfile(int profileID) {
+        ArrayList<AddDay> addDays = new ArrayList<>();
+        AddDay addDay = null;
+        Cursor cursor = null;
+        String query = "";
+        query = "select * from  add_table where  profile_id=  '" + profileID + "'  Order By start_shift_long";
+
+        try {
+            cursor = db.rawQuery(query, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int cursor_count = 0;
+
+        if (cursor != null) {
+            cursor_count = cursor.getCount();
+
+            if (cursor_count != 0) {
+                if (cursor.moveToFirst()) {
+                    do {
+
+                        addDay = new AddDay();
+                        addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
+                        addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
+                        addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
+                        addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
+                        addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
+                        addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
+                        addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
+                        addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
+                        addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
+                        addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
+                        addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
+                        addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
+                        addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
+                        addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
+                        addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
+                        addDay.setEnd_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.EndShift)));
+                        addDay.setWages_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.WagesPerHour)));
+                        addDay.setTotal_earnings(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalEarnings)));
+                        addDay.setGetting_tips(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTips)));
+                        addDay.setGettingg_tournamnts(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GettingTournamentDown)));
+                        addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
+                        addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
+                        addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
+                        addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
+                        addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
+                        addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
+                        addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
+                        addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
+                        addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
+
+                        addDays.add(addDay);
+                    }
+                    while (cursor.moveToNext());
+                }
+            }
+        }
+        return addDays;
+    }
+
+
+    public void updateProfileInfoInDays(ArrayList<AddDay> addDays, String profile_name, int profileID, boolean isGettingTournaments,
+                                        boolean isGettingTips) {
+
+        for (int i = 0; i < addDays.size(); i++) {
+            AddDay addDay = addDays.get(i);
+
+            addDay.setProfile(profile_name);
+
+            if (isGettingTournaments) {
+                addDay.setGettingg_tournamnts(1);
+            } else {
+                addDay.setGettingg_tournamnts(0);
+            }
+            if (isGettingTips) {
+                addDay.setGetting_tips(1);
+            } else {
+                addDay.setGetting_tips(0);
+            }
+
+
+            ContentValues contentValues = new ContentValues();
+            contentValues.put(DatabaseUtils.SelectedProfile_ID, profileID);
+            contentValues.put(DatabaseUtils.Profile, addDay.getProfile());
+            contentValues.put(DatabaseUtils.GettingTournamentDown, addDay.getGettingg_tournamnts());
+            contentValues.put(DatabaseUtils.GettingTips, addDay.getGetting_tips());
+
+            try {
+                int changedRecord = db.update(DatabaseUtils.ADD_DAY_TABLE, contentValues, DatabaseUtils.Add_ID + " =? ", new String[]{String.valueOf(addDay.getId())});
+                System.out.println("updated_add" + changedRecord);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+
 
     }
 

@@ -132,6 +132,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     FloatingActionButton floatingActionButton;
 //FloatingActionButton floatingActionButton;
 
+    int profileID;
     long start_shift_long, end_shift_long;
     ArrayList<AddDay> data;
     SharedPreferences.Editor editor;
@@ -145,7 +146,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     boolean is_first = false;
     String pdfDates = "";
     String totalEarningPdf = "";
-    String totalDays = "", totalhours = "", totalLibetips = "0", totalTDcount = "0", totalTipOut = "0", totalHourlywage = "0", subTotalEarnings = "0";
+    String totalDays = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -256,21 +257,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (profiles.size() > 0) {
 
-//                    selected_ProfileID = addDayArrayList.get(position).getId();
-//                    selected_profileName = addDayArrayList.get(position).getProfile();
+
+                    profileID = profiles.get(position).getId();
                     selected_profileName = profiles.get(position).getProfile_name();
                     start_week = profiles.get(position).getStartday();
 
-                    //if (addDayArrayList.size() > 0) {
-                    // start_shift = addDayArrayList.get(position).getStart_shift();
-                    //  no_data.setVisibility(View.GONE);
-                    //updateView(addDayArrayList, selected_profileName);
-                       /* if (reportTypeArray.length > 0) {
-                            selected_summary_type = spinnerReportType.getSelectedItem().;
-                        }*/
-
                     if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
-                        changeData(selected_summary_type, start_week, selected_profileName);
+                        changeData(selected_summary_type, start_week, selected_profileName, profileID);
                     }
 
                     //}
@@ -309,7 +302,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 spinnerReportType.setSelection(position);
                 selected_summary_type = parent.getSelectedItem().toString();
                 if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
-                    changeData(selected_summary_type, start_week, selected_profileName);
+                    changeData(selected_summary_type, start_week, selected_profileName, profileID);
                 }
             }
 
@@ -402,7 +395,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         profiles.add(0, profiles0);
         updateSpinner(profiles);
         if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
-            changeData(selected_summary_type, start_week, selected_profileName);
+            changeData(selected_summary_type, start_week, selected_profileName, profileID);
         }
 
         CommonMethods.setTheme(getSupportActionBar(), LandingActivity.this);
@@ -418,7 +411,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         profiles.add(0, profiles0);
         updateSpinner(profiles);
         if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
-            changeData(selected_summary_type, start_week, selected_profileName);
+            changeData(selected_summary_type, start_week, selected_profileName, profileID);
         }
     }
 
@@ -560,8 +553,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         }
                         addDayArrayList = new ArrayList<>();
 
+                      /*  addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
+                                getTimeInMillis(), selected_profileName);*/
                         addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
-                                getTimeInMillis(), selected_profileName);
+                                getTimeInMillis(), selected_profileName, profileID);
 
                         String dateFormat0 = "", dateFormatLast = "";
                         String reset0 = "", resetLast = "";
@@ -603,8 +598,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             data.clear();
                         }
                         if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
-                            changeData(selected_summary_type, start_week, selected_profileName);
+                            changeData(selected_summary_type, start_week, selected_profileName, profileID);
                         }
+
                         dialog1.dismiss();
                     }
                 });
@@ -848,7 +844,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    public void changeData(String spinner_selected, String start_week, String selected_profileName) {
+    public void changeData(String spinner_selected, String start_week, String selected_profileName, int profileID) {
         String date_format = "";
         if (default_date_format == 2) {
             date_format = "MM/dd/yyyy";
@@ -869,7 +865,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             pdfDates = new SimpleDateFormat(date_format).format(new Date(currentDate));
 
             //String current_date = String.valueOf(cal.getTimeInMillis());
-            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(selected_profileName);
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(selected_profileName, profileID);
+            //addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(selected_profileName);
             setAdapter(addDayArrayList);
             updateBottom(addDayArrayList);
 
@@ -919,8 +916,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 reset0 = new SimpleDateFormat(dateFormat0).format(new Date(reset_current));
                 reset6 = new SimpleDateFormat(dateFormatLast).format(new Date(reset_next_week));
 
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
-
+//                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName, profileID);
                 pdfDates = reset0 + " " + "-" + " " + reset6;
                 setAdapter(addDayArrayList);
                 updateBottom(addDayArrayList);
@@ -1002,8 +999,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 pdfDates = reset0 + " " + "-" + " " + resetLast;
 
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
-
+//                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName, profileID);
                 setAdapter(addDayArrayList);
                 updateBottom(addDayArrayList);
 
@@ -1038,8 +1035,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 pdfDates = reset0 + " " + "-" + " " + resetLast;
 
 
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
-
+                // addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName, profileID);
                 setAdapter(addDayArrayList);
                 updateBottom(addDayArrayList);
 
@@ -1073,8 +1070,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 pdfDates = reset0 + " " + "-" + " " + resetLast;
 
 
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
-
+                //addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName, profileID);
                 setAdapter(addDayArrayList);
                 updateBottom(addDayArrayList);
 
@@ -1108,8 +1105,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 pdfDates = reset0 + " " + "-" + " " + resetLast;
 
 
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
-
+//                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName, profileID);
                 setAdapter(addDayArrayList);
                 updateBottom(addDayArrayList);
 
@@ -1171,7 +1168,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             pdfDates = reset0 + " " + "-" + " " + resetLast;
 
 
-            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
+//            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName, profileID);
             setAdapter(addDayArrayList);
             updateBottom(addDayArrayList);
 
@@ -1181,7 +1179,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             String years = String.valueOf(year);
 
 
-            addDayArrayList = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName);
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName, profileID);
+            //addDayArrayList = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName);
             setAdapter(addDayArrayList);
             updateBottom(addDayArrayList);
         }
@@ -1837,7 +1836,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
 
 
-            //  sendEmail();
+            sendEmail();
 
         }
 

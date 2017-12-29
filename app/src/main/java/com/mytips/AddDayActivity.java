@@ -7,9 +7,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.support.constraint.ConstraintLayout;
-import android.support.constraint.ConstraintSet;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -58,11 +55,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class AddDayActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -316,21 +318,24 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             str = str.replace(".", "");
                         }
                         new_count = Integer.parseInt(str);
-//                        if (stable_count > 0) {
+
                         manually_total_counting = stable_count + new_count;
 
-                        //stable_count = stable_count + new_count;
+                        if (b != null) {
+                            stable_count = manually_total_counting;
+                        }
 
                         edittext_count.setText(String.valueOf(manually_total_counting));
-                        // new_count=0;
-//                        }
+
                     } else if (!str.equalsIgnoreCase("") && s.length() == 1) {
                         int c = Integer.parseInt(str);
-//                        if (stable_count > 0) {
+
                         manually_total_counting = stable_count + c;
-                        //stable_count = stable_count + c;
+                        if (b != null) {
+                            stable_count = manually_total_counting;
+                        }
                         edittext_count.setText(String.valueOf(manually_total_counting));
-//                        }
+
                     }
 
                 } else {
@@ -344,9 +349,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         edittext_count.setText(String.valueOf(Math.abs(manually_total_counting)));
                         //new_count = 0;
                     } else if (s.length() == 0) {
-                        new_count = 0;
+                        if (b == null) {
+                            new_count = 0;
+                        }
                         manually_total_counting = stable_count - new_count;
-
+                        if (b != null) {
+                            stable_count = manually_total_counting;
+                        }
 //                        stable_count = stable_count - new_count;
                         edittext_count.setText(String.valueOf(Math.abs(manually_total_counting)));
                     }
@@ -1006,7 +1015,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 Date parsedStartDate = null;
 
                 start_date = selectedDate;
-
+                startDateDb = selectedDate;
 //                startDateDb = currentDateString;
                 String date1 = new SimpleDateFormat(date_format).format(new Date(selectedDate));
                 end_date = date1;
@@ -1261,6 +1270,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         diffHours = diff / (60 * 60 * 1000) % 24;
         diffDays = diff / (24 * 60 * 60 * 1000);
         String hours = String.valueOf(diffHours);
+        diffHours = Math.round(diffHours);
+        diffMinutes = Math.round(diffMinutes);
+        diffDays = Math.round(diffDays);
+
         if (hours.contains("-")) {
             hours = hours.replace("-", " ");
         }
@@ -1269,10 +1282,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             min = min.replace("-", " ");
 
         }
-//        String sec = String.valueOf(diffSeconds);
-//        if (sec.contains("-")) {
-//            sec = sec.replace("-", " ");
-//        }
+
         if (diffDays != 0) {
             String day = String.valueOf(diffDays);
             if (day.contains("-")) {
@@ -1362,11 +1372,52 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
             } else {
 
-                if (selected_tipeesIDs == null || selected_tipeesIDs.size() == 0) {
+                if (!addDay.getTip_out_tipees().equalsIgnoreCase("")) {
+                    selected_tipeesIDs = new ArrayList<>(Arrays.asList(convertStringToArray(String.valueOf(addDay.getTip_out_tipees())).get(0)));
+                    if (selected_tipeesIDs.size() == 0) {
 
-                } else {
-                    //  joinedString = convertArrayToString(selected_tipeesIDs);
+                    } else if (selected_tipeesIDs != null && selected_tipeesIDs.size() > 0) {
+                        if (temp_arraylist != null && temp_arraylist.size() > 0) {
+
+                            if (tipeeInfos.size() > 0) {
+                                //if selected comes again
+                                for (int j = 0; j < selected_tipeesIDs.size(); j++) {
+                                    if (temp_arraylist.containsKey(selected_tipeesIDs.get(j))) {
+                                        if (temp_arraylist.get(selected_tipeesIDs.get(j)) == true) {
+                                            joinedString.append(temp_arraylist.get(selected_tipeesIDs.get(j)));
+                                            joinedString.append(",");
+                                        }
+                                    }
+                                }
+                                List<String> unselectedTipees = new ArrayList<>();
+                                //if a new tippee is selected
+                                for (Map.Entry<String, Boolean> newTippee : temp_arraylist.entrySet()) {
+                                    if (newTippee.getValue() == true) {
+                                        if (!selected_tipeesIDs.contains(newTippee.getKey()))
+                                            selected_tipeesIDs.add(newTippee.getKey());
+
+                                    } else {
+                                        selected_tipeesIDs.remove(newTippee.getKey());
+                                        //unselectedTipees.add(newTippee.getKey());
+                                    }
+                                }
+
+                                if (selected_tipeesIDs.size() > 0) {
+                                    for (int i = 0; i < selected_tipeesIDs.size(); i++) {
+                                        joinedString.append(selected_tipeesIDs.get(i));
+                                        joinedString.append(",");
+                                    }
+
+                                }
+
+                            }
+                        }
+                    }
                 }
+
+
+                // joinedString = convertArrayToString(selected_tipeesIDs);
+
                 try {
                     if (isStartDateChanged && isEndDateChanged) {
 
@@ -1628,10 +1679,13 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         if (b != null) {
             if (tipeeInfos != null) {
+
                 checked = fetched;
                 adapter = new FetchedTipeeAdapter(AddDayActivity.this, fetched, tipeeInfos, true, new TipeeChecked() {
                     @Override
                     public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo, int position) {
+                        temp_arraylist.put(tipeeInfo.getId(), isChecked);
+                        selected_tipeesIDs = fetched;
 
                     }
                 }, checked);
@@ -1941,7 +1995,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
         if (bundle != null) {
             addDay = (AddDay) b.getSerializable(Constants.AddDayProfile);
-            total_earnings.setText("$" + addDay.getTotal_earnings());
+//            total_earnings.setText("$" + addDay.getTotal_earnings());
+            total_earnings.setText("$" + earns);
         } else {
             total_earnings.setText("$" + earns);
         }
@@ -1973,8 +2028,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
         spinnerProfile.setSelection(pos);
 
-  /*      editText_new_count.setVisibility(View.VISIBLE);
-        new_count_textview.setVisibility(View.VISIBLE);*/
         long start_format = 0;
         long end_format = 0;
         start_format = addDay.getCheck_in();
@@ -1998,6 +2051,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         calStartDay.setTimeInMillis(start_format);
         calEndDay.setTimeInMillis(end_format);
+
+        result = datesDifference(calStartDay.getTime(), calEndDay.getTime());
 
 
         if (addDay.getDay_off() == 0) {
@@ -2037,12 +2092,28 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
             editText_endShift.setText(end);
             texview_hours.setText(addDay.getCalculated_hours());
+
+            if (!addDay.getTotal_tips().equalsIgnoreCase("")) {
+                total_tipsInput = Double.parseDouble(addDay.getTotal_tips());
+            }
             edit_total_tips.setText(addDay.getTotal_tips());
+            if (!addDay.getManual_tips().equalsIgnoreCase("")) {
+                result_tip_outpercentage = Double.parseDouble(addDay.getManual_tips());
+            }
+
             text_tip_out_percent.setText(addDay.getTip_out_percentage());
             total_tipout.setText(addDay.getTip_out());
         /*    if (!addDay.getTounament_count().equalsIgnoreCase("")) {
                 stable_count = Integer.parseInt(addDay.getTounament_count());
             }*/
+
+            if (!addDay.getTounament_count().equalsIgnoreCase("")) {
+                new_count = Integer.parseInt(addDay.getTounament_count());
+            }
+            if (!addDay.getWages_hourly().equalsIgnoreCase("")) {
+                wage_hourly = Double.parseDouble(addDay.getWages_hourly());
+            }
+
             editText_new_count.setText(addDay.getTounament_count());
             if (!addDay.getTounament_count().equalsIgnoreCase("")) {
                 new_count = Integer.parseInt(addDay.getTounament_count());
@@ -2203,7 +2274,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 //   Calendar cal = Calendar.getInstance();
                 Date date = cal.getTime();
 
-                String current_date_str = new SimpleDateFormat(date_format).format(date);
+                String current_date_str = new SimpleDateFormat("MM/dd/yyyy").format(date);
 
                 Date current_date = cal.getTime();
                 long current_date_long = current_date.getTime();
@@ -2225,7 +2296,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             if (pay_period.equalsIgnoreCase("Weekly")) {
                 today_list = new ArrayList<>();
 
-                DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+                DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
                 ArrayList<String> string_dates = new ArrayList<>();
                 ArrayList<Long> dates = new ArrayList<>();
                 for (int i = 0; i < 7; i++) {
@@ -2250,10 +2321,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     reset_next_week = dates.get(0);
                 }
                 counts_list = new ArrayList<>();
-                today_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(string_dates.get(0), selected_profile);
+                //  today_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(string_dates.get(0), selected_profile);
                 counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
 
-                counts_list.addAll(today_list);
+                //    counts_list.addAll(today_list);
                 counts_list = removeDuplicacy(counts_list);
 
                 if (end_payperiod == 1) {
@@ -2393,7 +2464,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 cal1.set(Calendar.MONTH, montth1);
 
                 cal1.setTimeInMillis(calStartDay.getTimeInMillis());
-                DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+                DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
                 ArrayList<String> string_dates = new ArrayList<>();
                 ArrayList<Long> dates = new ArrayList<>();
                 for (int i = 0; i < 14; i++) {
@@ -2419,10 +2490,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
                 counts_list = new ArrayList<>();
                 today_list = new ArrayList<>();
-                today_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(string_dates.get(0), selected_profile);
+                //   today_list = new DatabaseOperations(AddDayActivity.this).dailyCounts(string_dates.get(0), selected_profile);
                 counts_list = new DatabaseOperations(AddDayActivity.this).tournamentCountPerDay(reset_current, reset_next_week, selected_profile);
 
-                counts_list.addAll(today_list);
+                //  counts_list.addAll(today_list);
 
                 counts_list = removeDuplicacy(counts_list);
                 if (end_payperiod == 1) {
@@ -2544,14 +2615,25 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
     public ArrayList<CountList> removeDuplicacy(ArrayList<CountList> countLists) {
         ArrayList<CountList> count_list = new ArrayList();
-        HashSet<CountList> hashSet = new HashSet<CountList>();
+        /*HashSet<CountList> hashSet = new HashSet<CountList>();
         hashSet.addAll(countLists);
         count_list.clear();
-        count_list.addAll(hashSet);
+        count_list.addAll(hashSet);*/
+
+        count_list = countLists;
+        Collections.sort(count_list, new CustomComparator());
 
         return count_list;
     }
 
+
+    public class CustomComparator implements Comparator<CountList> {
+        @Override
+        public int compare(CountList o1, CountList o2) {
+
+            return o1.getId() == o2.getId() ? 1 : (o1.getId() != o2.getId() ? -1 : 0);
+        }
+    }
 }
 
 
