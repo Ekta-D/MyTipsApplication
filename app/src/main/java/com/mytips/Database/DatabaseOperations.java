@@ -86,7 +86,7 @@ public class DatabaseOperations {
 
     public void updateProfileValues(int id, String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
                                     boolean isGetTips, String payPeriod, String startDay, double hourPay, String holidayPay
-            , String tipees, int profile_color) {
+            , String tipees, String profileImage, int profile_color) {
 
         int supervisor = 0, tournamentTips = 0, getTips = 0;
         if (isSupervisor) {
@@ -109,6 +109,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.Tipees, tipees);
         contentValues.put(DatabaseUtils.ProfileColor, profile_color);
         contentValues.put(DatabaseUtils.HolidayPay, holidayPay);
+        contentValues.put(DatabaseUtils.ProfilePic, profileImage);
         try {
             int changedRecord = db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.Profile_ID + " =? ", new String[]{String.valueOf(id)});
             System.out.println("updated" + changedRecord);

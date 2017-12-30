@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -51,6 +52,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
@@ -64,6 +66,7 @@ import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.DriveResource;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
+import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.OpenFileActivityOptions;
 import com.google.android.gms.drive.query.Filters;
 import com.google.android.gms.drive.query.Query;
@@ -82,12 +85,14 @@ import com.google.android.gms.drive.DriveResourceClient;
 import com.mytips.Utils.Constants;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -118,7 +123,7 @@ import static android.content.ContentValues.TAG;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class SettingsActivity extends BaseDemoActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener /*implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener */ {
+public class SettingsActivity extends BaseDemoActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -131,6 +136,10 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
     double tipee_percent;
     String tipee_name_tipout;
     SharedPreferences sharedPreferences;
+    boolean is_first = false;
+    SharedPreferences.Editor editor;
+
+    private static final int REQUEST_CODE_RESOLUTION = 3;
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener =
             new Preference.OnPreferenceChangeListener() {
@@ -221,6 +230,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
         progressDialog = new ProgressDialog(SettingsActivity.this);
         context = SettingsActivity.this;
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         /*mReceiver = new BroadcastReceiver() {
             @Override
@@ -234,7 +244,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
         addPreferencesFromResource(R.xml.pref_general);
 //        setHasOptionsMenu(true);
         final EditTextPreference editTextPreference_name, editTextPreference_email;
-        Preference editTextPreference_show_add_tipee, restore_data;
+        Preference editTextPreference_show_add_tipee, backupData, restore_data;
         final Preference preference_set_passcode;
         final ListPreference date_list, time_list, currency_list, theme_list;
         // Bind the summaries of EditText/List/Dialog/Ringtone preferences
@@ -250,6 +260,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
         bindPreferenceSummaryToValue(findPreference("general_key"));
         bindPreferenceSummaryToValue(findPreference("backup_data"));
         bindPreferenceSummaryToValue(findPreference("backup_restore"));
+        bindPreferenceSummaryToValue(findPreference("backup"));
         bindPreferenceSummaryToValue(findPreference("get_passcode"));
         bindPreferenceSummaryToValue(findPreference("edit_add_tipees"));
 
@@ -672,6 +683,191 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                 return true;
             }
         });
+
+        backupData = (Preference) findPreference("backup");
+        backupData.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            @Override
+            public boolean onPreferenceClick(Preference preference) {
+                //signIn();
+                backupDataToDrive();
+                return true;
+            }
+        });
+
+    }
+
+    private void backupDataToDrive() {
+        String email = sharedPreferences.getString("user_email", "");
+        Log.i("login_email", email);
+
+        if (!email.contains("@gmail.com")) {
+            AlertDialog.Builder alert_builder = new AlertDialog.Builder(SettingsActivity.this);
+            alert_builder.setTitle("Make sure your account is of google");
+            alert_builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            });
+            AlertDialog alertDialog = alert_builder.create();
+            alertDialog.show();
+
+        } else {
+
+            try {
+
+                File sd = Environment.getExternalStorageDirectory();
+                final File data = Environment.getDataDirectory();
+                FileChannel source = null;
+                FileChannel destination = null;
+                String currentDBPath = "/data/" + "com.mytips" + "/databases/" + DatabaseUtils.db_Name;
+                String backupDBPath = DatabaseUtils.db_Name;
+                File currentDB = new File(data, currentDBPath);
+                backupDB = new File(sd, backupDBPath);
+                try {
+                    source = new FileInputStream(currentDB).getChannel();
+                    destination = new FileOutputStream(backupDB).getChannel();
+                    destination.transferFrom(source, 0, source.size());
+                    source.close();
+                    destination.close();
+                    Toast.makeText(this, "DB Exported!", Toast.LENGTH_LONG).show();
+
+
+                    if (mGoogleApiClient == null) {
+                        try {
+                            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                                    .addApi(Drive.API)
+                                    .addScope(Drive.SCOPE_FILE)
+                                    .addConnectionCallbacks(this)
+                                    .addOnConnectionFailedListener(this)
+                                    .build();
+                            is_first = true;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    mGoogleApiClient.connect();
+                    uploadToDrive();
+
+                    // TODO: 06-11-2017 account varification  and include to add two new jar files
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    public void uploadToDrive() {
+
+        create_file_in_folder();
+    }
+
+    public void create_file_in_folder() {
+
+        progressDialog = new ProgressDialog(SettingsActivity.this);
+        progressDialog.setMessage("Uploading database!");
+        progressDialog.show();
+        Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+            @Override
+            public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
+
+
+                saveToDrive(Drive.DriveApi.getRootFolder(mGoogleApiClient), "tipeesDB.db", "text/plain", backupDB, driveContentsResult);
+
+            }
+        });
+    }
+
+    boolean is_completed = false;
+    File backupDB = null;
+
+    void saveToDrive(final DriveFolder pFldr, final String titl,
+                     final String mime, final java.io.File file, DriveApi.DriveContentsResult driveContentsResult) {
+
+        // makeFolder();
+       /* MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                .setTitle(Constants.DatabaseFileName)
+                .setMimeType(mime)
+                .setStarred(false)
+                .build();*/
+        if (mGoogleApiClient != null && pFldr != null && titl != null && mime != null && file != null)
+            try {
+                // create content from file
+                String drive_folder_created_id = getResources().getString(R.string.folder_id);
+                DriveId drivers_folder_id = DriveId.decodeFromString(drive_folder_created_id);
+
+                Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
+                    @Override
+                    public void onResult(DriveApi.DriveContentsResult driveContentsResult) {
+                        DriveContents cont = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
+                                driveContentsResult.getDriveContents() : null;
+
+                        // write file to content, chunk by chunk
+                        if (cont != null) try {
+                            OutputStream oos = cont.getOutputStream();
+                            if (oos != null) try {
+                                InputStream is = new FileInputStream(file);
+                                byte[] buf = new byte[4096];
+                                int c;
+                                while ((c = is.read(buf, 0, buf.length)) > 0) {
+                                    oos.write(buf, 0, c);
+                                    oos.flush();
+                                }
+                            } finally {
+                                oos.close();
+                                progressDialog.dismiss();
+                            }
+
+                            // content's COOL, create metadata
+                            MetadataChangeSet meta = new MetadataChangeSet.Builder().setTitle(titl).setMimeType(mime).build();
+
+                            // now create file on GooDrive
+                            pFldr.createFile(mGoogleApiClient, meta, cont).setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
+                                @Override
+                                public void onResult(DriveFolder.DriveFileResult driveFileResult) {
+                                    if (driveFileResult != null && driveFileResult.getStatus().isSuccess()) {
+                                        DriveFile dFil = driveFileResult != null && driveFileResult.getStatus().isSuccess() ?
+                                                driveFileResult.getDriveFile() : null;
+                                        if (dFil != null) {
+                                            // BINGO , file uploaded
+                                            dFil.getMetadata(mGoogleApiClient).setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
+                                                @Override
+                                                public void onResult(DriveResource.MetadataResult metadataResult) {
+                                                    if (metadataResult != null && metadataResult.getStatus().isSuccess()) {
+                                                        is_completed = true;
+                                                        DriveId mDriveId = metadataResult.getMetadata().getDriveId();
+
+                                                        editor.putString(Constants.SharedDriveId, mDriveId.encodeToString());
+                                                        editor.commit();
+                                                    }
+                                                    progressDialog.dismiss();
+                                                    if (is_completed) {
+                                                        progressDialog.dismiss();
+                                                    }
+                                                }
+                                            });
+
+
+                                        }
+                                    } else { /* report error */ }
+                                }
+
+                            });
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        progressDialog.dismiss();
+
     }
 
     /**
@@ -760,7 +956,29 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
+        Log.i("drive", "connected called");
+        /*if (mGoogleApiClient.isConnected()) {
+            if (!is_first) {
+                progressDialog.dismiss();
+                uploadToDrive();
+            }
 
+        } else {
+            if (mGoogleApiClient == null) {
+                try {
+                    mGoogleApiClient = new GoogleApiClient.Builder(this)
+                            .addApi(Drive.API)
+                            .addScope(Drive.SCOPE_FILE)
+                            .addConnectionCallbacks(this)
+                            .addOnConnectionFailedListener(this)
+                            .build();
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            mGoogleApiClient.connect();
+        }*/
     }
 
     @Override
@@ -770,7 +988,19 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.i("drive", "connected failed");
 
+        /*if (connectionResult.hasResolution()) {
+            try {
+                connectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
+                progressDialog.dismiss();
+            } catch (IntentSender.SendIntentException e) {
+                // Unable to resolve, message user appropriately
+            }
+        } else {
+            GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, 0).show();
+            progressDialog.dismiss();
+        }*/
     }
 
     /**

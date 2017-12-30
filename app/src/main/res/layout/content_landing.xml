@@ -115,7 +115,7 @@
             android:layout_centerVertical="true"
             android:gravity="center"
             android:text="@string/no_data_text"
-            android:textSize="14dp"
+            android:textSize="18dp"
             android:visibility="visible" />
 
     </RelativeLayout>

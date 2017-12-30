@@ -101,6 +101,14 @@
         android:key="backup_data"
         android:title="@string/data_backup">
 
+        <Preference
+            android:capitalize="words"
+            android:inputType="textCapWords"
+            android:key="backup"
+            android:maxLines="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/backup" />
 
         <Preference
             android:capitalize="words"

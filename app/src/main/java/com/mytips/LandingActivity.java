@@ -202,7 +202,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         share = (ImageButton) findViewById(R.id.share);
         invite = (ImageButton) findViewById(R.id.invite);
         preferences = (ImageButton) findViewById(R.id.preferences);
-        backup = (ImageButton) findViewById(R.id.backup);
+        //backup = (ImageButton) findViewById(R.id.backup);
 
         textView_total_earnings = (TextView) findViewById(R.id.total_earnings);
         textView_hour_wage = (TextView) findViewById(R.id.hour_wage);
@@ -220,7 +220,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         share.setOnClickListener(this);
         invite.setOnClickListener(this);
         preferences.setOnClickListener(this);
-        backup.setOnClickListener(this);
+        //backup.setOnClickListener(this);
 
         spinnerProfile = (Spinner) findViewById(R.id.spinner_profile);
         spinnerReportType = (Spinner) findViewById(R.id.spinner_report);
@@ -649,7 +649,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 startActivityForResult(intent, 100);
 
                 break;
-            case R.id.backup:
+            /*case R.id.backup:
 
                 String email = sharedPreferences.getString("user_email", "");
                 Log.i("login_email", email);
@@ -714,7 +714,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     }
 
                 }
-                break;
+                break;*/
 
             case R.id.email_data:
 
@@ -1865,7 +1865,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        Log.i("drive", "connected called");
+       /* Log.i("drive", "connected called");
         if (mGoogleApiClient.isConnected()) {
             if (!is_first) {
                 progressDialog.dismiss();
@@ -1887,7 +1887,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
             mGoogleApiClient.connect();
-        }
+        }*/
 
     }
 
@@ -1901,7 +1901,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
 
-        Log.i("drive", "connected failed");
+        /*Log.i("drive", "connected failed");
 
         if (connectionResult.hasResolution()) {
             try {
@@ -1913,7 +1913,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, 0).show();
             progressDialog.dismiss();
-        }
+        }*/
 
     }
 
@@ -2038,7 +2038,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    public void uploadToDrive() {
+    ProgressDialog progressDialog;
+
+    /*public void uploadToDrive() {
 
         create_file_in_folder();
     }
@@ -2059,20 +2061,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             }
         });
-    }
+    }*/
 
-    boolean is_completed = false;
     boolean filter_search = false;
 
-    void saveToDrive(final DriveFolder pFldr, final String titl,
+    /*void saveToDrive(final DriveFolder pFldr, final String titl,
                      final String mime, final java.io.File file, DriveApi.DriveContentsResult driveContentsResult) {
 
         // makeFolder();
-       /* MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+       *//* MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
                 .setTitle(Constants.DatabaseFileName)
                 .setMimeType(mime)
                 .setStarred(false)
-                .build();*/
+                .build();*//*
         if (mGoogleApiClient != null && pFldr != null && titl != null && mime != null && file != null)
             try {
                 // create content from file
@@ -2132,7 +2133,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
                                         }
-                                    } else { /* report error */ }
+                                    } else { *//* report error *//* }
                                 }
 
                             });
@@ -2147,7 +2148,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         progressDialog.dismiss();
 
-    }
+    }*/
 
     public boolean checkPermissions() {
         int permissionWrite = ContextCompat.checkSelfPermission(this,
@@ -2331,10 +2332,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         String total = "";
         double wage = 0;
         for (int i = 0; i < addDays.size(); i++) {
-            if (!addDays.get(i).getWages_hourly().equalsIgnoreCase("")) {
+            /*if (!addDays.get(i).getWages_hourly().equalsIgnoreCase("")) {
 
-            }
-            d = d + Double.parseDouble(addDays.get(i).getWages_hourly());
+            }*/
+            d = d + Double.parseDouble(addDays.get(i).getWages_hourly().equals("")?"0.0":addDays.get(i).getWages_hourly());
 
         }
         total = String.valueOf(String.format("%.2f", d));

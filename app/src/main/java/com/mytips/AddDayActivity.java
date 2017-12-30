@@ -164,7 +164,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         findViewByIds();
 
-
         selected_timeformatIndex = sharedPreferences.getInt("selected_time", 1);
         default_date_format = sharedPreferences.getInt("selected_date", 2);
 
@@ -1372,10 +1371,32 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 }
             } else {
 
-                if (!addDay.getTip_out_tipees().equalsIgnoreCase("")) {
+                // Don't require this check,
+                // if (!addDay.getTip_out_tipees().equalsIgnoreCase("")) {
+                if(addDay.getTip_out_tipees().equalsIgnoreCase(""))
+                    selected_tipeesIDs = new ArrayList<>();
+                else
                     selected_tipeesIDs = new ArrayList<>(Arrays.asList(convertStringToArray(String.valueOf(addDay.getTip_out_tipees())).get(0)));
                     if (selected_tipeesIDs.size() == 0) {
+                        if(temp_arraylist!=null && temp_arraylist.size()>0) {
+                            for (Map.Entry<String, Boolean> newTippee : temp_arraylist.entrySet()) {
+                                if (newTippee.getValue() == true) {
+                                    if (!selected_tipeesIDs.contains(newTippee.getKey()))
+                                        selected_tipeesIDs.add(newTippee.getKey());
 
+                                } else {
+                                    selected_tipeesIDs.remove(newTippee.getKey());
+                                    //unselectedTipees.add(newTippee.getKey());
+                                }
+                            }
+                            if (selected_tipeesIDs.size() > 0) {
+                                for (int i = 0; i < selected_tipeesIDs.size(); i++) {
+                                    joinedString.append(selected_tipeesIDs.get(i));
+                                    joinedString.append(",");
+                                }
+
+                            }
+                        }
                     } else if (selected_tipeesIDs != null && selected_tipeesIDs.size() > 0) {
                         if (temp_arraylist != null && temp_arraylist.size() > 0) {
 
@@ -1413,7 +1434,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             }
                         }
                     }
-                }
+               // }
 
 
                 // joinedString = convertArrayToString(selected_tipeesIDs);
@@ -1502,9 +1523,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
 
         if (is_supervisor == 1 && getting_tournament == 0) {
-            checkBoxEndofPayPeriod.setVisibility(View.GONE);
             editText_new_count.setVisibility(View.GONE);
             new_count_textview.setVisibility(View.GONE);
+            checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
         } else {
             checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
             editText_new_count.setVisibility(View.VISIBLE);
@@ -1681,12 +1702,52 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             if (tipeeInfos != null) {
 
                 checked = fetched;
-                adapter = new FetchedTipeeAdapter(AddDayActivity.this, fetched, tipeeInfos, true, new TipeeChecked() {
+                adapter = new FetchedTipeeAdapter(AddDayActivity.this, fetched, info, true, new TipeeChecked() {
                     @Override
                     public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo, int position) {
                         temp_arraylist.put(tipeeInfo.getId(), isChecked);
                         selected_tipeesIDs = fetched;
 
+                        if (isChecked) {
+                            checkedTipeeCalculations(tipeeInfo);
+
+                        } else {
+
+                            if (selected_tipeesIDs != null && selected_tipeesIDs.size() > 0) {
+                                for (int i = 0; i < selected_tipeesIDs.size(); i++) {
+                                    if (selected_tipeesIDs.get(i).equalsIgnoreCase(tipeeInfo.getId())) {
+                                        selected_tipeesIDs.remove(tipeeInfo.getId());
+                                    }
+                                }
+                            }
+                            String per = tipeeInfo.getPercentage();
+                            double tipOut = 0;
+                            if (!per.equalsIgnoreCase("")) {
+                                tipeePercent = Math.abs(tipeePercent - Double.parseDouble(per));
+                                tipOut = (manual_percentage_data + tipeePercent) / 100 * total_tipsInput;
+
+                                text_tip_out_percent.setText(String.format("%.2f", tipeePercent + manual_percentage_data) + "%");
+                                total_tipout.setText(String.format("%.2f", tipOut));
+                            }
+
+                            String hr = String.valueOf(diffHours);
+                            if (hr.contains("-")) {
+                                hr = hr.replace("-", "");
+                            }
+                            String m = String.valueOf(diffMinutes);
+                            if (m.contains("-")) {
+                                m = m.replace("-", "");
+                            }
+                            String d = String.valueOf(diffDays);
+                            if (d.contains("-")) {
+                                d = d.replace("-", "");
+                            }
+                            calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
+                                    Integer.parseInt(m),
+                                    Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
+
+
+                        }
                     }
                 }, checked);
                 fetchedTipees.setAdapter(adapter);
@@ -1737,6 +1798,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         // perTd_label.setVisibility(View.VISIBLE);
 //        totalcount_label.setVisibility(View.VISIBLE);
 
+        checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
         perTd_label.setVisibility(View.GONE);
         totalcount_label.setVisibility(View.GONE);
 //        edittext_perTD.setVisibility(View.GONE);
@@ -1881,11 +1943,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             new_count_textview.setVisibility(View.VISIBLE);
         }
 
-        if (getting_tournament == 0) {
+        /*if (getting_tournament == 0) {
             checkBoxEndofPayPeriod.setVisibility(View.GONE);
-        } else {
+        } else {*/
             checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
-        }
+        //}
         editText_startShift.setHint("Start Shift");
         edittext_clockIn.setVisibility(View.VISIBLE);
         editText_endShift.setVisibility(View.VISIBLE);
@@ -2053,7 +2115,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         calEndDay.setTimeInMillis(end_format);
 
         result = datesDifference(calStartDay.getTime(), calEndDay.getTime());
-
 
         if (addDay.getDay_off() == 0) {
             if (selected_timeformatIndex == 0) {

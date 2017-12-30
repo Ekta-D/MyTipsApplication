@@ -35,6 +35,7 @@
     <string name="data_backup">Data &amp; Security </string>
     <string name="reset_data">Reset Data</string>
     <string name="backup_restore">Restore Data</string>
+    <string name="backup">Backup Data</string>
     <string name="get_passcode">Set/Reset Passcode</string>
     <string name="pref_default_hour">1 hour</string>
     <string name="pref_title_add_friends_to_messages">Theme</string>
@@ -135,5 +136,5 @@
 
     </array>
 
-    <string name="no_data_text">No Data found \n You may add Tippees under Settings from top menu \n then Start adding profiles \n and Add your days using the bottom button.</string>
+    <string name="no_data_text">No Data found. <!--\n You may add Tippees under Settings from top menu \n then Start adding profiles \n and Add your days using the bottom button.--></string>
 </resources>

@@ -26,6 +26,7 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:paddingLeft="40dp"
                 android:orientation="vertical">
 
                 <!--  <ImageButton
@@ -84,6 +85,7 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:paddingRight="40dp"
                 android:orientation="vertical">
 
                 <ImageButton
@@ -96,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="Preferences"
+                    android:text="Settings"
                     android:textSize="12sp" />
             </LinearLayout>
 
@@ -115,6 +117,7 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:paddingLeft="40dp"
                 android:orientation="vertical">
 
                 <ImageButton
@@ -144,13 +147,13 @@
                     android:id="@+id/invite"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:background="@drawable/ic_mailbox" />
+                    android:background="@drawable/ic_intro" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="Invite"
+                    android:text="Tutorial"
                     android:textSize="12sp" />
 
             </LinearLayout>
@@ -161,19 +164,20 @@
                 android:layout_margin="10dp"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:paddingRight="40dp"
                 android:orientation="vertical">
 
                 <ImageButton
-                    android:id="@+id/backup"
+                    android:id="@+id/about"
                     android:layout_width="50dp"
                     android:layout_height="50dp"
-                    android:background="@drawable/ic_backup_restore" />
+                    android:background="@drawable/ic_info" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:text="Backup"
+                    android:text="About"
                     android:textSize="12sp" />
 
             </LinearLayout>

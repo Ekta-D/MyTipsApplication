@@ -50,6 +50,8 @@ public abstract class BaseDemoActivity extends AppCompatPreferenceActivity {
      */
     protected static final int REQUEST_CODE_OPEN_ITEM = 1;
 
+    private static final int REQUEST_CODE_RESOLUTION = 3;
+
     /**
      * Handles high-level drive functions like sync
      */
@@ -98,6 +100,12 @@ public abstract class BaseDemoActivity extends AppCompatPreferenceActivity {
                     mOpenItemTaskSource.setResult(driveId);
                 } else {
                     mOpenItemTaskSource.setException(new RuntimeException("Unable to open file"));
+                }
+                break;
+            case REQUEST_CODE_RESOLUTION:
+                if (resultCode == RESULT_OK) {
+                    //uploadToDrive();
+
                 }
                 break;
         }

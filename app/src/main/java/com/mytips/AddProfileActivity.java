@@ -378,7 +378,7 @@ public class AddProfileActivity extends AppCompatActivity {
                         try {
                             dbOperations.updateProfileValues(id, profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString(), profileColors);
+                                    joinedString.toString(), image_name, profileColors);
 
 
                         } catch (Exception e) {
@@ -523,6 +523,8 @@ public class AddProfileActivity extends AppCompatActivity {
             }
 
         }
+
+        image_name = profiles.getProfile_pic();
         profileColors = profiles.getProfile_color();
         tipeeInfos = new ArrayList<>();
 
