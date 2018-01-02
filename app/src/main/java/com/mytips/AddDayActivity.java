@@ -1373,12 +1373,45 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
                 // Don't require this check,
                 // if (!addDay.getTip_out_tipees().equalsIgnoreCase("")) {
-                if(addDay.getTip_out_tipees().equalsIgnoreCase(""))
+                if (addDay.getTip_out_tipees().equalsIgnoreCase(""))
                     selected_tipeesIDs = new ArrayList<>();
                 else
-                    selected_tipeesIDs = new ArrayList<>(Arrays.asList(convertStringToArray(String.valueOf(addDay.getTip_out_tipees())).get(0)));
-                    if (selected_tipeesIDs.size() == 0) {
-                        if(temp_arraylist!=null && temp_arraylist.size()>0) {
+                    selected_tipeesIDs = new ArrayList<>(Arrays.asList(convertStringToArray(addDay.getTip_out_tipees())).get(0));
+                if (selected_tipeesIDs.size() == 0) {
+                    if (temp_arraylist != null && temp_arraylist.size() > 0) {
+                        for (Map.Entry<String, Boolean> newTippee : temp_arraylist.entrySet()) {
+                            if (newTippee.getValue() == true) {
+                                if (!selected_tipeesIDs.contains(newTippee.getKey()))
+                                    selected_tipeesIDs.add(newTippee.getKey());
+
+                            } else {
+                                selected_tipeesIDs.remove(newTippee.getKey());
+                                //unselectedTipees.add(newTippee.getKey());
+                            }
+                        }
+                        if (selected_tipeesIDs.size() > 0) {
+                            for (int i = 0; i < selected_tipeesIDs.size(); i++) {
+                                joinedString.append(selected_tipeesIDs.get(i));
+                                joinedString.append(",");
+                            }
+
+                        }
+                    }
+                } else if (selected_tipeesIDs != null && selected_tipeesIDs.size() > 0) {
+                    if (temp_arraylist != null && temp_arraylist.size() > 0) {
+
+                        if (tipeeInfos.size() > 0) {
+                            //if selected comes again
+                            for (int j = 0; j < selected_tipeesIDs.size(); j++) {
+                                if (temp_arraylist.containsKey(selected_tipeesIDs.get(j))) {
+                                    if (temp_arraylist.get(selected_tipeesIDs.get(j)) == true) {
+                                        joinedString.append(temp_arraylist.get(selected_tipeesIDs.get(j)));
+                                        joinedString.append(",");
+                                    }
+                                }
+                            }
+                            List<String> unselectedTipees = new ArrayList<>();
+                            //if a new tippee is selected
                             for (Map.Entry<String, Boolean> newTippee : temp_arraylist.entrySet()) {
                                 if (newTippee.getValue() == true) {
                                     if (!selected_tipeesIDs.contains(newTippee.getKey()))
@@ -1389,6 +1422,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                     //unselectedTipees.add(newTippee.getKey());
                                 }
                             }
+
                             if (selected_tipeesIDs.size() > 0) {
                                 for (int i = 0; i < selected_tipeesIDs.size(); i++) {
                                     joinedString.append(selected_tipeesIDs.get(i));
@@ -1396,45 +1430,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 }
 
                             }
-                        }
-                    } else if (selected_tipeesIDs != null && selected_tipeesIDs.size() > 0) {
-                        if (temp_arraylist != null && temp_arraylist.size() > 0) {
 
-                            if (tipeeInfos.size() > 0) {
-                                //if selected comes again
-                                for (int j = 0; j < selected_tipeesIDs.size(); j++) {
-                                    if (temp_arraylist.containsKey(selected_tipeesIDs.get(j))) {
-                                        if (temp_arraylist.get(selected_tipeesIDs.get(j)) == true) {
-                                            joinedString.append(temp_arraylist.get(selected_tipeesIDs.get(j)));
-                                            joinedString.append(",");
-                                        }
-                                    }
-                                }
-                                List<String> unselectedTipees = new ArrayList<>();
-                                //if a new tippee is selected
-                                for (Map.Entry<String, Boolean> newTippee : temp_arraylist.entrySet()) {
-                                    if (newTippee.getValue() == true) {
-                                        if (!selected_tipeesIDs.contains(newTippee.getKey()))
-                                            selected_tipeesIDs.add(newTippee.getKey());
-
-                                    } else {
-                                        selected_tipeesIDs.remove(newTippee.getKey());
-                                        //unselectedTipees.add(newTippee.getKey());
-                                    }
-                                }
-
-                                if (selected_tipeesIDs.size() > 0) {
-                                    for (int i = 0; i < selected_tipeesIDs.size(); i++) {
-                                        joinedString.append(selected_tipeesIDs.get(i));
-                                        joinedString.append(",");
-                                    }
-
-                                }
-
-                            }
                         }
                     }
-               // }
+                }
+                // }
 
 
                 // joinedString = convertArrayToString(selected_tipeesIDs);
@@ -1701,12 +1701,19 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         if (b != null) {
             if (tipeeInfos != null) {
 
-                checked = fetched;
+                if (fetched != null && fetched.size() > 0) {
+                    checked = fetched;
+                    //   checked = new ArrayList<>(Arrays.asList(fetched.get(0)));
+                }
+
                 adapter = new FetchedTipeeAdapter(AddDayActivity.this, fetched, info, true, new TipeeChecked() {
                     @Override
                     public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo, int position) {
                         temp_arraylist.put(tipeeInfo.getId(), isChecked);
-                        selected_tipeesIDs = fetched;
+                        //   selected_tipeesIDs = fetched;
+                        if (fetched != null && fetched.size() > 0) {
+                            selected_tipeesIDs = new ArrayList<>(Arrays.asList(fetched.get(0)));
+                        }
 
                         if (isChecked) {
                             checkedTipeeCalculations(tipeeInfo);
@@ -1853,7 +1860,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         if (b == null) {
             tipee_nodata.setVisibility(View.VISIBLE);
-        } else if (fetched.size() > 0) {
+        } else if (fetched != null && fetched.size() > 0) {
             tipee_nodata.setVisibility(View.GONE);
         }
         texview_hours.setVisibility(View.VISIBLE); // visible calculated hours
@@ -1946,7 +1953,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         /*if (getting_tournament == 0) {
             checkBoxEndofPayPeriod.setVisibility(View.GONE);
         } else {*/
-            checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
+        checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
         //}
         editText_startShift.setHint("Start Shift");
         edittext_clockIn.setVisibility(View.VISIBLE);
@@ -2066,7 +2073,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     String addDayID;
-    List<String> fetched = new ArrayList<>();
+    List<String> fetched;
     Date d = null, d1 = null;
     Calendar startDateTime, endDateTime;
     long updated_start_values, updated_end_values;
@@ -2208,9 +2215,12 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 tipee_layout.setVisibility(View.GONE);
             } else {
                 tipee_layout.setVisibility(View.VISIBLE);
-                fetched = convertStringToArray(String.valueOf(addDay.getTip_out_tipees()));
+                if (!addDay.getTip_out_tipees().equalsIgnoreCase("")) {
+                    fetched = new ArrayList<>(Arrays.asList(convertStringToArray(addDay.getTip_out_tipees())).get(0));
+                }
+                //  fetched = new ArrayList<>(Arrays.asList(convertStringToArray(String.valueOf(addDay.getTip_out_tipees())).get(0)));
 
-                if (fetched.size() > 0) {
+                if (fetched != null && fetched.size() > 0) {
                     getAllTipees(fetched);
                     text_tip_out_percent.setVisibility(View.VISIBLE);
                     total_tipoutPer.setVisibility(View.VISIBLE);
@@ -2640,6 +2650,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
     public void checkedTipeeCalculations(TipeeInfo selectedTipeesID) {
         selected_tipeesIDs.add(selectedTipeesID.getId());
+
         checked.add(selectedTipeesID.getId());
 
         String per = selectedTipeesID.getPercentage();
