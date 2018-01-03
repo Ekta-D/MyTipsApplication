@@ -9,6 +9,16 @@ public class TipeeInfo {
     String percentage;
     String id;
     boolean is_deleted;
+    boolean is_checkedInAddDay;
+    public boolean isIs_checkedInAddDay() {
+        return is_checkedInAddDay;
+    }
+
+    public void setIs_checkedInAddDay(boolean is_checkedInAddDay) {
+        this.is_checkedInAddDay = is_checkedInAddDay;
+    }
+
+
 
     public boolean isIs_deleted() {
         return is_deleted;

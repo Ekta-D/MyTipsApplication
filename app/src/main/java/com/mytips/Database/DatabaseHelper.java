@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 DatabaseUtils.TipeeID + " INTEGER,  "
                 + DatabaseUtils.TipeeName + " TEXT, "
                 + DatabaseUtils.IsDeleted + " INTEGER,  "
+                + DatabaseUtils.IsCheckedInAddDay + " INTEGER,  "
                 + DatabaseUtils.TipeeOut + " TEXT );");
 
 
@@ -78,6 +79,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
                 + DatabaseUtils.StartDayWeek + " TEXT, "
 
+                + DatabaseUtils.PerHourProfileWage + " TEXT, " // hourly wage of profile
                 + DatabaseUtils.WagesPerHour + " TEXT, "
                 + DatabaseUtils.TotalEarnings + " TEXT, "
                 + DatabaseUtils.SelectedProfile_ID + " INTEGER, "

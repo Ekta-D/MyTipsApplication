@@ -37,6 +37,8 @@ public class DatabaseUtils {
     public static final String TipeeName = "tipee_name";
     public static final String TipeeOut = "tip_out";
     public static final String IsDeleted = "is_deleted";
+    public static final String IsCheckedInAddDay = "is_checked";
+
 
 
     //add day fields
@@ -70,7 +72,7 @@ public class DatabaseUtils {
     public static final String SelectedProfileColor = "selected_profile_color";
     public static final String TotalHr = "total_hours";
     public static final String TotalMin = "total_mins";
-
+    public static final String PerHourProfileWage = "per_hour_wage";
 
 
 }
