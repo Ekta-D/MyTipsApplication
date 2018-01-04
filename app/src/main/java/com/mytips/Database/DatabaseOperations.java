@@ -741,7 +741,8 @@ public class DatabaseOperations {
         Cursor cursor = null;
         String string = "";
         CountList countList;
-        String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile= '" + profile + "' ";
+//        String query = "select * from  add_table where start_shift = '" + date + "'  AND  profile= '" + profile + "' ";
+        String query = "select * from  add_table where end_shift = '" + date + "'  AND  profile= '" + profile + "' ";
         try {
             cursor = db.rawQuery(query, null);
         } catch (Exception e) {
