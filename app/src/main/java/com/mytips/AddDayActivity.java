@@ -2098,6 +2098,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         if (payperiodTds_str != null && !payperiodTds_str.equals("")) {
             totalPayperiodCount = Integer.parseInt(payperiodTds_str);
         }*/
+     /*   if (!addDay.getTounament_count().equals("")) {
+            stable_count = Integer.parseInt(addDay.getTounament_count());
+        }*/
 
         selected_profile = addDay.getProfile();
         int pos = 0;
@@ -2157,8 +2160,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
 
 
-        edittext_TournamentTotal.setText(addDay.getTotal_tournament_downs());
-        edittext_perTD.setText(addDay.getTournament_perday());
+
 
 
         d = new Date(start_format);
@@ -2301,8 +2303,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             updateDayOffView();
         }
-
-
+        edittext_TournamentTotal.setText(addDay.getTotal_tournament_downs());
+        edittext_perTD.setText(addDay.getTournament_perday());
     }
 
     @Override
