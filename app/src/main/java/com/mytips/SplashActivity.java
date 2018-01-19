@@ -100,8 +100,6 @@ public class SplashActivity extends GoogleAuthorizationActivity/* implements Goo
                 @Override
                 public void run() {
                     if (!password.equalsIgnoreCase("")) {
-
-
                         startActivity(new Intent(SplashActivity.this, LockScreen.class));
                     } else {
 

@@ -111,8 +111,9 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
         if (fromAddDay) {
             if (add_day_checked.contains(tipeeInfo.getId())) {
                // viewHolder.checkBox.setChecked(checkedItems.get(position, true));
+                viewHolder.checkBox.setOnCheckedChangeListener(null);
               viewHolder.checkBox.setChecked(checkedItems.get(position, true));
-                viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -127,6 +128,8 @@ public class FetchedTipeeAdapter extends ArrayAdapter<TipeeInfo> implements Comp
                 });
             } else {
                // viewHolder.checkBox.setChecked(checkedItems.get(position, false));
+                viewHolder.checkBox.setOnCheckedChangeListener(null);
+                viewHolder.checkBox.setChecked(checkedItems.get(position, false));
                viewHolder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

@@ -635,19 +635,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 } catch (Exception e) {
                     //e.toString();
                 }
-
                 break;
             case R.id.invite:
-                Intent shareIntent = new Intent(Intent.ACTION_SEND);
-                shareIntent.putExtra(Intent.EXTRA_EMAIL, "enter email");
-                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "My application name");
-                shareIntent.putExtra(Intent.EXTRA_TEXT, "My application text");
-
-
-                shareIntent.setType("text/html");
-                Intent intent = Intent.createChooser(shareIntent, "Choose Email Client");
-                startActivityForResult(intent, 100);
-
+                sharedPreferences.edit().putBoolean("showOnBoarding", true).commit();
+                startActivity(new Intent(LandingActivity.this, ScreenSlideActivity.class));
                 break;
             /*case R.id.backup:
 

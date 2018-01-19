@@ -137,4 +137,10 @@
     </array>
 
     <string name="no_data_text">No Data found. <!--\n You may add Tippees under Settings from top menu \n then Start adding profiles \n and Add your days using the bottom button.--></string>
+    <string name="title_screen_slide">OnBoarding</string>
+
+    <string name="action_previous">Previous</string>
+    <string name="action_next">Next</string>
+    <string name="action_finish">Finish</string>
+
 </resources>

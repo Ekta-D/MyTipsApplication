@@ -2,12 +2,14 @@ package com.mytips;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -20,6 +22,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.CheckBox;
@@ -238,7 +241,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             Integer.parseInt(m),
                             Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown
                             , holiday_off_value, b);
-                    edittext_TournamentTotal.setText(String.valueOf(total_tournamentdown));
+
+                    edittext_TournamentTotal.setText(String.valueOf(String.format("%.2f", total_tournamentdown)));
 
                 } else if (str.equalsIgnoreCase("") && total_tournamentdown != 0) {
                     count_perTd = 0;
@@ -264,7 +268,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                             Integer.parseInt(m),
                             Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown
                             , holiday_off_value, b);
-                    edittext_TournamentTotal.setText(String.valueOf(total_tournamentdown));
+                    edittext_TournamentTotal.setText(String.format("%.2f", String.valueOf(total_tournamentdown)));
                 } else if (str.equalsIgnoreCase("") && total_tournamentdown == 0) {
                     totalPayperiodCount = 0;
                     count_perTd = 0;
@@ -397,7 +401,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown
                         , holiday_off_value
                         , b);
-                edittext_TournamentTotal.setText(String.valueOf(total));
+
+                edittext_TournamentTotal.setText(String.valueOf(String.format("%.2f", total)));
             }
         });
 
@@ -481,10 +486,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                     if (d.contains("-")) {
                         d = d.replace("-", "");
                     }
-                    calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
-                            Integer.parseInt(m),
-                            Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value
-                            , b);
+
+                    if (is_supervisor == 1) {
+                        showSelectHolidayPayForSupervisor(hr, m, d);
+                    } else
+                        calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
+                                Integer.parseInt(m),
+                                Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value
+                                , b);
 
                 } else {
                     holidayPay = 0;
@@ -664,6 +673,39 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
             }
         });
+    }
+
+    private void showSelectHolidayPayForSupervisor(final String hr, final String m, final String d) {
+        AlertDialog.Builder builderSingle = new AlertDialog.Builder(AddDayActivity.this);
+        //builderSingle.setIcon(R.drawable.ic_launcher);
+        builderSingle.setTitle("Select Holiday Pay");
+        builderSingle.setCancelable(false);
+
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getBaseContext(), android.R.layout.select_dialog_singlechoice);
+        arrayAdapter.add("Time and a Half");
+        arrayAdapter.add("Double Pay");
+        arrayAdapter.add("Triple Pay");
+
+        /*builderSingle.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });*/
+
+        builderSingle.setAdapter(arrayAdapter, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String strName = arrayAdapter.getItem(which);
+                holiday_off_value = strName;
+                calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
+                        Integer.parseInt(m),
+                        Integer.parseInt(d), result_tip_outpercentage, total_tipsInput, total_tournamentdown, holiday_off_value
+                        , b);
+                dialog.dismiss();
+            }
+        });
+        builderSingle.show();
     }
 
     public void findViewByIds() {
@@ -1562,6 +1604,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             showTipsView();
 
             if (selectedTipeesID.size() > 0) {
+
                 getAllTipees(selectedTipeesID, fetched);
                 //  text_tip_out_percent.setVisibility(View.VISIBLE);
 //                total_tipoutPer.setVisibility(View.VISIBLE);
@@ -1643,6 +1686,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
         if (tipeeInfos != null) {
             selected_tipeesIDs = new ArrayList<>();
+            if (addDay != null)
+                selected_tipeesIDs = new ArrayList<>(Arrays.asList(convertStringToArray(addDay.getTip_out_tipees())).get(0));
             //      checked = fetched;
             checked = CheckedTipeesAddDays;
 
@@ -1652,6 +1697,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             adapter = new FetchedTipeeAdapter(AddDayActivity.this, selectedProfileTipees, info, true, new TipeeChecked() {
                 @Override
                 public void OnTipeeChange(boolean isChecked, TipeeInfo tipeeInfo, int position) {
+                    temp_arraylist.put(tipeeInfo.getId(), isChecked);
                     if (isChecked) {
                         checkedTipeeCalculations(tipeeInfo);
                     } else {
@@ -1663,6 +1709,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 }
                             }
                         }
+
+                        //checkedTipeeCalculations(tipeeInfo);
                         String per = tipeeInfo.getPercentage();
                         double tipOut = 0;
                         if (!per.equalsIgnoreCase("")) {
@@ -1688,7 +1736,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                                 Integer.parseInt(m),
                                 Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
-
 
                     }
                 }
@@ -2064,6 +2111,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 } else {
                     finalEarning = finalEarning - val;
                 }
+            } else if (holiday_payoff_data.equalsIgnoreCase("Triple Pay")) {
+                double val = finalEarning;
+
+                if (holidayPay == 1) {
+                    finalEarning = finalEarning + val * 2;
+                } else {
+                    finalEarning = finalEarning - val * 2;
+                }
             }
         }
         calculated_wages_hourly = String.valueOf(finalEarning);
@@ -2160,9 +2215,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         }
 
 
-
-
-
         d = new Date(start_format);
         d1 = new Date(end_format);
         updated_start_values = d.getTime();
@@ -2188,7 +2240,9 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             }
 
             text_tip_out_percent.setText(addDay.getTip_out_percentage());
+            tipeePercent = Double.parseDouble(addDay.getTip_out_percentage().replace('%', ' ').trim());
             total_tipout.setText(addDay.getTip_out());
+
         /*    if (!addDay.getTounament_count().equalsIgnoreCase("")) {
                 stable_count = Integer.parseInt(addDay.getTounament_count());
             }*/
@@ -2234,6 +2288,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 //  fetched = new ArrayList<>(Arrays.asList(convertStringToArray(String.valueOf(addDay.getTip_out_tipees())).get(0)));
 
                 if (fetched != null && fetched.size() > 0) {
+                    //selectedTipeesID = addDay.getTip
                     getAllTipees(selectedTipeesID, fetched);
                     text_tip_out_percent.setVisibility(View.VISIBLE);
                     total_tipoutPer.setVisibility(View.VISIBLE);
@@ -2303,8 +2358,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             updateDayOffView();
         }
-        edittext_TournamentTotal.setText(addDay.getTotal_tournament_downs());
-        edittext_perTD.setText(addDay.getTournament_perday());
+        if (!addDay.getTotal_tournament_downs().equalsIgnoreCase(""))
+            edittext_TournamentTotal.setText(String.valueOf(String.format("%.2f", Double.valueOf(addDay.getTotal_tournament_downs()))));
+        if (!addDay.getTournament_perday().equalsIgnoreCase(""))
+            edittext_perTD.setText(String.valueOf(String.format("%.2f", Double.valueOf(addDay.getTournament_perday()))));
     }
 
     @Override

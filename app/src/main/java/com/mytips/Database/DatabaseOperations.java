@@ -6,16 +6,12 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import com.mytips.ActiveProfiles;
 import com.mytips.Model.AddDay;
 import com.mytips.Model.CountList;
 import com.mytips.Model.Profiles;
 import com.mytips.Model.TipeeInfo;
-import com.mytips.SettingsActivity;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 /**
  * Created by Beesolver on 05-10-2017.
@@ -572,7 +568,7 @@ public class DatabaseOperations {
         if (profile.equalsIgnoreCase("All")) {
             query = "select * from  add_table  Order By start_shift_long";
         } else {
-            query = "select * from  add_table where  id=  '" + profileID + "'  Order By start_shift_long";
+            query = "select * from  add_table where  profile_id=  '" + profileID + "'  Order By start_shift_long";
         }
 
         try {
