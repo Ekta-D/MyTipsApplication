@@ -33,4 +33,24 @@
     <color name="red">#e20b12</color>
     <color name="green">#4a795c</color>
     <color name="black">#212121</color>
+
+
+        <color name="intro_blue">#00b4ff</color>
+        <color name="intro_aqua">#00deff</color>
+        <color name="intro_green">#5cf058</color>
+        <color name="intro_cherry">#fb5e65</color>
+        <color name="intro_orange">#fe991e</color>
+        <color name="intro_purple">#b400ff</color>
+        <color name="intro_yellow">#f0c106</color>
+
+        <array name="intro_rainbow">
+            <item>@color/intro_blue</item>
+            <item>@color/intro_aqua</item>
+            <item>@color/intro_green</item>
+            <item>@color/intro_cherry</item>
+            <item>@color/intro_orange</item>
+            <item>@color/intro_purple</item>
+            <item>@color/intro_yellow</item>
+        </array>
+
 </resources>

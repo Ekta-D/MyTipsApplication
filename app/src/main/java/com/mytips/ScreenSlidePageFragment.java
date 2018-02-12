@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 /**
@@ -72,8 +73,12 @@ public class ScreenSlidePageFragment extends Fragment {
 
         TypedArray images = getResources().obtainTypedArray(R.array.onboarding_images);
 
+        int[] rainbow = getActivity().getResources().getIntArray(R.array.intro_rainbow);
+
+        LinearLayout layoutBack = (LinearLayout) rootView.findViewById(R.id.layout_back);
         ImageView view = rootView.findViewById(R.id.imageView);
         view.setImageDrawable(getResources().getDrawable(images.getResourceId(mPageNumber,-1)));
+        layoutBack.setBackgroundColor(rainbow[mPageNumber]);
         images.recycle();
         // Set the title view to show the page number.
         /*((TextView) rootView.findViewById(android.R.id.text1)).setText(
