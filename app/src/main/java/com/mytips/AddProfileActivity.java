@@ -32,11 +32,14 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.itextpdf.text.pdf.parser.Line;
 import com.mytips.Adapter.FetchedTipeeAdapter;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Interface.TipeeChecked;
@@ -58,7 +61,7 @@ import java.util.Map;
 import java.util.Random;
 
 
-public class AddProfileActivity extends AppCompatActivity {
+public class AddProfileActivity extends AppCompatActivity implements View.OnClickListener {
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
 
     ImageButton imageButton;
@@ -86,6 +89,9 @@ public class AddProfileActivity extends AppCompatActivity {
     int[] profile_colors;
     ArrayList<Integer> clicked_positions;
     HashMap<String, Boolean> temp_arraylist = new HashMap<>();
+
+    LinearLayout color01, color02, color03, color04, color05, color06;
+    ImageView selected01, selected02, selected03, selected04, selected05, selected06;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,9 +127,32 @@ public class AddProfileActivity extends AppCompatActivity {
         if (b != null) {
             clicked_positions = new ArrayList<>();
         }
+
+
     }
 
     public void initView() {
+
+        color01 = (LinearLayout) findViewById(R.id.color_1);
+        color02 = (LinearLayout) findViewById(R.id.color_2);
+        color03 = (LinearLayout) findViewById(R.id.color_3);
+        color04 = (LinearLayout) findViewById(R.id.color_4);
+        color05 = (LinearLayout) findViewById(R.id.color_5);
+        color06 = (LinearLayout) findViewById(R.id.color_6);
+
+        selected01 = (ImageView) findViewById(R.id.selected_1);
+        selected02 = (ImageView) findViewById(R.id.selected_2);
+        selected03 = (ImageView) findViewById(R.id.selected_3);
+        selected04 = (ImageView) findViewById(R.id.selected_4);
+        selected05 = (ImageView) findViewById(R.id.selected_5);
+        selected06 = (ImageView) findViewById(R.id.selected_6);
+
+        color01.setOnClickListener(this);
+        color02.setOnClickListener(this);
+        color03.setOnClickListener(this);
+        color04.setOnClickListener(this);
+        color05.setOnClickListener(this);
+        color06.setOnClickListener(this);
 
         dbOperations = new DatabaseOperations(AddProfileActivity.this);
         listView_fetched_tipees = (ListView) findViewById(R.id.fetched_tipees);
@@ -319,11 +348,11 @@ public class AddProfileActivity extends AppCompatActivity {
 
                         try {
 
-                            int color = getRandomColor(profile_colors);
+//                            int color = getRandomColor(profile_colors);
 
                             dbOperations.insertProfileInfoIntoDatabase(profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString(), image_name, color);
+                                    joinedString.toString(), image_name, chosen_color);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -526,6 +555,63 @@ public class AddProfileActivity extends AppCompatActivity {
 
         image_name = profiles.getProfile_pic();
         profileColors = profiles.getProfile_color();
+        if (profileColors==0)
+        {
+            selected01.setVisibility(View.VISIBLE);
+            selected02.setVisibility(View.GONE);
+            selected03.setVisibility(View.GONE);
+            selected04.setVisibility(View.GONE);
+            selected05.setVisibility(View.GONE);
+            selected06.setVisibility(View.GONE);
+
+        }
+        else if (profileColors==1)
+        {
+            selected02.setVisibility(View.VISIBLE);
+            selected01.setVisibility(View.GONE);
+            selected03.setVisibility(View.GONE);
+            selected04.setVisibility(View.GONE);
+            selected05.setVisibility(View.GONE);
+            selected06.setVisibility(View.GONE);
+
+        }else if (profileColors==2)
+        {
+            selected03.setVisibility(View.VISIBLE);
+
+            selected02.setVisibility(View.GONE);
+            selected01.setVisibility(View.GONE);
+            selected04.setVisibility(View.GONE);
+            selected05.setVisibility(View.GONE);
+            selected06.setVisibility(View.GONE);
+
+        }else if (profileColors==3)
+        {
+            selected04.setVisibility(View.VISIBLE);
+            selected02.setVisibility(View.GONE);
+            selected01.setVisibility(View.GONE);
+            selected03.setVisibility(View.GONE);
+            selected05.setVisibility(View.GONE);
+            selected06.setVisibility(View.GONE);
+
+        }else if (profileColors==4)
+        {
+            selected05.setVisibility(View.VISIBLE);
+            selected02.setVisibility(View.GONE);
+            selected01.setVisibility(View.GONE);
+            selected03.setVisibility(View.GONE);
+            selected04.setVisibility(View.GONE);
+            selected06.setVisibility(View.GONE);
+
+        }else if (profileColors==5)
+        {
+            selected06.setVisibility(View.VISIBLE);
+            selected02.setVisibility(View.GONE);
+            selected01.setVisibility(View.GONE);
+            selected03.setVisibility(View.GONE);
+            selected04.setVisibility(View.GONE);
+            selected05.setVisibility(View.GONE);
+
+        }
         tipeeInfos = new ArrayList<>();
 
         tipeeInfos = new DatabaseOperations(AddProfileActivity.this).fetchTipeeList(AddProfileActivity.this);
@@ -617,55 +703,73 @@ public class AddProfileActivity extends AppCompatActivity {
     }
 
 
-/*    public boolean checkPermissions() {
-        int permissionWrite = ContextCompat.checkSelfPermission(this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        int storagePermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        int camera_permission = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-        int finger_print = ContextCompat.checkSelfPermission(this, Manifest.permission.USE_FINGERPRINT);
-        List<String> listPermissionsNeeded = new ArrayList<>();
-
-        if (storagePermission != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-        }
-        if (permissionWrite != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        }
-        if (camera_permission != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.CAMERA);
-        }
-
-        if (finger_print != PackageManager.PERMISSION_GRANTED) {
-            listPermissionsNeeded.add(Manifest.permission.USE_FINGERPRINT);
-        }
-
-        if (!listPermissionsNeeded.isEmpty()) {
-            ActivityCompat.requestPermissions(this,
-                    listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]), MY_PERMISSIONS_REQUEST_ACCOUNTS);
-            return false;
-        }
-
-        return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_REQUEST_ACCOUNTS:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                    //Toast.makeText(SplashActivity.this, "permissions granted!", Toast.LENGTH_SHORT).show();
-                } else {
-                    //Toast.makeText(SplashActivity.this, "permissions not granted!", Toast.LENGTH_SHORT).show();
-                }
-                break;
-        }
-    }*/
-
-
     public static int getRandomColor(int[] array) {
         int rnd = new Random().nextInt(array.length);
         return rnd;
+    }
+
+    int chosen_color = 0;
+
+    @Override
+    public void onClick(View v) {
+
+        switch (v.getId()) {
+            case R.id.color_1:
+                chosen_color = 0;
+                selected01.setVisibility(View.VISIBLE);
+                selected02.setVisibility(View.GONE);
+                selected03.setVisibility(View.GONE);
+                selected04.setVisibility(View.GONE);
+                selected05.setVisibility(View.GONE);
+                selected06.setVisibility(View.GONE);
+                break;
+            case R.id.color_2:
+                chosen_color = 1;
+                selected02.setVisibility(View.VISIBLE);
+                selected01.setVisibility(View.GONE);
+                selected03.setVisibility(View.GONE);
+                selected04.setVisibility(View.GONE);
+                selected05.setVisibility(View.GONE);
+                selected06.setVisibility(View.GONE);
+                break;
+            case R.id.color_3:
+                chosen_color = 2;
+                selected03.setVisibility(View.VISIBLE);
+
+                selected02.setVisibility(View.GONE);
+                selected01.setVisibility(View.GONE);
+                selected04.setVisibility(View.GONE);
+                selected05.setVisibility(View.GONE);
+                selected06.setVisibility(View.GONE);
+                break;
+            case R.id.color_4:
+                chosen_color = 3;
+                selected04.setVisibility(View.VISIBLE);
+                selected02.setVisibility(View.GONE);
+                selected01.setVisibility(View.GONE);
+                selected03.setVisibility(View.GONE);
+                selected05.setVisibility(View.GONE);
+                selected06.setVisibility(View.GONE);
+                break;
+            case R.id.color_5:
+                chosen_color = 4;
+                selected05.setVisibility(View.VISIBLE);
+                selected02.setVisibility(View.GONE);
+                selected01.setVisibility(View.GONE);
+                selected03.setVisibility(View.GONE);
+                selected04.setVisibility(View.GONE);
+                selected06.setVisibility(View.GONE);
+                break;
+            case R.id.color_6:
+                chosen_color = 5;
+                selected06.setVisibility(View.VISIBLE);
+                selected02.setVisibility(View.GONE);
+                selected01.setVisibility(View.GONE);
+                selected03.setVisibility(View.GONE);
+                selected04.setVisibility(View.GONE);
+                selected05.setVisibility(View.GONE);
+                break;
+        }
+
     }
 }

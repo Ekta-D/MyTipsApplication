@@ -53,4 +53,13 @@
             <item>@color/intro_yellow</item>
         </array>
 
+
+    <color name="profile_color1">#FF0000</color>
+    <color name="profile_color2">#006400</color>
+    <color name="profile_color3">#0000FF</color>
+    <color name="profile_color4">#8B4513</color>
+    <color name="profile_color5">#EE82EE</color>
+    <color name="profile_color6">#7EC0EE</color>
+    <color name="profile_color7">#FFA500</color>
+    <color name="profile_color8">#808000</color>
 </resources>

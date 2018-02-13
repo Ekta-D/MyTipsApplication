@@ -70,14 +70,14 @@ public class ScreenSlideActivity extends FragmentActivity implements View.OnClic
         super.onCreate(savedInstanceState);
 
 
-            View decorView = getWindow().getDecorView();
+        View decorView = getWindow().getDecorView();
 // Hide the status bar.
-            int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-            decorView.setSystemUiVisibility(uiOptions);
+        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+        decorView.setSystemUiVisibility(uiOptions);
 // Remember that you should never show the action bar if the
 // status bar is hidden, so hide that too if necessary.
-            ActionBar actionBar = getActionBar();
-            actionBar.hide();
+        ActionBar actionBar = getActionBar();
+        actionBar.hide();
 
 
         //CommonMethods.setTheme(getActionBar(), ScreenSlideActivity.this);
@@ -120,15 +120,19 @@ public class ScreenSlideActivity extends FragmentActivity implements View.OnClic
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.activity_screen_slide, menu);
 
-        menu.findItem(R.id.action_previous).setEnabled(mPager.getCurrentItem() > 0);
+        if (mPager != null) {
+            menu.findItem(R.id.action_previous).setEnabled(mPager.getCurrentItem() > 0);
 
-        // Add either a "next" or "finish" button to the action bar, depending on which page
-        // is currently selected.
-        MenuItem item = menu.add(Menu.NONE, R.id.action_next, Menu.NONE,
-                (mPager.getCurrentItem() == mPagerAdapter.getCount() - 1)
-                        ? R.string.action_finish
-                        : R.string.action_next);
-        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+            // Add either a "next" or "finish" button to the action bar, depending on which page
+            // is currently selected.
+            MenuItem item = menu.add(Menu.NONE, R.id.action_next, Menu.NONE,
+                    (mPager.getCurrentItem() == mPagerAdapter.getCount() - 1)
+                            ? R.string.action_finish
+                            : R.string.action_next);
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+        }
+
         return true;
     }
 
@@ -189,7 +193,7 @@ public class ScreenSlideActivity extends FragmentActivity implements View.OnClic
 
         @Override
         public Fragment getItem(int position) {
-            if(position > 6)
+            if (position > 6)
                 next.setText("Finish");
             else
                 next.setText("Next");

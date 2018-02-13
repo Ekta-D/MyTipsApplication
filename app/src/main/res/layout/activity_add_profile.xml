@@ -40,7 +40,7 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/checkBox_gets_tips" />
+            app:layout_constraintTop_toBottomOf="@+id/color_chooser_layout" />
 
         <TextView
             android:id="@+id/textView7"
@@ -95,8 +95,8 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:text="Are you a Supervisor?"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_is_supervisor"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/checkBox_is_supervisor" />
 
         <TextView
@@ -106,8 +106,8 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:text="Do you get Tournament Tips?"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_gets_tournament_tips"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/checkBox_gets_tournament_tips" />
 
         <CheckBox
@@ -127,8 +127,8 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:text="Do you get Tips?"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/checkBox_gets_tips"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/checkBox_gets_tips" />
 
         <CheckBox
@@ -140,6 +140,17 @@
             android:layout_marginTop="8dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/checkBox_gets_tournament_tips" />
+
+        <TextView
+            android:id="@+id/choose_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:text="Choose color for your profile"
+            app:layout_constraintTop_toBottomOf="@+id/checkBox_gets_tips" />
+
 
         <TextView
             android:id="@+id/textView15"
@@ -173,8 +184,8 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:text="Start day of the week"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/spinner_start_day_of_week"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/spinner_start_day_of_week" />
 
         <Spinner
@@ -205,8 +216,8 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:text="Basic Hourly Pay"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/editText_houly_pay"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/editText_houly_pay" />
 
         <EditText
@@ -228,8 +239,8 @@
             android:layout_marginLeft="8dp"
             android:layout_marginStart="8dp"
             android:text="Holiday Pay"
-            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintBottom_toBottomOf="@+id/spinner_holiday_pay"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="@+id/spinner_holiday_pay" />
 
         <Spinner
@@ -259,18 +270,18 @@
             android:id="@+id/tipeess"
             android:layout_width="0dp"
             android:layout_height="100dp"
+            android:layout_marginBottom="20dp"
             android:layout_marginEnd="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="7dp"
             android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView20"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="20dp">
+            app:layout_constraintTop_toBottomOf="@+id/textView20">
 
 
             <ListView
@@ -289,6 +300,22 @@
                 android:visibility="visible" />
 
         </RelativeLayout>
+
+
+        <LinearLayout
+            android:id="@+id/color_chooser_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            app:layout_constraintTop_toBottomOf="@+id/choose_text">
+
+            <include layout="@layout/color_chooser" />
+
+        </LinearLayout>
+
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

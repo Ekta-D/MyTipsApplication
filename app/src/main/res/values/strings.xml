@@ -127,12 +127,12 @@
     <string name="select_file">tipeesDB.db</string>
 
     <array name="profile_colors">
-        <item>@color/blue_primary_dark</item>
-        <item>@color/orange_accent</item>
-        <item>@color/orange_primary_dark</item>
-        <item>@color/red</item>
-        <item>@color/green</item>
-        <item>@color/black</item>
+        <item>@color/profile_color1</item>
+        <item>@color/profile_color2</item>
+        <item>@color/profile_color3</item>
+        <item>@color/profile_color4</item>
+        <item>@color/profile_color5</item>
+        <item>@color/profile_color6</item>
 
     </array>
 
