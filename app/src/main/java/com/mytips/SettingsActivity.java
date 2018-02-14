@@ -450,13 +450,20 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                 CharSequence[] entries = listPreference.getEntries();
 
                 int tempIndex = 0;
-                if (index == -1) {
-                    tempIndex = 2;
-                } else if (index == 0) {
+                if (index == 0)
                     tempIndex = 1;
-                } else {
-                    tempIndex = 0;
-                }
+                else if (index == -1)
+                    tempIndex = 2;
+                else if (index == -2)
+                    tempIndex = 3;
+                else if (index == -3)
+                    tempIndex = 4;
+                else if (index == -4)
+                    tempIndex = 5;
+                else if (index == -5)
+                    tempIndex = 6;
+
+
                 preference.setSummary(entries[tempIndex]);
                 CommonMethods.setTheme(getSupportActionBar(), SettingsActivity.this);
                 return true;
@@ -526,8 +533,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                                 if (name.equalsIgnoreCase(" ") || percent.equalsIgnoreCase("")) {
                                     Toast.makeText(SettingsActivity.this, "Please enter details of tippee!", Toast.LENGTH_SHORT).show();
                                     return;
-                                }
-                                else{
+                                } else {
                                     if (!percent.equalsIgnoreCase("")) {
                                         tipee_percent = Double.parseDouble(percent);
                                     }

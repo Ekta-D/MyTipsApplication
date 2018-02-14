@@ -3,6 +3,13 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#7f303f9f</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="intro_blue_dark">#81c5e1</color>
+    <color name="intro_aqua_dark">#6cdff1</color>
+    <color name="intro_green_dark">#51bc4e</color>
+    <color name="intro_cherry_dark">#fb5e65</color>
+    <color name="intro_orange_dark">#ed8507</color>
+    <color name="intro_purple_dark">#9e13d9</color>
+    <color name="intro_yellow_dark">#cca507</color>
     <!--
         <color name="colorPrimaryLight">#7fe4e3e3</color>
         <color name="colorPrimaryDarkLight">#e6a3a3a3</color>

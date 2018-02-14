@@ -35,18 +35,54 @@ public class CommonMethods {
         if (sharedPreferences.getInt("selected_theme", 0) == 1) {
             //default Black and white
             if (actionBar != null)
-                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.colorPrimary)));
-            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.colorPrimaryDark), context.getResources().getColor(R.color.colorPrimary));
+
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_blue)));
+            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_blue_dark), context.getResources().getColor(R.color.intro_blue));
         } else if (sharedPreferences.getInt("selected_theme", 0) == 0) {
             //Navy Blue and white
             if (actionBar != null)
-                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.blue_primary)));
-            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.blue_primary_dark), context.getResources().getColor(R.color.blue_primary));
+
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_aqua)));
+            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_aqua_dark), context.getResources().getColor(R.color.intro_aqua));
         } else if (sharedPreferences.getInt("selected_theme", 0) == -1) {
             //Orange and white
             if (actionBar != null)
-                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.orange_primary)));
-            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.orange_primary_dark), context.getResources().getColor(R.color.orange_primary));
+
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_green)));
+            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_green_dark), context.getResources().getColor(R.color.intro_green));
+
+        }
+
+        else if (sharedPreferences.getInt("selected_theme", 0) == -2) {
+            //Orange and white
+            if (actionBar != null)
+
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_cherry)));
+            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_cherry_dark), context.getResources().getColor(R.color.intro_cherry));
+
+        }
+        else if (sharedPreferences.getInt("selected_theme", 0) == -3) {
+            //Orange and white
+            if (actionBar != null)
+
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_orange)));
+            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_orange_dark), context.getResources().getColor(R.color.intro_orange));
+
+        }
+        else if (sharedPreferences.getInt("selected_theme", 0) == -4) {
+            //Orange and white
+            if (actionBar != null)
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_purple)));
+            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_purple_dark), context.getResources().getColor(R.color.intro_purple));
+
+
+        }
+        else if (sharedPreferences.getInt("selected_theme", 0) == -5) {
+            //Orange and white
+            if (actionBar != null)
+                actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_yellow)));
+            setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_yellow_dark), context.getResources().getColor(R.color.intro_yellow));
+
         }
     }
 
