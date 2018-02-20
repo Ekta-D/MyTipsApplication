@@ -279,24 +279,28 @@ public class DatabaseOperations {
                     int is_supervisor = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsSupervisor));
                     int get_tournament = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GetTournamentTip));
                     int get_tips = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GetTips));
-                    String startday = cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek));
-                    String holodayPay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay));
-                    String tipees = cursor.getString(cursor.getColumnIndex(DatabaseUtils.Tipees));
+//                    String startday = cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek));
+//                    String holodayPay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay));
+//                    String tipees = cursor.getString(cursor.getColumnIndex(DatabaseUtils.Tipees));
 
                     profiles.setId(Integer.parseInt(id));
                     profiles.setIs_supervisor(is_supervisor);
-                    profiles.setStartday(startday);
+
                     profiles.setGet_tips(get_tips);
                     profiles.setGet_tournamenttip(get_tournament);
-                    profiles.setHoliday_pay(holodayPay);
+
                     profiles.setProfile_id(profileId);
                     profiles.setProfile_name(profileName);
                     profiles.setPay_period(payPeriod);
                     profiles.setHourly_pay(hourlypay);
                     profiles.setIs_active(isActive);
-                    profiles.setTipees_name(tipees);
-                    profiles.setProfile_pic(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfilePic)));
-                    profiles.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.ProfileColor)));
+                    profiles.setStartday(cursor.getColumnIndex(DatabaseUtils.StartDayWeek) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)) : "0");
+                    profiles.setHoliday_pay(cursor.getColumnIndex(DatabaseUtils.HolidayPay) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay)) : "");
+                    profiles.setTipees_name(cursor.getColumnIndex(DatabaseUtils.Tipees) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.Tipees)) : "");
+
+                    profiles.setProfile_pic((cursor.getColumnIndex(DatabaseUtils.ProfilePic) != -1) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfilePic)) : "");
+                    profiles.setProfile_color((cursor.getColumnIndex(DatabaseUtils.ProfileColor) != -1) ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.ProfileColor)) : 0);
+
                     profilesList.add(profiles);
                 }
                 while (cursor.moveToNext());
@@ -406,17 +410,17 @@ public class DatabaseOperations {
                 do {
                     addDay = new AddDay();
                     addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
-                    addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
-                    addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
-                    addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
-                    addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
-                    addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
-                    addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
-                    addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
-                    addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
-                    addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
-                    addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
-                    addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
+                    addDay.setProfile(cursor.getColumnIndex(DatabaseUtils.Profile) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)) : "");
+                    addDay.setCalculated_hours(cursor.getColumnIndex(DatabaseUtils.CalculatedHours) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)) : "0");
+                    addDay.setIsHolidaypay(cursor.getColumnIndex(DatabaseUtils.isHolidayPay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)) : 0);
+                    addDay.setDay_off(cursor.getColumnIndex(DatabaseUtils.IsDayOff) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)) : 0);
+                    addDay.setTotal_tips(cursor.getColumnIndex(DatabaseUtils.TotalTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)) : "0");
+                    addDay.setTip_out_tipees(cursor.getColumnIndex(DatabaseUtils.TipOutTipees) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)) : "");
+                    addDay.setTounament_count(cursor.getColumnIndex(DatabaseUtils.TournamentCount) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)) : "0");
+                    addDay.setTournament_perday(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)) : "0");
+                    addDay.setTip_out_percentage(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)) : "0");
+                    addDay.setTip_out(cursor.getColumnIndex(DatabaseUtils.TotaTipOut) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)) : "0");
+                    addDay.setTotal_tournament_downs(cursor.getColumnIndex(DatabaseUtils.TounamentDowns) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)) : "0");
                     addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
                     addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
                     addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
@@ -428,13 +432,14 @@ public class DatabaseOperations {
                     addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                     addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                     addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
-                    addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
-                    addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
-                    addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
-                    addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
-                    addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
-                    addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
-                    addDay.setProfile_wage_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)));
+                    addDay.setDollar_checked(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)) : 0);
+                    addDay.setManual_tips(cursor.getColumnIndex(DatabaseUtils.ManualTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)) : "0");
+                    addDay.setProfile_color(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)) : 0);
+                    addDay.setIsEndPay(cursor.getColumnIndex(DatabaseUtils.isEndDay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)) : 0);
+                    addDay.setTotal_hours(cursor.getColumnIndex(DatabaseUtils.TotalHr) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)) : 0);
+                    addDay.setTotal_minutes(cursor.getColumnIndex(DatabaseUtils.TotalMin) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)) : 0);
+                    addDay.setProfile_wage_hourly((cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage) != -1) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)) : "0");
+
                     addDayArrayList.add(addDay);
                 }
                 while (cursor.moveToNext());
@@ -519,17 +524,17 @@ public class DatabaseOperations {
                     do {
                         addDay = new AddDay();
                         addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
-                        addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
-                        addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
-                        addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
-                        addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
-                        addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
-                        addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
-                        addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
-                        addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
-                        addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
-                        addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
-                        addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
+                        addDay.setProfile(cursor.getColumnIndex(DatabaseUtils.Profile) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)) : "");
+                        addDay.setCalculated_hours(cursor.getColumnIndex(DatabaseUtils.CalculatedHours) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)) : "0");
+                        addDay.setIsHolidaypay(cursor.getColumnIndex(DatabaseUtils.isHolidayPay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)) : 0);
+                        addDay.setDay_off(cursor.getColumnIndex(DatabaseUtils.IsDayOff) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)) : 0);
+                        addDay.setTotal_tips(cursor.getColumnIndex(DatabaseUtils.TotalTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)) : "0");
+                        addDay.setTip_out_tipees(cursor.getColumnIndex(DatabaseUtils.TipOutTipees) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)) : "");
+                        addDay.setTounament_count(cursor.getColumnIndex(DatabaseUtils.TournamentCount) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)) : "0");
+                        addDay.setTournament_perday(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)) : "0");
+                        addDay.setTip_out_percentage(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)) : "0");
+                        addDay.setTip_out(cursor.getColumnIndex(DatabaseUtils.TotaTipOut) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)) : "0");
+                        addDay.setTotal_tournament_downs(cursor.getColumnIndex(DatabaseUtils.TounamentDowns) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)) : "0");
                         addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
                         addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
                         addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
@@ -541,13 +546,14 @@ public class DatabaseOperations {
                         addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                         addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
-                        addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
-                        addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
-                        addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
-                        addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
-                        addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
-                        addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
-                        addDay.setProfile_wage_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)));
+                        addDay.setDollar_checked(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)) : 0);
+                        addDay.setManual_tips(cursor.getColumnIndex(DatabaseUtils.ManualTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)) : "0");
+                        addDay.setProfile_color(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)) : 0);
+                        addDay.setIsEndPay(cursor.getColumnIndex(DatabaseUtils.isEndDay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)) : 0);
+                        addDay.setTotal_hours(cursor.getColumnIndex(DatabaseUtils.TotalHr) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)) : 0);
+                        addDay.setTotal_minutes(cursor.getColumnIndex(DatabaseUtils.TotalMin) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)) : 0);
+                        addDay.setProfile_wage_hourly((cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage) != -1) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)) : "0");
+
                         fetched_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -587,17 +593,17 @@ public class DatabaseOperations {
 
                         addDay = new AddDay();
                         addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
-                        addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
-                        addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
-                        addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
-                        addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
-                        addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
-                        addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
-                        addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
-                        addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
-                        addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
-                        addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
-                        addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
+                        addDay.setProfile(cursor.getColumnIndex(DatabaseUtils.Profile) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)) : "");
+                        addDay.setCalculated_hours(cursor.getColumnIndex(DatabaseUtils.CalculatedHours) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)) : "0");
+                        addDay.setIsHolidaypay(cursor.getColumnIndex(DatabaseUtils.isHolidayPay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)) : 0);
+                        addDay.setDay_off(cursor.getColumnIndex(DatabaseUtils.IsDayOff) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)) : 0);
+                        addDay.setTotal_tips(cursor.getColumnIndex(DatabaseUtils.TotalTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)) : "0");
+                        addDay.setTip_out_tipees(cursor.getColumnIndex(DatabaseUtils.TipOutTipees) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)) : "");
+                        addDay.setTounament_count(cursor.getColumnIndex(DatabaseUtils.TournamentCount) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)) : "0");
+                        addDay.setTournament_perday(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)) : "0");
+                        addDay.setTip_out_percentage(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)) : "0");
+                        addDay.setTip_out(cursor.getColumnIndex(DatabaseUtils.TotaTipOut) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)) : "0");
+                        addDay.setTotal_tournament_downs(cursor.getColumnIndex(DatabaseUtils.TounamentDowns) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)) : "0");
                         addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
                         addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
                         addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
@@ -609,13 +615,15 @@ public class DatabaseOperations {
                         addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                         addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
-                        addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
-                        addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
-                        addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
-                        addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
-                        addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
-                        addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
-                        addDay.setProfile_wage_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)));
+                        addDay.setDollar_checked(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)) : 0);
+                        addDay.setManual_tips(cursor.getColumnIndex(DatabaseUtils.ManualTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)) : "0");
+                        addDay.setProfile_color(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)) : 0);
+                        addDay.setIsEndPay(cursor.getColumnIndex(DatabaseUtils.isEndDay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)) : 0);
+                        addDay.setTotal_hours(cursor.getColumnIndex(DatabaseUtils.TotalHr) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)) : 0);
+                        addDay.setTotal_minutes(cursor.getColumnIndex(DatabaseUtils.TotalMin) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)) : 0);
+
+                        addDay.setProfile_wage_hourly((cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage) != -1) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)) : "0");
+
                         daily_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -653,17 +661,17 @@ public class DatabaseOperations {
 
                         addDay = new AddDay();
                         addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
-                        addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
-                        addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
-                        addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
-                        addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
-                        addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
-                        addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
-                        addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
-                        addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
-                        addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
-                        addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
-                        addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
+                        addDay.setProfile(cursor.getColumnIndex(DatabaseUtils.Profile) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)) : "");
+                        addDay.setCalculated_hours(cursor.getColumnIndex(DatabaseUtils.CalculatedHours) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)) : "0");
+                        addDay.setIsHolidaypay(cursor.getColumnIndex(DatabaseUtils.isHolidayPay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)) : 0);
+                        addDay.setDay_off(cursor.getColumnIndex(DatabaseUtils.IsDayOff) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)) : 0);
+                        addDay.setTotal_tips(cursor.getColumnIndex(DatabaseUtils.TotalTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)) : "0");
+                        addDay.setTip_out_tipees(cursor.getColumnIndex(DatabaseUtils.TipOutTipees) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)) : "");
+                        addDay.setTounament_count(cursor.getColumnIndex(DatabaseUtils.TournamentCount) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)) : "0");
+                        addDay.setTournament_perday(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)) : "0");
+                        addDay.setTip_out_percentage(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)) : "0");
+                        addDay.setTip_out(cursor.getColumnIndex(DatabaseUtils.TotaTipOut) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)) : "0");
+                        addDay.setTotal_tournament_downs(cursor.getColumnIndex(DatabaseUtils.TounamentDowns) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)) : "0");
                         addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
                         addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
                         addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
@@ -675,13 +683,14 @@ public class DatabaseOperations {
                         addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                         addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
-                        addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
-                        addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
-                        addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
-                        addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
-                        addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
-                        addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
-                        addDay.setProfile_wage_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)));
+                        addDay.setDollar_checked(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)) : 0);
+                        addDay.setManual_tips(cursor.getColumnIndex(DatabaseUtils.ManualTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)) : "0");
+                        addDay.setProfile_color(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)) : 0);
+                        addDay.setIsEndPay(cursor.getColumnIndex(DatabaseUtils.isEndDay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)) : 0);
+                        addDay.setTotal_hours(cursor.getColumnIndex(DatabaseUtils.TotalHr) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)) : 0);
+                        addDay.setTotal_minutes(cursor.getColumnIndex(DatabaseUtils.TotalMin) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)) : 0);
+                        addDay.setProfile_wage_hourly((cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage) != -1) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)) : "0");
+
                         fetched_data.add(addDay);
                     }
                     while (cursor.moveToNext());
@@ -823,24 +832,28 @@ public class DatabaseOperations {
                     int is_supervisor = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsSupervisor));
                     int get_tournament = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GetTournamentTip));
                     int get_tips = cursor.getInt(cursor.getColumnIndex(DatabaseUtils.GetTips));
-                    String startday = cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek));
-                    String holodayPay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay));
-                    String tipees = cursor.getString(cursor.getColumnIndex(DatabaseUtils.Tipees));
+                    //  String startday = cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek));
+                    // String holodayPay = cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay));
+                    //  String tipees = cursor.getString(cursor.getColumnIndex(DatabaseUtils.Tipees));
 
                     profiles.setId(Integer.parseInt(id));
                     profiles.setIs_supervisor(is_supervisor);
-                    profiles.setStartday(startday);
+
                     profiles.setGet_tips(get_tips);
                     profiles.setGet_tournamenttip(get_tournament);
-                    profiles.setHoliday_pay(holodayPay);
+
                     profiles.setProfile_id(profileId);
                     profiles.setProfile_name(profileName);
                     profiles.setPay_period(payPeriod);
                     profiles.setHourly_pay(hourlypay);
                     profiles.setIs_active(isActive);
-                    profiles.setTipees_name(tipees);
-                    profiles.setProfile_pic(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfilePic)));
-                    profiles.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.ProfileColor)));
+                    profiles.setStartday(cursor.getColumnIndex(DatabaseUtils.StartDayWeek) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)) : "0");
+                    profiles.setHoliday_pay(cursor.getColumnIndex(DatabaseUtils.HolidayPay) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.HolidayPay)) : "");
+                    profiles.setTipees_name(cursor.getColumnIndex(DatabaseUtils.Tipees) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.Tipees)) : "");
+                    profiles.setProfile_pic(cursor.getColumnIndex(DatabaseUtils.ProfilePic) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfilePic)) : "");
+
+                    profiles.setProfile_color(cursor.getColumnIndex(DatabaseUtils.ProfileColor) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.ProfileColor)) : 0);
+
                     deactivated_profiles.add(profiles);
                 }
                 while (cursor.moveToNext());
@@ -915,17 +928,17 @@ public class DatabaseOperations {
 
                         addDay = new AddDay();
                         addDay.setId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Add_ID)));
-                        addDay.setProfile(cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)));
-                        addDay.setCalculated_hours(cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)));
-                        addDay.setIsHolidaypay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)));
-                        addDay.setDay_off(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)));
-                        addDay.setTotal_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)));
-                        addDay.setTip_out_tipees(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)));
-                        addDay.setTounament_count(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)));
-                        addDay.setTournament_perday(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)));
-                        addDay.setTip_out_percentage(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)));
-                        addDay.setTip_out(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)));
-                        addDay.setTotal_tournament_downs(cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)));
+                        addDay.setProfile(cursor.getColumnIndex(DatabaseUtils.Profile) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.Profile)) : "");
+                        addDay.setCalculated_hours(cursor.getColumnIndex(DatabaseUtils.CalculatedHours) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.CalculatedHours)) : "0");
+                        addDay.setIsHolidaypay(cursor.getColumnIndex(DatabaseUtils.isHolidayPay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isHolidayPay)) : 0);
+                        addDay.setDay_off(cursor.getColumnIndex(DatabaseUtils.IsDayOff) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.IsDayOff)) : 0);
+                        addDay.setTotal_tips(cursor.getColumnIndex(DatabaseUtils.TotalTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotalTips)) : "0");
+                        addDay.setTip_out_tipees(cursor.getColumnIndex(DatabaseUtils.TipOutTipees) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutTipees)) : "");
+                        addDay.setTounament_count(cursor.getColumnIndex(DatabaseUtils.TournamentCount) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentCount)) : "0");
+                        addDay.setTournament_perday(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TournamentPerDay)) : "0");
+                        addDay.setTip_out_percentage(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TipOutPercentage)) : "0");
+                        addDay.setTip_out(cursor.getColumnIndex(DatabaseUtils.TotaTipOut) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TotaTipOut)) : "0");
+                        addDay.setTotal_tournament_downs(cursor.getColumnIndex(DatabaseUtils.TounamentDowns) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.TounamentDowns)) : "0");
                         addDay.setStart_shift(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartShift)));
                         addDay.setCheck_in(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockIn)));
                         addDay.setCheck_out(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.ClockOut)));
@@ -937,13 +950,16 @@ public class DatabaseOperations {
                         addDay.setStart_day_week(cursor.getString(cursor.getColumnIndex(DatabaseUtils.StartDayWeek)));
                         addDay.setStart_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.StartShiftLong)));
                         addDay.setEnd_long(cursor.getLong(cursor.getColumnIndex(DatabaseUtils.EndShiftLong)));
-                        addDay.setDollar_checked(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)));
-                        addDay.setManual_tips(cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)));
-                        addDay.setProfile_color(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)));
-                        addDay.setIsEndPay(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)));
-                        addDay.setTotal_hours(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)));
-                        addDay.setTotal_minutes(cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)));
-                        addDay.setProfile_wage_hourly(cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)));
+                        addDay.setDollar_checked(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TipeeDollarChecked)) : 0);
+                        addDay.setManual_tips(cursor.getColumnIndex(DatabaseUtils.ManualTips) != -1 ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.ManualTips)) : "0");
+                        addDay.setProfile_color(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.SelectedProfileColor)) : 0);
+                        addDay.setIsEndPay(cursor.getColumnIndex(DatabaseUtils.isEndDay) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.isEndDay)) : 0);
+                        addDay.setTotal_hours(cursor.getColumnIndex(DatabaseUtils.TotalHr) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)) : 0);
+                        addDay.setTotal_minutes(cursor.getColumnIndex(DatabaseUtils.TotalMin) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)) : 0);
+                        addDay.setTotal_minutes((cursor.getColumnIndex(DatabaseUtils.TotalMin) != -1) ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)) : 0);
+
+                        addDay.setProfile_wage_hourly((cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage) != -1) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)) : "0");
+
                         addDays.add(addDay);
                     }
                     while (cursor.moveToNext());

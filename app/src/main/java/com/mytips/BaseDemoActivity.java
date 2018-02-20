@@ -44,7 +44,7 @@ public abstract class BaseDemoActivity extends AppCompatPreferenceActivity {
      * Request code for google sign-in
      */
     protected static final int REQUEST_CODE_SIGN_IN = 0;
-
+    protected static final int REQUEST_BACKUP_SIGN_IN = 4;
     /**
      * Request code for the Drive picker
      */
@@ -108,6 +108,11 @@ public abstract class BaseDemoActivity extends AppCompatPreferenceActivity {
 
                 }
                 break;
+            case REQUEST_BACKUP_SIGN_IN:
+                if (resultCode == RESULT_OK) {
+
+                }
+                break;
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -115,23 +120,25 @@ public abstract class BaseDemoActivity extends AppCompatPreferenceActivity {
     /**
      * Starts the sign-in process and initializes the Drive client.
      */
-    protected void signIn() {
+    protected void signIn(boolean is_backup) {
+
         Set<Scope> requiredScopes = new HashSet<>(2);
         requiredScopes.add(Drive.SCOPE_FILE);
         requiredScopes.add(Drive.SCOPE_APPFOLDER);
         GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(this);
-        if (signInAccount != null && signInAccount.getGrantedScopes().containsAll(requiredScopes)) {
-            initializeDriveClient(signInAccount);
 
-        } else {
-            GoogleSignInOptions signInOptions =
-                    new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                            .requestScopes(Drive.SCOPE_FILE)
-                            .requestScopes(Drive.SCOPE_APPFOLDER)
-                            .build();
-            GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, signInOptions);
-            startActivityForResult(googleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
-        }
+            if (signInAccount != null && signInAccount.getGrantedScopes().containsAll(requiredScopes)) {
+                initializeDriveClient(signInAccount);
+
+            } else {
+                GoogleSignInOptions signInOptions =
+                        new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .requestScopes(Drive.SCOPE_FILE)
+                                .requestScopes(Drive.SCOPE_APPFOLDER)
+                                .build();
+                GoogleSignInClient googleSignInClient = GoogleSignIn.getClient(this, signInOptions);
+                startActivityForResult(googleSignInClient.getSignInIntent(), REQUEST_CODE_SIGN_IN);
+            }
     }
 
     /**

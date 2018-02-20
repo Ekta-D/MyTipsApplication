@@ -685,7 +685,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 readFromGoogleDrive();
-                signIn();
+                signIn(false);
                 return true;
             }
         });
@@ -694,9 +694,16 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
         backupData.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
-                //signIn();
-                backupDataToDrive();
-                return true;
+                GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(SettingsActivity.this);
+                if (signInAccount==null)
+                {
+                    emailChooser();
+                }else{
+                    backupDataToDrive();
+                }
+
+
+                    return true;
             }
         });
 
@@ -926,16 +933,6 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
 //                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
-/*    @Override
-    public void onConnected(@Nullable Bundle bundle) {
-
-        if (mGoogleApiClient.isConnected()) {
-           // searchFileInDrive();
-            *//*String driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
-            java.io.File fl = new java.io.File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
-            DownloadFile(DriveId.decodeFromString(driveID), fl);*//*
-        }
-    }*/
 
     private void searchFileInDrive() {
 
@@ -963,28 +960,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Log.i("drive", "connected called");
-        /*if (mGoogleApiClient.isConnected()) {
-            if (!is_first) {
-                progressDialog.dismiss();
-                uploadToDrive();
-            }
 
-        } else {
-            if (mGoogleApiClient == null) {
-                try {
-                    mGoogleApiClient = new GoogleApiClient.Builder(this)
-                            .addApi(Drive.API)
-                            .addScope(Drive.SCOPE_FILE)
-                            .addConnectionCallbacks(this)
-                            .addOnConnectionFailedListener(this)
-                            .build();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            mGoogleApiClient.connect();
-        }*/
     }
 
     @Override
@@ -996,17 +972,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.i("drive", "connected failed");
 
-        /*if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-                progressDialog.dismiss();
-            } catch (IntentSender.SendIntentException e) {
-                // Unable to resolve, message user appropriately
-            }
-        } else {
-            GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, 0).show();
-            progressDialog.dismiss();
-        }*/
+
     }
 
     /**
@@ -1141,7 +1107,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
 
     }
 
-    protected static final int REQUEST_CODE_SIGN_IN = 0;
+    protected static final int SIGN_IN = 0;
 
     @Override
     protected void onDriveClientReady() {
@@ -1241,59 +1207,6 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
         // [END read_contents]
     }
 
-    String driveID = "";
-    /*Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            if (is_done) {
-                driveID = sharedPreferences.getString(Constants.SharedDriveId, "");
-
-                loadFile(Constants.DatabaseFileName);
-
-
-                DriveFile file = Drive.DriveApi.getFile(
-                        mGoogleApiClient, DriveId.decodeFromString(driveID));
-
-                DriveApi.DriveContentsResult driveContentsResult = file.open(
-                        mGoogleApiClient,
-                        DriveFile.MODE_READ_ONLY, null).await();
-                DriveContents driveContents = driveContentsResult
-                        .getDriveContents();
-                InputStream inputstream = driveContents.getInputStream();
-
-                try {
-                    f1 = new java.io.File(Environment.getExternalStorageDirectory(), Constants.FetchedData);
-                    FileOutputStream fileOutput = new FileOutputStream(f1);
-
-                    byte[] buffer = new byte[1024];
-                    int bufferLength = 0;
-                    while ((bufferLength = inputstream.read(buffer)) > 0) {
-                        fileOutput.write(buffer, 0, bufferLength);
-                        isDone = true;
-
-                    }
-                    fileOutput.close();
-                    inputstream.close();
-                    if (isDone) {
-                        final java.io.File data = Environment.getDataDirectory();
-                        String currentDBPath = "/data/" + "com.mytips" + "/databases/" + DatabaseUtils.db_Name;
-                        java.io.File currentDB = new java.io.File(data, currentDBPath);
-                        try {
-                            fileCopy(f1, currentDB);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        progressDialog.dismiss();
-                    }
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-
-            }
-        }
-    };*/
-
     private void loadFile(String filename) {
         Query query = new Query.Builder()
                 .addFilter(Filters.eq(SearchableField.TITLE, filename))
@@ -1313,28 +1226,24 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
             }
         });
     }
-   /* private static List<com.google.api.services.drive.model.File> retrieveAllFiles(com.google.api.services.drive.Drive services) {
-        List<com.google.api.services.drive.model.File> result = new ArrayList<>();
-        com.google.api.services.drive.Drive.Files.List request = null;
-        do {
-            try {
-                request = services.files().list();
-                FileList fileList = request.execute();
-                result.addAll(fileList.getItems());
-                request.setPageToken(fileList.getNextPageToken());
 
-            } catch (IOException e) {
-                System.out.println("An error occurred: " + e);
+    public void emailChooser() {
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, SIGN_IN);
 
-            }
-        } while (request.getPageToken() != null &&
-                request.getPageToken().length() > 0);
-        Log.i("result", result.toString());
+    }
 
-        return result;
-
-    }*/
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == SIGN_IN) {
+            backupDataToDrive();
+        }
+    }
 }
 
 

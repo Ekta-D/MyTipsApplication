@@ -29,7 +29,6 @@ public class CommonMethods {
         Date d = (Date) c.getTime();
         return d;
     }
-
     public static void setTheme(ActionBar actionBar, Activity context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
         if (sharedPreferences.getInt("selected_theme", 0) == 1) {
