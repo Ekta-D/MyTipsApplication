@@ -136,8 +136,10 @@ public class SummaryAdapter extends BaseAdapter {
         }
 
         String tipO = "";
+        double tips_outs = 0;
         if (!addDayArrayList.get(position).getTip_out().equalsIgnoreCase("") && addDayArrayList.get(position).getTip_out() != null) {
-            tipO = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getTip_out()));
+            tips_outs = Double.parseDouble(addDayArrayList.get(position).getTip_out());
+            tipO = String.format("%.2f", tips_outs);
         } else if (tipO.equalsIgnoreCase("")) {
             tipO = "0";
         }

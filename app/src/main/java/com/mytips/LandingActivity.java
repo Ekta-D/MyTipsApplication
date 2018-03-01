@@ -1604,7 +1604,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingBottom(3);
                             cell.setNoWrap(false);
                             cell.setFixedHeight(40f);
-
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
@@ -1625,6 +1624,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             String tips = addDayArrayList.get(i).getTotal_tips();
                             if (tips.equalsIgnoreCase("")) {
                                 tips = "0";
+                            } else {
+                                double live_tips = Double.parseDouble(addDayArrayList.get(i).getTotal_tips());
+                                tips = String.format("%.2f", live_tips);
                             }
                             cell = new PdfPCell(new Phrase(tips, font));
                             cell.setPaddingTop(3);
@@ -2326,7 +2328,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             /*if (!addDays.get(i).getWages_hourly().equalsIgnoreCase("")) {
 
             }*/
-            d = d + Double.parseDouble(addDays.get(i).getWages_hourly().equals("")?"0.0":addDays.get(i).getWages_hourly());
+            d = d + Double.parseDouble(addDays.get(i).getWages_hourly().equals("") ? "0.0" : addDays.get(i).getWages_hourly());
 
         }
         total = String.valueOf(String.format("%.2f", d));

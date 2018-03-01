@@ -147,7 +147,7 @@
         <item>@color/profile_color6</item>
 
     </array>
-
+    <string name="screen_type">7-inch-tablet</string>
     <string name="no_data_text">No Data found. <!--\n You may add Tippees under Settings from top menu \n then Start adding profiles \n and Add your days using the bottom button.--></string>
     <string name="title_screen_slide">OnBoarding</string>
 

@@ -15,6 +15,7 @@
         android:icon="@drawable/mytips"
         android:label="@string/app_name"
         android:largeHeap="true"
+        android:hardwareAccelerated="true"
         android:roundIcon="@drawable/mytips"
         android:supportsRtl="true">
 
@@ -34,7 +35,7 @@
         </activity>
 
         <activity android:name=".ScreenSlideActivity"
-            android:label="@string/app_name"
+            android:label="@string/app_name"  android:screenOrientation="portrait"
             android:uiOptions="splitActionBarWhenNarrow">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -75,7 +76,7 @@
             android:theme="@style/AppTheme" />
         <activity
             android:name=".ActiveProfiles"
-            android:label="@string/active_profile"
+            android:label="@string/active_profile"  android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
         <activity
             android:name=".SetPasscode"

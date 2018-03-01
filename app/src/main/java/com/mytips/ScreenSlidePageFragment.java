@@ -17,8 +17,15 @@
 package com.mytips;
 
 import android.app.Fragment;
+import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +36,7 @@ import android.widget.TextView;
 /**
  * A fragment representing a single step in a wizard. The fragment shows a dummy title indicating
  * the page number, along with some dummy text.
- *
+ * <p>
  * <p>This class is used by the {@link } and {@link
  * ScreenSlideActivity} samples.</p>
  */
@@ -43,6 +50,7 @@ public class ScreenSlidePageFragment extends Fragment {
      * The fragment's page number, which is set to the argument value for {@link #ARG_PAGE}.
      */
     private int mPageNumber;
+    double tab_size = 0;
 
     /**
      * Factory method for this fragment class. Constructs a new fragment for the given page number.
@@ -66,7 +74,7 @@ public class ScreenSlidePageFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-            Bundle savedInstanceState) {
+                             Bundle savedInstanceState) {
         // Inflate the layout containing a title and body text.
         ViewGroup rootView = (ViewGroup) inflater
                 .inflate(R.layout.fragment_screen_slide_page, container, false);
@@ -77,8 +85,27 @@ public class ScreenSlidePageFragment extends Fragment {
 
         LinearLayout layoutBack = (LinearLayout) rootView.findViewById(R.id.layout_back);
         ImageView view = rootView.findViewById(R.id.imageView);
-        view.setImageDrawable(getResources().getDrawable(images.getResourceId(mPageNumber,-1)));
+        Drawable drawable = compressImage(getResources().getDrawable(images.getResourceId(mPageNumber, -1)));
+        view.setImageDrawable(drawable);
+
+
+        boolean isTab = isTablet();
+        if (isTab) {
+            int paddingDp = 0;
+            if (tab_size > 6 && tab_size < 7) {
+                paddingDp = 50;
+            } else {
+                paddingDp = 100;
+            }
+
+            float density = getActivity().getResources().getDisplayMetrics().density;
+            int paddingPixel = (int) (paddingDp * density);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            layoutParams.setMargins(paddingPixel, 0, paddingPixel, 0);
+            view.setLayoutParams(layoutParams);
+        }
         layoutBack.setBackgroundColor(rainbow[mPageNumber]);
+
         images.recycle();
         // Set the title view to show the page number.
         /*((TextView) rootView.findViewById(android.R.id.text1)).setText(
@@ -93,4 +120,35 @@ public class ScreenSlidePageFragment extends Fragment {
     public int getPageNumber() {
         return mPageNumber;
     }
+
+    public Drawable compressImage(Drawable drawable) {
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+        Bitmap b = ((BitmapDrawable) drawable).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, width, height, false);
+
+        return new BitmapDrawable(getResources(), bitmapResized);
+    }
+
+    public boolean isTablet() {
+        try {
+            // Compute screen size
+            Context context = getActivity();
+            DisplayMetrics dm = context.getResources().getDisplayMetrics();
+            float screenWidth = dm.widthPixels / dm.xdpi;
+            float screenHeight = dm.heightPixels / dm.ydpi;
+            double size = Math.sqrt(Math.pow(screenWidth, 2) +
+                    Math.pow(screenHeight, 2));
+            // Tablet devices have a screen size greater than 6 inches
+            tab_size = size;
+            return size >= 6;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
 }
+
+
