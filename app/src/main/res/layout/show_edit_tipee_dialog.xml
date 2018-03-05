@@ -14,16 +14,16 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tippee"
             android:layout_centerVertical="true"
+            android:text="Tippee"
             android:textColor="@color/colorBlack"
             android:textSize="20sp" />
 
         <Button
             android:id="@+id/button"
-            android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:text=" + Add Tippee "
@@ -32,8 +32,16 @@
     </RelativeLayout>
 
     <ListView
+        android:id="@+id/tipee_name_list"
         android:layout_width="match_parent"
-        android:layout_height="220dp"
-        android:id="@+id/tipee_name_list" />
+        android:layout_height="220dp" />
+
+    <Button
+        android:id="@+id/done_tippee"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="Done"
+        android:textAllCaps="false" />
 
 </LinearLayout>

@@ -486,6 +486,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                 tipees_dilog.getWindow().setAttributes(lp);
 
                 Button add_tipee_btn = (Button) tipees_dilog.findViewById(R.id.button);
+                Button done = (Button) tipees_dilog.findViewById(R.id.done_tippee);
 
                 final ListView tipees_list = (ListView) tipees_dilog.findViewById(R.id.tipee_name_list);
                 ArrayList<TipeeInfo> fetchInfo = Preferences.getInstance(SettingsActivity.this).getTipeeList(Constants.TipeeListKey);
@@ -502,6 +503,12 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                             tippess_infolist);
                     tipees_list.setAdapter(adapter);
                 }
+                done.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        tipees_dilog.dismiss();
+                    }
+                });
                 add_tipee_btn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -695,15 +702,14 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
             @Override
             public boolean onPreferenceClick(Preference preference) {
                 GoogleSignInAccount signInAccount = GoogleSignIn.getLastSignedInAccount(SettingsActivity.this);
-                if (signInAccount==null)
-                {
+                if (signInAccount == null) {
                     emailChooser();
-                }else{
+                } else {
                     backupDataToDrive();
                 }
 
 
-                    return true;
+                return true;
             }
         });
 

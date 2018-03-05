@@ -1490,11 +1490,11 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 document.open();
 
-                Font blackfont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.BOLD, BaseColor.BLACK);
-                Font font = FontFactory.getFont(FontFactory.HELVETICA, 12, Font.NORMAL, BaseColor.GRAY);
+                Font blackfont = FontFactory.getFont(FontFactory.HELVETICA, 9, Font.BOLD, BaseColor.BLACK);
+                Font font = FontFactory.getFont(FontFactory.HELVETICA, 9, Font.NORMAL, BaseColor.GRAY);
 
                 PdfPCell taskcell = new PdfPCell();
-                float[] taskcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
+                float[] taskcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
                 PdfPTable tasktable = new PdfPTable(taskcolumnWidths);
 
                 tasktable.setWidthPercentage(100);
@@ -1537,6 +1537,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 tasktable.addCell(taskcell);
 
+
+                taskcell = new PdfPCell(new Phrase("T Tips", blackfont));
+                taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                taskcell.setBackgroundColor(BaseColor.WHITE);
+                taskcell.setFixedHeight(20f);
+
+                tasktable.addCell(taskcell);
 
                 taskcell = new PdfPCell(new Phrase("TD Count", blackfont));
                 taskcell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1640,6 +1647,24 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                             tasktable.addCell(cell);
 
+                            String tournament_downnTips = addDayArrayList.get(i).getTotal_tournament_downs();
+                            if (tournament_downnTips.equalsIgnoreCase("")) {
+                                tournament_downnTips = "0";
+                            } else {
+                                double tournament_totaldown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs());
+                                tournament_downnTips = String.format("%.2f", tournament_totaldown);
+                            }
+                            cell = new PdfPCell(new Phrase(tournament_downnTips, font));
+                            cell.setPaddingTop(3);
+                            cell.setPaddingBottom(3);
+                            cell.disableBorderSide(2);
+                            cell.setNoWrap(false);
+                            cell.setFixedHeight(40f);
+                            cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                            cell.setVerticalAlignment(Element.ALIGN_CENTER);
+                            cell.setBackgroundColor(BaseColor.WHITE);
+
+                            tasktable.addCell(cell);
 
                             String count = addDayArrayList.get(i).getTounament_count();
                             if (count.equalsIgnoreCase("")) {
@@ -1674,7 +1699,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             tasktable.addCell(cell);
 
 
-                            String wages = addDayArrayList.get(i).getWages_hourly();
+                            String wages = addDayArrayList.get(i).getProfile_wage_hourly();
 
                             if (wages.equalsIgnoreCase("")) {
                                 wages = "0";
@@ -1720,7 +1745,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 }
 
                 PdfPCell bottomCell = new PdfPCell();
-                float[] bottomcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
+                float[] bottomcolumnWidths = {2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f, 2f};
                 PdfPTable bottomTable = new PdfPTable(bottomcolumnWidths);
 
                 //  bottomTable.setWidthPercentage(100);
@@ -1731,7 +1756,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 bottomTable.getDefaultCell().disableBorderSide(1);
                 bottomTable.getDefaultCell().disableBorderSide(3);
 
-                Font redFont = FontFactory.getFont(FontFactory.HELVETICA, 13, Font.NORMAL, BaseColor.RED);
+                Font redFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, BaseColor.RED);
 
                 totalDays = String.valueOf(addDayArrayList.size());
 
@@ -1770,6 +1795,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 bottomTable.addCell(bottomCell);
 
+
+                String total_tournmaent_downs=calculateTournamentTips(addDayArrayList);
+                bottomCell = new PdfPCell(new Phrase("$" + total_tournmaent_downs, redFont));
+                bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                bottomCell.setBackgroundColor(BaseColor.WHITE);
+                bottomCell.setFixedHeight(40f);
+
+                bottomTable.addCell(bottomCell);
 
                 String totalTD = calculatedTdCount(addDayArrayList);
 
@@ -2293,13 +2326,29 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         for (int i = 0; i < addDays.size(); i++) {
             if (!addDays.get(i).getTounament_count().equalsIgnoreCase("")) {
                 tds = Integer.parseInt(addDays.get(i).getTounament_count());
+                td = td + tds;
             }
 
-            td = td + tds;
+
 
         }
         totalTDCount = String.valueOf(td);
         return totalTDCount;
+    }
+
+    public String calculateTournamentTips(ArrayList<AddDay> addDays) {
+        String total_tournament = "";
+        double per_tournnt = 0;
+        double tournments_total = 0;
+        for (int i = 0; i < addDays.size(); i++) {
+            if (!addDays.get(i).getTotal_tournament_downs().equalsIgnoreCase("")) {
+                per_tournnt = Double.parseDouble(addDays.get(i).getTotal_tournament_downs());
+                tournments_total = tournments_total + per_tournnt;
+            }
+
+        }
+        total_tournament = String.format("%.2f", tournments_total);
+        return total_tournament;
     }
 
     public String calculatTotatTipOut(ArrayList<AddDay> addDays) {
@@ -2313,7 +2362,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 d = d + d0;
             }
 
-            d = d + d0;
 
         }
         tip_outs = String.valueOf(d);

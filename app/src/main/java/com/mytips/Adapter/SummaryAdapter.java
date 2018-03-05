@@ -149,8 +149,14 @@ public class SummaryAdapter extends BaseAdapter {
             wH = String.valueOf(Double.parseDouble(addDayArrayList.get(position).getWages_hourly()));
         }*/
         double wage_hourly_double = 0;
-        if (addDayArrayList.get(position).getWages_hourly() != null && !addDayArrayList.get(position).getWages_hourly().equalsIgnoreCase("")) {
+      /*  if (addDayArrayList.get(position).getWages_hourly() != null && !addDayArrayList.get(position).getWages_hourly().equalsIgnoreCase("")) {
             wage_hourly_double = Double.parseDouble(addDayArrayList.get(position).getWages_hourly());
+            wH = String.format("%.2f", wage_hourly_double);
+        } else if (wH.equalsIgnoreCase("")) {
+            wH = "0";
+        }*/
+        if (addDayArrayList.get(position).getProfile_wage_hourly() != null && !addDayArrayList.get(position).getProfile_wage_hourly().equalsIgnoreCase("")) {
+            wage_hourly_double = Double.parseDouble(addDayArrayList.get(position).getProfile_wage_hourly());
             wH = String.format("%.2f", wage_hourly_double);
         } else if (wH.equalsIgnoreCase("")) {
             wH = "0";
