@@ -46,28 +46,28 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="5dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="5dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="16dp"
         android:text="Summary"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintLeft_toRightOf="@+id/spinner_profile"
         app:layout_constraintRight_toLeftOf="@+id/spinner_report"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="5dp" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_calendar_today"
-        android:visibility="visible"
         android:layout_alignParentRight="true"
-        app:backgroundTint="@color/blue_accent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="45dp"
         android:layout_marginRight="16dp"
+        android:src="@drawable/ic_calendar_today"
+        android:visibility="visible"
+        app:backgroundTint="@color/blue_accent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
 
@@ -88,14 +88,15 @@
     </RelativeLayout>
 
     <RelativeLayout
-        android:layout_width="0dp"
         android:id="@+id/no_data_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginEnd="2dp"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:layout_marginStart="2dp"
         android:layout_marginTop="8dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/bottom_layout"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -109,6 +110,37 @@
 
         <TextView
             android:id="@+id/no_data_landing"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:text="@string/no_data_text"
+            android:textSize="18dp"
+            android:visibility="visible" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/summarry_parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_layout"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_profile">
+
+        <include layout="@layout/summary_weekly_layout" />
+
+        <TextView
+            android:id="@+id/summary_no_data_landing"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerHorizontal="true"

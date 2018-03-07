@@ -28,7 +28,7 @@ public class Profiles implements Serializable {
     }
 
     int id;
-    String profile_id;
+    String profile_id="";
     String profile_name;
     int is_supervisor;
     int get_tournamenttip;

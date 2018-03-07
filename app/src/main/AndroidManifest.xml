@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.mytips">
 
     <uses-permission android:name="android.permission.CAMERA" />
@@ -14,10 +15,12 @@
         android:allowBackup="true"
         android:icon="@drawable/mytips"
         android:label="@string/app_name"
+        android:debuggable="true"
         android:largeHeap="true"
         android:hardwareAccelerated="true"
         android:roundIcon="@drawable/mytips"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        tools:ignore="HardcodedDebugMode">
 
         <meta-data
             android:name="com.google.app.id"

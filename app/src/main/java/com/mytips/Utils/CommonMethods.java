@@ -29,6 +29,7 @@ public class CommonMethods {
         Date d = (Date) c.getTime();
         return d;
     }
+
     public static void setTheme(ActionBar actionBar, Activity context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
         if (sharedPreferences.getInt("selected_theme", 0) == 1) {
@@ -50,33 +51,28 @@ public class CommonMethods {
                 actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_green)));
             setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_green_dark), context.getResources().getColor(R.color.intro_green));
 
-        }
-
-        else if (sharedPreferences.getInt("selected_theme", 0) == -2) {
+        } else if (sharedPreferences.getInt("selected_theme", 0) == -2) {
             //Orange and white
             if (actionBar != null)
 
                 actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_cherry)));
             setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_cherry_dark), context.getResources().getColor(R.color.intro_cherry));
 
-        }
-        else if (sharedPreferences.getInt("selected_theme", 0) == -3) {
+        } else if (sharedPreferences.getInt("selected_theme", 0) == -3) {
             //Orange and white
             if (actionBar != null)
 
                 actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_orange)));
             setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_orange_dark), context.getResources().getColor(R.color.intro_orange));
 
-        }
-        else if (sharedPreferences.getInt("selected_theme", 0) == -4) {
+        } else if (sharedPreferences.getInt("selected_theme", 0) == -4) {
             //Orange and white
             if (actionBar != null)
                 actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_purple)));
             setStatusAndNavigationBarColor(context, context.getResources().getColor(R.color.intro_purple_dark), context.getResources().getColor(R.color.intro_purple));
 
 
-        }
-        else if (sharedPreferences.getInt("selected_theme", 0) == -5) {
+        } else if (sharedPreferences.getInt("selected_theme", 0) == -5) {
             //Orange and white
             if (actionBar != null)
                 actionBar.setBackgroundDrawable(new ColorDrawable(context.getResources().getColor(R.color.intro_yellow)));
