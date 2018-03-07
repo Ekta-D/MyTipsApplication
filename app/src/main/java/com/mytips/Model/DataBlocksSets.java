@@ -16,6 +16,16 @@ public class DataBlocksSets {
     String mDates;
     String mTipoutPercentage;
 
+    public long getmEndDateLong() {
+        return mEndDateLong;
+    }
+
+    public void setmEndDateLong(long mEndDateLong) {
+        this.mEndDateLong = mEndDateLong;
+    }
+
+    long mEndDateLong;
+
     public String getmDates() {
         return mDates;
     }

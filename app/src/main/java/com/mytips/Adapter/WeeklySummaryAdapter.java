@@ -82,7 +82,7 @@ public class WeeklySummaryAdapter extends BaseAdapter {
         viewHolder._TotalIncome.setText(dataBlocksSetsArrayList.get(position).getmTotalIncome());
 
         viewHolder._dates.setBackground(context.getResources().getDrawable(R.drawable.dates_rounded_corners));
-//        viewHolder._dates.setText(dataBlocksSetsArrayList.get(position).getmDates());
+        viewHolder._dates.setText(dataBlocksSetsArrayList.get(position).getmProfile() + " " + dataBlocksSetsArrayList.get(position).getmDates());
 
         return convertView;
     }

@@ -36,6 +36,8 @@ public class SummaryAdapter extends BaseAdapter {
         this.index = index;
     }
 
+
+
     @Override
     public int getCount() {
         return addDayArrayList.size();

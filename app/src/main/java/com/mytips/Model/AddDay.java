@@ -41,6 +41,16 @@ public class AddDay implements Serializable {
 
     int dollar_checked;
 
+    public String getSelectedProfileId() {
+        return selectedProfileId;
+    }
+
+    public void setSelectedProfileId(String selectedProfileId) {
+        this.selectedProfileId = selectedProfileId;
+    }
+
+    String selectedProfileId;
+
     public String getProfile_wage_hourly() {
         return profile_wage_hourly;
     }

@@ -104,6 +104,31 @@ public class ScreenSlidePageFragment extends Fragment {
             layoutParams.setMargins(paddingPixel, 0, paddingPixel, 0);
             view.setLayoutParams(layoutParams);
         }
+
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        System.out.println("metrics: "+metrics.density);
+                int paddingDp = 20;
+                float density = getActivity().getResources().getDisplayMetrics().density;
+                int paddingPixel = (int) (paddingDp * density);
+                LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                switch(metrics.densityDpi) {
+                    case DisplayMetrics.DENSITY_420:
+                        layoutParams.setMargins(paddingPixel, 0, paddingPixel, 0);
+                        view.setLayoutParams(layoutParams);
+                        break;
+                    case DisplayMetrics.DENSITY_XXHIGH:
+
+                        layoutParams.setMargins(paddingPixel, 0, paddingPixel, 0);
+                        view.setLayoutParams(layoutParams);
+                        break;
+
+                    case DisplayMetrics.DENSITY_XXXHIGH:
+
+                break;
+
+        }
+
         layoutBack.setBackgroundColor(rainbow[mPageNumber]);
 
         images.recycle();
@@ -128,7 +153,7 @@ public class ScreenSlidePageFragment extends Fragment {
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
         Bitmap b = ((BitmapDrawable) drawable).getBitmap();
-        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, width, height, false);
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, width-60, height, false);
 
         return new BitmapDrawable(getResources(), bitmapResized);
     }
