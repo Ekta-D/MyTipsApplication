@@ -111,7 +111,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     ArrayList<AddDay> updated_spinner;
     String selected_profileName;
     ArrayList<Profiles> profiles;
-    TextView no_data;
+    TextView no_data, _nodata;
     String start_week = "";
     String start_shift = "";
     boolean pastDateSelected;
@@ -139,6 +139,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     WeeklySummaryAdapter weeklySummaryAdapter;
     ListView _summaryBasedList;
     RelativeLayout summary_parentlayout;
+    RelativeLayout daily_layout,bottomEarning_layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -162,7 +163,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         default_date_format = sharedPreferences.getInt("selected_date", 2);
         summary_parentlayout = (RelativeLayout) findViewById(R.id.summarry_parent);
+        daily_layout = (RelativeLayout) findViewById(R.id.no_data_parent);
         _summaryBasedList = (ListView) findViewById(R.id.summary_listview);
+        bottomEarning_layout=(RelativeLayout)findViewById(R.id.bottom_layout);
         _summaryBasedList.setDivider(null);
         floatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
         floatingActionButton.setVisibility(View.VISIBLE);
@@ -175,6 +178,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         no_data = (TextView) findViewById(R.id.no_data_landing);
+        _nodata = (TextView) findViewById(R.id.summary_no_data_landing);
         no_data.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -832,6 +836,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+    ArrayList<DataBlocksSets> _dataSet;
+
     public void changeData(String spinner_selected, String start_week, String selected_profileName, int profileID) {
         String date_format = "";
         if (default_date_format == 2) {
@@ -841,8 +847,11 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         } else {
             date_format = "MMM d,yyyy";
         }
-        if (spinner_selected.equalsIgnoreCase("Daily")) {
 
+        if (spinner_selected.equalsIgnoreCase("Daily")) {
+            bottomEarning_layout.setVisibility(View.VISIBLE);
+            daily_layout.setVisibility(View.VISIBLE);
+            summary_parentlayout.setVisibility(View.GONE);
             Calendar cal = Calendar.getInstance();
 
             String currentDate = (cal.get(Calendar.MONTH) + 1) + "/"
@@ -859,338 +868,53 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             updateBottom(addDayArrayList);
 
         } else if (spinner_selected.equalsIgnoreCase("Weekly")) {
-//            int start_day = CommonMethods.getDay(start_week);
-            int start_day = 1;// for sunday
-            Calendar calendar1 = Calendar.getInstance();
-            calendar1.set(Calendar.DAY_OF_WEEK, start_day);
-            calendar1.set(Calendar.HOUR_OF_DAY, 0);
-            calendar1.set(Calendar.MINUTE, 0);
-            calendar1.set(Calendar.SECOND, 0);
-            calendar1.set(Calendar.MILLISECOND, 0);
 
-            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
-            ArrayList<String> string_dates = new ArrayList<>();
-            ArrayList<Long> dates = new ArrayList<>();
+            daily_layout.setVisibility(View.GONE);
+            bottomEarning_layout.setVisibility(View.GONE);
+            _dataSet = new ArrayList<>();
 
-
-            //6-March-2018
-               /*   for (int i = 0; i < 7; i++) {
-
-                String str_date = dateFormat.format(calendar1.getTime().getTime());
-
-                Date date = calendar1.getTime();
-                long lon = date.getTime();
-
-                calendar1.add(Calendar.DATE, 1);
-
-                string_dates.add(str_date);
-
-
-                dates.add(lon);
-            }
-            long reset_next_week = 0;
-            long reset_current = 0;
-            String reset0 = "", reset6 = "";
-            if (dates.size() > 0) {
-
-                reset_current = dates.get(0);
-
-                reset_next_week = dates.get(6);
-
-
-                String dateFormat0 = "", dateFormatLast = "";
-
-                dateFormat0 = getDateFormatForPdf(date_format, reset_current);
-                dateFormatLast = getDateFormatForPdf(date_format, reset_next_week);
-
-
-                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(reset_current));
-                reset6 = new SimpleDateFormat(dateFormatLast).format(new Date(reset_next_week));
-
-//                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName, profileID);
-                pdfDates = reset0 + " " + "-" + " " + reset6;
-
-              setAdapter(addDayArrayList);
-                updateBottom(addDayArrayList);
-
-        }*/
-
-
-            setWeeklyData(start_week, "Weekly", profiles);
+            _dataSet = setWeeklyData("Weekly", profiles);
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
-            Calendar calendar1 = Calendar.getInstance();
-//            int start_day = 1;//for sunday
-//            calendar1.set(Calendar.DAY_OF_WEEK, start_day);
-//            int start_day = 1;//for sunday
-//            Calendar calendar1 = Calendar.getInstance();
-//            calendar1.set(Calendar.DAY_OF_WEEK, start_day);
-//
-//            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
-//            ArrayList<String> string_dates = new ArrayList<>();
-//            ArrayList<Long> dates = new ArrayList<>();
-//            for (int i = 0; i < 15; i++) {
-//
-//                String str_date = dateFormat.format(calendar1.getTime().getTime());
-//
-//                Date date = calendar1.getTime();
-//                long lon = date.getTime();
-//
-//                calendar1.add(Calendar.DATE, 1);
-//
-//                string_dates.add(str_date);
-//
-//
-//                dates.add(lon);
-//            }
-//            Log.i("string_dates", string_dates.toString());
+            daily_layout.setVisibility(View.GONE);
+            bottomEarning_layout.setVisibility(View.GONE);
+            _dataSet = new ArrayList<>();
 
-
-            int month = calendar1.get(Calendar.MONTH);
-
-            int year = calendar1.get(Calendar.YEAR);
-            int days = CommonMethods.numDays(month, year);
-
-            Calendar start_day_monthly = Calendar.getInstance();
-
-            Calendar end_day_monthly = Calendar.getInstance();
-            start_day_monthly.set(Calendar.MONTH, month);
-
-            start_day_monthly.set(Calendar.HOUR, 0);
-            start_day_monthly.set(Calendar.MINUTE, 0);
-            start_day_monthly.set(Calendar.SECOND, 0);
-
-            end_day_monthly.set(Calendar.MONTH, month);
-
-            end_day_monthly.set(Calendar.HOUR, 0);
-            end_day_monthly.set(Calendar.MINUTE, 0);
-            end_day_monthly.set(Calendar.SECOND, 0);
-            if (days == 28) {
-                int current_day = calendar1.get(Calendar.DAY_OF_MONTH);
-                if (current_day <= 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
-                } else if (current_day > 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 28);
-                }
-
-                Date d = start_day_monthly.getTime();
-                long start_l = d.getTime();
-
-                Date d2 = end_day_monthly.getTime();
-                long end_l = d2.getTime();
-
-
-                String dateFormat0 = "", dateFormatLast = "";
-
-                dateFormat0 = getDateFormatForPdf(date_format, start_l);
-                dateFormatLast = getDateFormatForPdf(date_format, end_l);
-
-                String reset0 = "", resetLast = "";
-                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(start_l));
-                resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(end_l));
-
-                pdfDates = reset0 + " " + "-" + " " + resetLast;
-
-//                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName, profileID);
-                //6-March-2018
-               /* setAdapter(addDayArrayList);
-                updateBottom(addDayArrayList);*/
-
-            } else if (days == 29) {
-                int current_day = calendar1.get(Calendar.DAY_OF_MONTH);
-
-                if (current_day <= 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
-                } else if (current_day > 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 29);
-                }
-                Date d = start_day_monthly.getTime();
-                long start_l = d.getTime();
-
-                Date d2 = end_day_monthly.getTime();
-                long end_l = d2.getTime();
-
-
-                String dateFormat0 = "", dateFormatLast = "";
-
-                dateFormat0 = getDateFormatForPdf(date_format, start_l);
-                dateFormatLast = getDateFormatForPdf(date_format, end_l);
-
-
-                String reset0 = "", resetLast = "";
-                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(start_l));
-                resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(end_l));
-
-                pdfDates = reset0 + " " + "-" + " " + resetLast;
-
-
-                // addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName, profileID);
-                setAdapter(addDayArrayList);
-                updateBottom(addDayArrayList);
-
-            } else if (days == 30) {
-                int current_day = calendar1.get(Calendar.DAY_OF_MONTH);
-
-                if (current_day <= 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
-                } else if (current_day > 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 30);
-                }
-                Date d = start_day_monthly.getTime();
-                long start_l = d.getTime();
-
-                Date d2 = end_day_monthly.getTime();
-                long end_l = d2.getTime();
-
-
-                String dateFormat0 = "", dateFormatLast = "";
-
-                dateFormat0 = getDateFormatForPdf(date_format, start_l);
-                dateFormatLast = getDateFormatForPdf(date_format, end_l);
-
-
-                String reset0 = "", resetLast = "";
-                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(start_l));
-                resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(end_l));
-
-                pdfDates = reset0 + " " + "-" + " " + resetLast;
-
-
-                //addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName, profileID);
-                //6-March-2018
-               /* setAdapter(addDayArrayList);
-                updateBottom(addDayArrayList);*/
-            } else {
-                int current_day = calendar1.get(Calendar.DAY_OF_MONTH);
-                if (current_day <= 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 1);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 14);
-                } else if (current_day > 14) {
-                    start_day_monthly.set(Calendar.DAY_OF_MONTH, 15);
-                    end_day_monthly.set(Calendar.DAY_OF_MONTH, 31);
-                }
-
-                Date d = start_day_monthly.getTime();
-                long start_l = d.getTime();
-
-                Date d2 = end_day_monthly.getTime();
-                long end_l = d2.getTime();
-
-
-                String dateFormat0 = "", dateFormatLast = "";
-
-                dateFormat0 = getDateFormatForPdf(date_format, start_l);
-                dateFormatLast = getDateFormatForPdf(date_format, end_l);
-
-
-                String reset0 = "", resetLast = "";
-                reset0 = new SimpleDateFormat(dateFormat0).format(new Date(start_l));
-                resetLast = new SimpleDateFormat(dateFormatLast).format(new Date(end_l));
-
-                pdfDates = reset0 + " " + "-" + " " + resetLast;
-
-
-//                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName);
-                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_l, end_l, selected_profileName, profileID);
-                //6-March-2018
-               /* setAdapter(addDayArrayList);
-                updateBottom(addDayArrayList);*/
-
-               /* long reset_next_week = 0;
-                long reset_current = 0;
-                if (dates.size() > 0) {
-
-                    reset_current = dates.get(0);
-                    reset_next_week = dates.get(14);
-                    addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_current, reset_next_week, selected_profileName);
-
-                    setAdapter(addDayArrayList);
-                    updateBottom(addDayArrayList);
-                }*/
-            }
+            _dataSet = setBiWeeklyBlocks(profiles);
         } else if (spinner_selected.equalsIgnoreCase("Monthly"))
 
         {
-            Calendar cal = Calendar.getInstance();
-            int month = cal.get(Calendar.MONTH);
+            daily_layout.setVisibility(View.GONE);
+            _dataSet = new ArrayList<>();
+            bottomEarning_layout.setVisibility(View.GONE);
+            _dataSet = makeMonthlyBlocks(profiles);
+        } else {
 
-            Calendar cal1 = Calendar.getInstance();
+            daily_layout.setVisibility(View.GONE);
+            _dataSet = new ArrayList<>();
+            _dataSet = makeYearlyBlocks(profiles);
+        }
+        if (spinner_selected.equalsIgnoreCase("Daily")) {
+            if (addDayArrayList.size() > 0)
 
-            cal1.set(Calendar.MONTH, month);
+            {
+                no_data.setVisibility(View.GONE);
+            } else
 
-            int start_month = cal1.get(Calendar.MONTH); // 0 for jan and 11 for Dec
-            int year = cal1.get(Calendar.YEAR);
-            int days = CommonMethods.numDays(start_month, year);
-
-
-            Calendar start_calendar = Calendar.getInstance();
-            start_calendar.set(Calendar.DAY_OF_MONTH, 1);
-
-            start_calendar.set(Calendar.HOUR, 0);
-            start_calendar.set(Calendar.MINUTE, 0);
-            start_calendar.set(Calendar.SECOND, 0);
-
-            Calendar end_calendar = Calendar.getInstance();
-            if (days == 28) {
-                end_calendar.set(Calendar.DAY_OF_MONTH, 28);
-            } else if (days == 29) {
-                end_calendar.set(Calendar.DAY_OF_MONTH, 29);
-            } else if (days == 30) {
-                end_calendar.set(Calendar.DAY_OF_MONTH, 30);
-            } else {
-                end_calendar.set(Calendar.DAY_OF_MONTH, 31);
+            {
+                no_data.setVisibility(View.VISIBLE);
             }
+        } else {
+            if (_dataSet.size() > 0)
 
+            {
+                _nodata.setVisibility(View.GONE);
+            } else
 
-            Date start_date = start_calendar.getTime();
-            long start_date_long = start_date.getTime();
-
-            Date end_date = end_calendar.getTime();
-            long end_date_long = end_date.getTime();
-
-            String reset0 = "", resetLast = "";
-            reset0 = new SimpleDateFormat("MMMM d'st'").format(new Date(start_date_long));
-            resetLast = new SimpleDateFormat("d'st' yyyy").format(new Date(end_date_long));
-
-            pdfDates = reset0 + " " + "-" + " " + resetLast;
-
-
-//            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName);
-            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, selected_profileName, profileID);
-            setAdapter(addDayArrayList);
-            updateBottom(addDayArrayList);
-
-        } else
-
-        {
-            Calendar cal = Calendar.getInstance();
-            int year = cal.get(Calendar.YEAR);
-            String years = String.valueOf(year);
-
-
-            addDayArrayList = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName, profileID);
-            //addDayArrayList = new DatabaseOperations(LandingActivity.this).yearlyData(years, selected_profileName);
-            setAdapter(addDayArrayList);
-            updateBottom(addDayArrayList);
+            {
+                _nodata.setVisibility(View.VISIBLE);
+            }
         }
-        if (addDayArrayList.size() > 0)
 
-        {
-            no_data.setVisibility(View.GONE);
-        } else
-
-        {
-            no_data.setVisibility(View.VISIBLE);
-        }
     }
 
 
@@ -2395,46 +2119,80 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    private ArrayList<DataBlocksSets> setBiWeeklyBlocks(ArrayList<Profiles> all_profiles) {
 
-    public void setWeeklyData(String start_dayOfWeek, String summary_type, ArrayList<Profiles> profiles) {
+        summary_parentlayout.setVisibility(View.VISIBLE);
+        ArrayList<AddDay> fetched_allData = new ArrayList<>();
+
+        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profiles);
+        ArrayList<AddDay> particular_profile = new ArrayList<>();
+        dataBlocksSetsArrayList = new ArrayList<>();
+        for (int i = 0; i < all_profiles.size(); i++) {
+            int single_profile = all_profiles.get(i).getId();
+            if (single_profile > 0) {
+
+                for (int j = 0; j < fetched_allData.size(); j++) {
+                    if (fetched_allData.get(j).getSelectedProfileId().equalsIgnoreCase(String.valueOf(single_profile))) {
+                        particular_profile.add(fetched_allData.get(j));
+                    }
+
+
+                }
+                Collections.sort(particular_profile, new StringDateComparator());
+                Log.i("Sorted_list", particular_profile.toString());
+                //particular_profile : single profile all data
+                if (particular_profile.size() > 0) {
+
+                    dataBlocksSetsArrayList = makeBiWeeklyBlocksData(particular_profile);
+                    particular_profile.clear();
+                }
+            }
+        }
+        weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, dataBlocksSetsArrayList);
+        _summaryBasedList.setAdapter(weeklySummaryAdapter);
+        return dataBlocksSetsArrayList;
+    }
+
+    public ArrayList<DataBlocksSets> setWeeklyData(String summary_type, ArrayList<Profiles> profiles) {
         summary_parentlayout.setVisibility(View.VISIBLE);
 
         addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profiles);
 
 
         if (summary_type.equalsIgnoreCase("Weekly")) {
-
-            saparateProfilesData(addDayArrayList, profiles);
-
+            dataBlocksSetsArrayList = new ArrayList<>();
+            dataBlocksSetsArrayList = saparateProfilesData(addDayArrayList, profiles);
             weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, dataBlocksSetsArrayList);
-
             _summaryBasedList.setAdapter(weeklySummaryAdapter);
         }
+        return dataBlocksSetsArrayList;
     }
 
-    public ArrayList<AddDay> saparateProfilesData(ArrayList<AddDay> list, ArrayList<Profiles> all_profiles) {
+    public ArrayList<DataBlocksSets> saparateProfilesData(ArrayList<AddDay> list, ArrayList<Profiles> all_profiles) {
         ArrayList<AddDay> particular_profile = new ArrayList<>();
-
+        dataBlocksSetsArrayList = new ArrayList<>();
         for (int i = 0; i < all_profiles.size(); i++) {
             int single_profile = all_profiles.get(i).getId();
             if (single_profile > 0) {
 
                 for (int j = 0; j < list.size(); j++) {
-                    if (list.get(j).getId().equalsIgnoreCase(String.valueOf(single_profile))) {
+                    if (list.get(j).getSelectedProfileId().equalsIgnoreCase(String.valueOf(single_profile))) {
                         particular_profile.add(list.get(j));
                     }
+
+
+                }
+                Collections.sort(particular_profile, new StringDateComparator());
+                Log.i("Sorted_list", particular_profile.toString());
+                //particular_profile : single profile all data
+                if (particular_profile.size() > 0) {
+
+                    dataBlocksSetsArrayList = makeBlocksData(particular_profile);
+                    particular_profile.clear();
                 }
             }
         }
-        //Collections.sort(particular_profile, new SortComparator());
-        Log.i("Sorted_list", particular_profile.toString());
-        //particular_profile : single profile all data
-        if (particular_profile.size() > 0) {
-
-            dataBlocksSetsArrayList = makeBlocksData(particular_profile);
-        }
-
-        return particular_profile;
+        return dataBlocksSetsArrayList;
     }
 
 
@@ -2475,144 +2233,249 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public ArrayList<DataBlocksSets> makeBlocksData(ArrayList<AddDay> profileData) {
-        //ArrayList<DataBlocksSets> dataBlocksSetsArrayList = new ArrayList<>();
         ArrayList<Long> _weeklyDates = null;
         ArrayList<String> _stringDates;
         String profileID = profileData.get(0).getSelectedProfileId();
         String profileName = profileData.get(0).getProfile();
+        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+        String starting_date = dateFormat.format(profileData.get(0).getStart_long());
+
         if (profileData.size() > 0) {
-            long zeroth_date;
-            String start_week;
-            _weeklyDates = new ArrayList<>();
-            _stringDates = new ArrayList<>();
-//            for (int m = 0; m < 1; m++) {
-            zeroth_date = profileData.get(0).getStart_long();
-            start_week = profileData.get(0).getStart_day_week();
+            if (!starting_date.contains(profileData.get(0).getStart_day_week())) {
+                long zeroth_date;
+                String start_week;
+                _weeklyDates = new ArrayList<>();
+                _stringDates = new ArrayList<>();
 
-            int _day = getDay(start_week);
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.DAY_OF_WEEK, _day);
-            calendar.setTimeInMillis(zeroth_date);
+                zeroth_date = profileData.get(0).getStart_long();
+                start_week = profileData.get(0).getStart_day_week();
 
-
-            DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
-
-            // make a week from zeroth date
-            for (int k = 0; k < 7; k++) {
-                String str_date = dateFormat.format(calendar.getTime().getTime());
-
-                Date date = calendar.getTime();
-
-                long lon = date.getTime();
-
-                calendar.add(Calendar.DATE, -1);
-
-                _stringDates.add(str_date);
+                int _day = getDay(start_week);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.DAY_OF_WEEK, _day);
+                calendar.setTimeInMillis(zeroth_date);
 
 
-                _weeklyDates.add(lon);
-            }
+                // make a week from zeroth date
+                for (int k = 0; k < 7; k++) {
+                    String str_date = dateFormat.format(calendar.getTime().getTime());
 
-            int index_startDay = 0;
-            long start_date = 0;
-            if (_stringDates.size() > 0) {
-                index_startDay = Collections.binarySearch(_stringDates, start_week);
-            }
-            index_startDay = Math.abs(index_startDay);
-            if (_weeklyDates.size() > 0) {
-                start_date = _weeklyDates.get(index_startDay);
-            }
-            calendar.setTimeInMillis(start_date);
-            _stringDates.clear();
-            _weeklyDates.clear();
-            // make week with start day of week
-            for (int j = 0; j < 7; j++) {
-                String str_date = dateFormat.format(calendar.getTime().getTime());
+                    Date date = calendar.getTime();
 
-                Date date = calendar.getTime();
+                    long lon = date.getTime();
 
-                long lon = date.getTime();
+                    calendar.add(Calendar.DATE, -1);
 
-                calendar.add(Calendar.DATE, 1);
-
-                _stringDates.add(str_date);
+                    _stringDates.add(str_date);
 
 
-                _weeklyDates.add(lon);
-            }
-
-            System.out.println(_weeklyDates.toString());
-            System.out.println(_stringDates.toString());
-
-            long reset_start_date = _weeklyDates.get(0);
-            long reset_end_date = _weeklyDates.get(6);
-
-            // data between day of week
-            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
-
-            if (addDayArrayList.size() > 0) {
-                DataBlocksSets dataBlocksSets;
-                String mLiveTips = "", mTournamentDown = "", mTipOut = "", mHrlWage = "", mTipsPerDown = "", mTotalIncome = "",
-                        mTotalTDown = "", mTipoutPercentage = "", blocks_date = "";
-                double totalLiveTips = 0, totalTDowns = 0, totalHrwage = 0, totalTipsDowns = 0, totalIncome = 0, totalDonws = 0, totalPercentage = 0;
-                int totalTounrmaneDonwns = 0;
-
-                //make profile data block from weekly data
-
-                for (int i = 0; i < addDayArrayList.size(); i++) {
-
-                    String mProfile = addDayArrayList.get(i).getProfile();
-
-                    double singleTip = Double.parseDouble(addDayArrayList.get(i).getTotal_tips().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tips());
-                    totalLiveTips = totalLiveTips + singleTip;
-
-                    double singlePerTDown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
-                    totalTDowns = totalTDowns + singlePerTDown;
-
-                    int singleTournamentCount = Integer.parseInt(addDayArrayList.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTounament_count());
-                    totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
-
-                    double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
-                    totalHrwage = totalHrwage + singleHrWage;
-
-                    double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
-                    totalTipsDowns = totalTipsDowns + singleTipsPerdown;
-
-                    double singleProfileTotalTD = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
-                    totalDonws = totalDonws + singleProfileTotalTD;
-
-                    double singleProfileIncome = Double.parseDouble(addDayArrayList.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_earnings());
-                    totalIncome = totalIncome + singleProfileIncome;
-
-
+                    _weeklyDates.add(lon);
                 }
-                mLiveTips = String.format("%.2f", totalLiveTips);
-                mTournamentDown = String.format("%.2f", totalTDowns);
-                mTipOut = String.valueOf(totalTounrmaneDonwns);
-                mHrlWage = String.format("%.2f", totalHrwage);
-                mTipsPerDown = String.format("%.2f", totalTipsDowns);
-                mTotalTDown = String.format("%.2f", totalDonws);
-                mTotalIncome = String.format("%.2f", totalIncome);
-                blocks_date = _stringDates.get(0) + "," + " " + _stringDates.get(6);
 
-                dataBlocksSets = new DataBlocksSets();
+                int index_startDay = 0;
+                long start_date = 0;
+                if (_stringDates.size() > 0) {
+                    index_startDay = Collections.binarySearch(_stringDates, start_week);
+                }
+                index_startDay = Math.abs(index_startDay);
+                if (_weeklyDates.size() > 0) {
+                    start_date = _weeklyDates.get(index_startDay);
+                }
+                calendar.setTimeInMillis(start_date);
+                _stringDates.clear();
+                _weeklyDates.clear();
+                // make week with start day of week
+                for (int j = 0; j < 7; j++) {
+                    String str_date = dateFormat.format(calendar.getTime().getTime());
 
-                dataBlocksSets.setmProfile(profileName);
-                dataBlocksSets.setmLiveTips(mLiveTips);
-                dataBlocksSets.setmTournamentDowns(mTournamentDown);
-                dataBlocksSets.setmTipOut(mTipOut);
-                dataBlocksSets.setmHrlyWage(mHrlWage);
-                dataBlocksSets.setmTipPerDown(mTipsPerDown);
-                dataBlocksSets.setmTotalTDDowns(mTotalTDown);
-                dataBlocksSets.setmTotalIncome(mTotalIncome);
-                dataBlocksSets.setmDates(blocks_date);
-                dataBlocksSets.setmEndDateLong(reset_end_date);
+                    Date date = calendar.getTime();
 
-                dataBlocksSetsArrayList.add(dataBlocksSets);
-//                }
+                    long lon = date.getTime();
 
-                // next blocks for next seven days
-                addNextBlock(profileData);
+                    calendar.add(Calendar.DATE, 1);
+
+                    _stringDates.add(str_date);
+
+
+                    _weeklyDates.add(lon);
+                }
+
+                System.out.println(_weeklyDates.toString());
+                System.out.println(_stringDates.toString());
+
+                long reset_start_date = _weeklyDates.get(0);
+                long reset_end_date = _weeklyDates.get(6);
+
+                // data between day of week
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
+
+                if (addDayArrayList.size() > 0) {
+                    DataBlocksSets dataBlocksSets;
+                    String mLiveTips = "", mTournamentDown = "", mTipOut = "", mHrlWage = "", mTipsPerDown = "", mTotalIncome = "",
+                            mTotalTDown = "", mTipoutPercentage = "", blocks_date = "";
+                    double totalLiveTips = 0, totalTDowns = 0, totalHrwage = 0, totalTipsDowns = 0, totalIncome = 0, totalDonws = 0, totalPercentage = 0;
+                    int totalTounrmaneDonwns = 0;
+
+                    //make profile data block from weekly data
+
+                    for (int i = 0; i < addDayArrayList.size(); i++) {
+
+                        String mProfile = addDayArrayList.get(i).getProfile();
+
+                        double singleTip = Double.parseDouble(addDayArrayList.get(i).getTotal_tips().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tips());
+                        totalLiveTips = totalLiveTips + singleTip;
+
+                        double singlePerTDown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                        totalTDowns = totalTDowns + singlePerTDown;
+
+                        int singleTournamentCount = Integer.parseInt(addDayArrayList.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTounament_count());
+                        totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
+
+                        double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
+                        totalHrwage = singleHrWage;
+
+                        double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
+                        totalTipsDowns = totalTipsDowns + singleTipsPerdown;
+
+                        double singleProfileTotalTD = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                        totalDonws = totalDonws + singleProfileTotalTD;
+
+                        double singleProfileIncome = Double.parseDouble(addDayArrayList.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_earnings());
+                        totalIncome = totalIncome + singleProfileIncome;
+
+
+                    }
+                    mLiveTips = String.format("%.2f", totalLiveTips);
+                    mTournamentDown = String.format("%.2f", totalTDowns);
+                    mTipOut = String.valueOf(totalTounrmaneDonwns);
+                    mHrlWage = String.format("%.2f", totalHrwage);
+                    mTipsPerDown = String.format("%.2f", totalTipsDowns);
+                    mTotalTDown = String.format("%.2f", totalDonws);
+                    mTotalIncome = String.format("%.2f", totalIncome);
+                    blocks_date = _stringDates.get(0) + "," + " " + _stringDates.get(6);
+
+                    dataBlocksSets = new DataBlocksSets();
+
+                    dataBlocksSets.setmProfile(profileName);
+                    dataBlocksSets.setmLiveTips("$"+mLiveTips);
+                    dataBlocksSets.setmTournamentDowns(mTournamentDown);
+                    dataBlocksSets.setmTipOut(mTipOut);
+                    dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                    dataBlocksSets.setmTipPerDown(mTipsPerDown);
+                    dataBlocksSets.setmTotalTDDowns(mTotalTDown);
+                    dataBlocksSets.setmTotalIncome("$"+mTotalIncome);
+                    dataBlocksSets.setmDates(blocks_date);
+                    dataBlocksSets.setmEndDateLong(reset_end_date);
+
+                    dataBlocksSetsArrayList.add(dataBlocksSets);
+
+
+                    // next blocks for next seven days
+                    addNextBlock(profileData);
+                }
+            } else {
+                long zeroth_date;
+                String start_week;
+                _weeklyDates = new ArrayList<>();
+                _stringDates = new ArrayList<>();
+
+                zeroth_date = profileData.get(0).getStart_long();
+                start_week = profileData.get(0).getStart_day_week();
+
+                int _day = getDay(start_week);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.DAY_OF_WEEK, _day);
+                calendar.setTimeInMillis(zeroth_date);
+                // make a week from zeroth date
+
+                for (int j = 0; j < 7; j++) {
+                    String str_date = dateFormat.format(calendar.getTime().getTime());
+
+                    Date date = calendar.getTime();
+
+                    long lon = date.getTime();
+
+                    calendar.add(Calendar.DATE, 1);
+
+                    _stringDates.add(str_date);
+
+
+                    _weeklyDates.add(lon);
+                }
+                System.out.println(_weeklyDates.toString());
+                System.out.println(_stringDates.toString());
+
+                long reset_start_date = _weeklyDates.get(0);
+                long reset_end_date = _weeklyDates.get(6);
+
+                // data between day of week
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
+
+
+                if (addDayArrayList.size() > 0) {
+                    DataBlocksSets dataBlocksSets;
+                    String mLiveTips = "", mTournamentDown = "", mTipOut = "", mHrlWage = "", mTipsPerDown = "", mTotalIncome = "",
+                            mTotalTDown = "", mTipoutPercentage = "", blocks_date = "";
+                    double totalLiveTips = 0, totalTDowns = 0, totalHrwage = 0, totalTipsDowns = 0, totalIncome = 0, totalDonws = 0, totalPercentage = 0;
+                    int totalTounrmaneDonwns = 0;
+
+                    //make profile data block from weekly data
+
+                    for (int i = 0; i < addDayArrayList.size(); i++) {
+
+                        String mProfile = addDayArrayList.get(i).getProfile();
+
+                        double singleTip = Double.parseDouble(addDayArrayList.get(i).getTotal_tips().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tips());
+                        totalLiveTips = totalLiveTips + singleTip;
+
+                        double singlePerTDown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                        totalTDowns = totalTDowns + singlePerTDown;
+
+                        int singleTournamentCount = Integer.parseInt(addDayArrayList.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTounament_count());
+                        totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
+
+                        double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
+                        totalHrwage = singleHrWage;
+
+                        double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
+                        totalTipsDowns = totalTipsDowns + singleTipsPerdown;
+
+                        double singleProfileTotalTD = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                        totalDonws = totalDonws + singleProfileTotalTD;
+
+                        double singleProfileIncome = Double.parseDouble(addDayArrayList.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_earnings());
+                        totalIncome = totalIncome + singleProfileIncome;
+
+
+                    }
+                    mLiveTips = String.format("%.2f", totalLiveTips);
+                    mTournamentDown = String.format("%.2f", totalTDowns);
+                    mTipOut = String.valueOf(totalTounrmaneDonwns);
+                    mHrlWage = String.format("%.2f", totalHrwage);
+                    mTipsPerDown = String.format("%.2f", totalTipsDowns);
+                    mTotalTDown = String.format("%.2f", totalDonws);
+                    mTotalIncome = String.format("%.2f", totalIncome);
+                    blocks_date = _stringDates.get(0) + "," + " " + _stringDates.get(6);
+
+                    dataBlocksSets = new DataBlocksSets();
+
+                    dataBlocksSets.setmProfile(profileName);
+                    dataBlocksSets.setmLiveTips("$"+mLiveTips);
+                    dataBlocksSets.setmTournamentDowns(mTournamentDown);
+                    dataBlocksSets.setmTipOut(mTipOut);
+                    dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                    dataBlocksSets.setmTipPerDown(mTipsPerDown);
+                    dataBlocksSets.setmTotalTDDowns(mTotalTDown);
+                    dataBlocksSets.setmTotalIncome("$"+mTotalIncome);
+                    dataBlocksSets.setmDates(blocks_date);
+                    dataBlocksSets.setmEndDateLong(reset_end_date);
+
+                    dataBlocksSetsArrayList.add(dataBlocksSets);
+
+
+                    // next blocks for next seven days
+                    addNextBlock(profileData);
+                }
             }
         }
 
@@ -2667,7 +2530,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         calendar.set(Calendar.DAY_OF_WEEK, _day);
         calendar.setTimeInMillis(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong());
         calendar.add(Calendar.DATE, 1);
-        if (new Date(_list.get(_list.size()-1).getStart_long()).after(new Date(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong()))) {
+        if (new Date(_list.get(_list.size() - 1).getStart_long()).after(new Date(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong()))) {
             for (int j = 0; j < 7; j++) {
 
                 String str_date = dateFormat.format(calendar.getTime().getTime());
@@ -2683,8 +2546,174 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 _weeklyDates.add(lon);
             }
+            long reset_start_date = _weeklyDates.get(0);
+            long reset_end_date = _weeklyDates.get(6);
+
+            // data between day of week
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
+
+            if (addDayArrayList.size() > 0) {
+                DataBlocksSets dataBlocksSets;
+                String mLiveTips = "", mTournamentDown = "", mTipOut = "", mHrlWage = "", mTipsPerDown = "", mTotalIncome = "",
+                        mTotalTDown = "", mTipoutPercentage = "", blocks_date = "";
+                double totalLiveTips = 0, totalTDowns = 0, totalHrwage = 0, totalTipsDowns = 0, totalIncome = 0, totalDonws = 0, totalPercentage = 0;
+                int totalTounrmaneDonwns = 0;
+
+                //make profile data block from weekly data
+                for (int i = 0; i < addDayArrayList.size(); i++) {
+
+                    String mProfile = addDayArrayList.get(i).getProfile();
+
+                    double singleTip = Double.parseDouble(addDayArrayList.get(i).getTotal_tips().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tips());
+                    totalLiveTips = totalLiveTips + singleTip;
+
+                    double singlePerTDown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                    totalTDowns = totalTDowns + singlePerTDown;
+
+                    int singleTournamentCount = Integer.parseInt(addDayArrayList.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTounament_count());
+                    totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
+
+                    double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
+                    totalHrwage = singleHrWage;
+
+                    double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
+                    totalTipsDowns = totalTipsDowns + singleTipsPerdown;
+
+                    double singleProfileTotalTD = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                    totalDonws = totalDonws + singleProfileTotalTD;
+
+                    double singleProfileIncome = Double.parseDouble(addDayArrayList.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_earnings());
+                    totalIncome = totalIncome + singleProfileIncome;
+
+
+                }
+                mLiveTips = String.format("%.2f", totalLiveTips);
+                mTournamentDown = String.format("%.2f", totalTDowns);
+                mTipOut = String.valueOf(totalTounrmaneDonwns);
+                mHrlWage = String.format("%.2f", totalHrwage);
+                mTipsPerDown = String.format("%.2f", totalTipsDowns);
+                mTotalTDown = String.format("%.2f", totalDonws);
+                mTotalIncome = String.format("%.2f", totalIncome);
+                blocks_date = _stringDates.get(0) + "," + " " + _stringDates.get(6);
+
+                dataBlocksSets = new DataBlocksSets();
+
+                dataBlocksSets.setmProfile(profileName);
+                dataBlocksSets.setmLiveTips("$"+mLiveTips);
+                dataBlocksSets.setmTournamentDowns(mTournamentDown);
+                dataBlocksSets.setmTipOut(mTipOut);
+                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmTipPerDown(mTipsPerDown);
+                dataBlocksSets.setmTotalTDDowns(mTotalTDown);
+                dataBlocksSets.setmTotalIncome("$"+mTotalIncome);
+                dataBlocksSets.setmDates(blocks_date);
+                dataBlocksSets.setmEndDateLong(reset_end_date);
+
+                dataBlocksSetsArrayList.add(dataBlocksSets);
+                addNextBlock(_list);
+
+            }
+        }
+
+
+    }
+
+    class StringDateComparator implements Comparator<AddDay> {
+        SimpleDateFormat dateFormat = new SimpleDateFormat(date_format);
+
+        public int compare(AddDay lhs, AddDay rhs) {
+            int return_val = 0;
+            try {
+                return_val = dateFormat.parse(lhs.getStart_shift()).compareTo(dateFormat.parse(rhs.getStart_shift()));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            return return_val;
+        }
+    }
+
+    private ArrayList<DataBlocksSets> makeBiWeeklyBlocksData(ArrayList<AddDay> single_profile) {
+
+        ArrayList<DataBlocksSets> blocksSetsArrayList = new ArrayList<>();
+        ArrayList<Long> _weeklyDates = null;
+        ArrayList<String> _stringDates;
+        String profileID = single_profile.get(0).getSelectedProfileId();
+        String profileName = single_profile.get(0).getProfile();
+
+        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+        String starting_date = dateFormat.format(single_profile.get(0).getStart_long());
+
+
+        if (single_profile.size() > 0) {
+            if (!starting_date.contains(single_profile.get(0).getStart_day_week())) {
+                long zeroth_date;
+                String start_week;
+                _weeklyDates = new ArrayList<>();
+                _stringDates = new ArrayList<>();
+
+                zeroth_date = single_profile.get(0).getStart_long();
+                start_week = single_profile.get(0).getStart_day_week();
+
+                int _day = getDay(start_week);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.DAY_OF_WEEK, _day);
+                calendar.setTimeInMillis(zeroth_date);
+
+
+                // make a week from zeroth date
+                for (int k = 0; k < 14; k++) {
+                    String str_date = dateFormat.format(calendar.getTime().getTime());
+
+                    Date date = calendar.getTime();
+
+                    long lon = date.getTime();
+
+                    calendar.add(Calendar.DATE, -1);
+
+                    _stringDates.add(str_date);
+
+
+                    _weeklyDates.add(lon);
+                }
+
+                int index_startDay = 0;
+                long start_date = 0;
+                if (_stringDates.size() > 0) {
+                    for (int i = 0; i < 7; i++) {
+                        if (_stringDates.get(i).contains(start_week)) {
+                            index_startDay = i;
+                            break;
+                        }
+                    }
+                }
+                index_startDay = Math.abs(index_startDay);
+                if (_weeklyDates.size() > 0) {
+                    start_date = _weeklyDates.get(index_startDay);
+                }
+                calendar.setTimeInMillis(start_date);
+                _stringDates.clear();
+                _weeklyDates.clear();
+                // make week with start day of week
+                for (int j = 0; j < 14; j++) {
+                    String str_date = dateFormat.format(calendar.getTime().getTime());
+
+                    Date date = calendar.getTime();
+
+                    long lon = date.getTime();
+
+                    calendar.add(Calendar.DATE, 1);
+
+                    _stringDates.add(str_date);
+
+
+                    _weeklyDates.add(lon);
+                }
+
+                System.out.println(_weeklyDates.toString());
+                System.out.println(_stringDates.toString());
+
                 long reset_start_date = _weeklyDates.get(0);
-                long reset_end_date = _weeklyDates.get(6);
+                long reset_end_date = _weeklyDates.get(13);
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -2697,6 +2726,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     int totalTounrmaneDonwns = 0;
 
                     //make profile data block from weekly data
+
                     for (int i = 0; i < addDayArrayList.size(); i++) {
 
                         String mProfile = addDayArrayList.get(i).getProfile();
@@ -2711,7 +2741,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
 
                         double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
-                        totalHrwage = totalHrwage + singleHrWage;
+                        totalHrwage = singleHrWage;
 
                         double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
                         totalTipsDowns = totalTipsDowns + singleTipsPerdown;
@@ -2731,27 +2761,540 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     mTipsPerDown = String.format("%.2f", totalTipsDowns);
                     mTotalTDown = String.format("%.2f", totalDonws);
                     mTotalIncome = String.format("%.2f", totalIncome);
-                    blocks_date = _stringDates.get(0) + "," + " " + _stringDates.get(6);
+                    blocks_date = _stringDates.get(0) + "," + " " + _stringDates.get(13);
 
                     dataBlocksSets = new DataBlocksSets();
 
                     dataBlocksSets.setmProfile(profileName);
-                    dataBlocksSets.setmLiveTips(mLiveTips);
+                    dataBlocksSets.setmLiveTips("$"+mLiveTips);
                     dataBlocksSets.setmTournamentDowns(mTournamentDown);
                     dataBlocksSets.setmTipOut(mTipOut);
-                    dataBlocksSets.setmHrlyWage(mHrlWage);
+                    dataBlocksSets.setmHrlyWage("$" + mHrlWage);
                     dataBlocksSets.setmTipPerDown(mTipsPerDown);
                     dataBlocksSets.setmTotalTDDowns(mTotalTDown);
-                    dataBlocksSets.setmTotalIncome(mTotalIncome);
+                    dataBlocksSets.setmTotalIncome("$"+mTotalIncome);
                     dataBlocksSets.setmDates(blocks_date);
                     dataBlocksSets.setmEndDateLong(reset_end_date);
 
                     dataBlocksSetsArrayList.add(dataBlocksSets);
-                    addNextBlock(_list);
+
+
+                    // next blocks for next seven days
+                    addNextBiWeeklyBlock(single_profile);
+                }
+            } else {
+                long zeroth_date;
+                String start_week;
+                _weeklyDates = new ArrayList<>();
+                _stringDates = new ArrayList<>();
+
+                zeroth_date = single_profile.get(0).getStart_long();
+                start_week = single_profile.get(0).getStart_day_week();
+
+                int _day = getDay(start_week);
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.DAY_OF_WEEK, _day);
+                calendar.setTimeInMillis(zeroth_date);
+
+                for (int j = 0; j < 14; j++) {
+                    String str_date = dateFormat.format(calendar.getTime().getTime());
+
+                    Date date = calendar.getTime();
+
+                    long lon = date.getTime();
+
+                    calendar.add(Calendar.DATE, 1);
+
+                    _stringDates.add(str_date);
+
+
+                    _weeklyDates.add(lon);
+                }
+
+                System.out.println(_weeklyDates.toString());
+                System.out.println(_stringDates.toString());
+
+                long reset_start_date = _weeklyDates.get(0);
+                long reset_end_date = _weeklyDates.get(13);
+
+                // data between day of week
+                addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
+
+                if (addDayArrayList.size() > 0) {
+                    DataBlocksSets dataBlocksSets;
+                    String mLiveTips = "", mTournamentDown = "", mTipOut = "", mHrlWage = "", mTipsPerDown = "", mTotalIncome = "",
+                            mTotalTDown = "", mTipoutPercentage = "", blocks_date = "";
+                    double totalLiveTips = 0, totalTDowns = 0, totalHrwage = 0, totalTipsDowns = 0, totalIncome = 0, totalDonws = 0, totalPercentage = 0;
+                    int totalTounrmaneDonwns = 0;
+
+                    //make profile data block from weekly data
+
+                    for (int i = 0; i < addDayArrayList.size(); i++) {
+
+                        String mProfile = addDayArrayList.get(i).getProfile();
+
+                        double singleTip = Double.parseDouble(addDayArrayList.get(i).getTotal_tips().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tips());
+                        totalLiveTips = totalLiveTips + singleTip;
+
+                        double singlePerTDown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                        totalTDowns = totalTDowns + singlePerTDown;
+
+                        int singleTournamentCount = Integer.parseInt(addDayArrayList.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTounament_count());
+                        totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
+
+                        double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
+                        totalHrwage = singleHrWage;
+
+                        double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
+                        totalTipsDowns = totalTipsDowns + singleTipsPerdown;
+
+                        double singleProfileTotalTD = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                        totalDonws = totalDonws + singleProfileTotalTD;
+
+                        double singleProfileIncome = Double.parseDouble(addDayArrayList.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_earnings());
+                        totalIncome = totalIncome + singleProfileIncome;
+
+
+                    }
+                    mLiveTips = String.format("%.2f", totalLiveTips);
+                    mTournamentDown = String.format("%.2f", totalTDowns);
+                    mTipOut = String.valueOf(totalTounrmaneDonwns);
+                    mHrlWage = String.format("%.2f", totalHrwage);
+                    mTipsPerDown = String.format("%.2f", totalTipsDowns);
+                    mTotalTDown = String.format("%.2f", totalDonws);
+                    mTotalIncome = String.format("%.2f", totalIncome);
+                    blocks_date = _stringDates.get(0) + "," + " " + _stringDates.get(13);
+
+                    dataBlocksSets = new DataBlocksSets();
+
+                    dataBlocksSets.setmProfile(profileName);
+                    dataBlocksSets.setmLiveTips("$"+mLiveTips);
+                    dataBlocksSets.setmTournamentDowns(mTournamentDown);
+                    dataBlocksSets.setmTipOut(mTipOut);
+                    dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                    dataBlocksSets.setmTipPerDown(mTipsPerDown);
+                    dataBlocksSets.setmTotalTDDowns(mTotalTDown);
+                    dataBlocksSets.setmTotalIncome("$"+mTotalIncome);
+                    dataBlocksSets.setmDates(blocks_date);
+                    dataBlocksSets.setmEndDateLong(reset_end_date);
+
+                    dataBlocksSetsArrayList.add(dataBlocksSets);
+
+
+                    // next blocks for next seven days
+                    addNextBiWeeklyBlock(single_profile);
+                }
+            }
+
+        }
+        blocksSetsArrayList = dataBlocksSetsArrayList;
+
+        return blocksSetsArrayList;
+    }
+
+    private void addNextBiWeeklyBlock(ArrayList<AddDay> _list) {
+        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+        ArrayList<Long> _weeklyDates = null;
+        ArrayList<String> _stringDates;
+        _weeklyDates = new ArrayList<>();
+        _stringDates = new ArrayList<>();
+
+        String profileID = _list.get(0).getSelectedProfileId();
+        String profileName = _list.get(0).getProfile();
+
+
+        int _day = getDay(start_week);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_WEEK, _day);
+        calendar.setTimeInMillis(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong());
+        calendar.add(Calendar.DATE, 1);
+        if (new Date(_list.get(_list.size() - 1).getStart_long()).after(new Date(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong()))) {
+            for (int j = 0; j < 14; j++) {
+
+                String str_date = dateFormat.format(calendar.getTime().getTime());
+
+                Date date = calendar.getTime();
+
+                long lon = date.getTime();
+
+                calendar.add(Calendar.DATE, 1);
+
+                _stringDates.add(str_date);
+
+
+                _weeklyDates.add(lon);
+            }
+            long reset_start_date = _weeklyDates.get(0);
+            long reset_end_date = _weeklyDates.get(13);
+
+            // data between day of week
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
+
+            if (addDayArrayList.size() > 0) {
+                DataBlocksSets dataBlocksSets;
+                String mLiveTips = "", mTournamentDown = "", mTipOut = "", mHrlWage = "", mTipsPerDown = "", mTotalIncome = "",
+                        mTotalTDown = "", mTipoutPercentage = "", blocks_date = "";
+                double totalLiveTips = 0, totalTDowns = 0, totalHrwage = 0, totalTipsDowns = 0, totalIncome = 0, totalDonws = 0, totalPercentage = 0;
+                int totalTounrmaneDonwns = 0;
+
+                //make profile data block from weekly data
+                for (int i = 0; i < addDayArrayList.size(); i++) {
+
+                    String mProfile = addDayArrayList.get(i).getProfile();
+
+                    double singleTip = Double.parseDouble(addDayArrayList.get(i).getTotal_tips().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tips());
+                    totalLiveTips = totalLiveTips + singleTip;
+
+                    double singlePerTDown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                    totalTDowns = totalTDowns + singlePerTDown;
+
+                    int singleTournamentCount = Integer.parseInt(addDayArrayList.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTounament_count());
+                    totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
+
+                    double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
+                    totalHrwage = singleHrWage;
+
+                    double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
+                    totalTipsDowns = totalTipsDowns + singleTipsPerdown;
+
+                    double singleProfileTotalTD = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                    totalDonws = totalDonws + singleProfileTotalTD;
+
+                    double singleProfileIncome = Double.parseDouble(addDayArrayList.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_earnings());
+                    totalIncome = totalIncome + singleProfileIncome;
+
+
+                }
+                mLiveTips = String.format("%.2f", totalLiveTips);
+                mTournamentDown = String.format("%.2f", totalTDowns);
+                mTipOut = String.valueOf(totalTounrmaneDonwns);
+                mHrlWage = String.format("%.2f", totalHrwage);
+                mTipsPerDown = String.format("%.2f", totalTipsDowns);
+                mTotalTDown = String.format("%.2f", totalDonws);
+                mTotalIncome = String.format("%.2f", totalIncome);
+                blocks_date = _stringDates.get(0) + "," + " " + _stringDates.get(13);
+
+                dataBlocksSets = new DataBlocksSets();
+
+                dataBlocksSets.setmProfile(profileName);
+                dataBlocksSets.setmLiveTips("$"+mLiveTips);
+                dataBlocksSets.setmTournamentDowns(mTournamentDown);
+                dataBlocksSets.setmTipOut(mTipOut);
+                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmTipPerDown(mTipsPerDown);
+                dataBlocksSets.setmTotalTDDowns(mTotalTDown);
+                dataBlocksSets.setmTotalIncome("$"+mTotalIncome);
+                dataBlocksSets.setmDates(blocks_date);
+                dataBlocksSets.setmEndDateLong(reset_end_date);
+
+                dataBlocksSetsArrayList.add(dataBlocksSets);
+                addNextBiWeeklyBlock(_list);
+            }
+        }
+    }
+
+
+    private ArrayList<DataBlocksSets> makeMonthlyBlocks(ArrayList<Profiles> profile_list) {
+
+        ArrayList<DataBlocksSets> _monthlySets = new ArrayList<>();
+        summary_parentlayout.setVisibility(View.VISIBLE);
+        ArrayList<AddDay> fetched_allData = new ArrayList<>();
+
+        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profiles);
+        ArrayList<AddDay> particular_profile = new ArrayList<>();
+        ArrayList<DataBlocksSets> full_monthlySet = new ArrayList<>();
+        for (int i = 0; i < profile_list.size(); i++) {
+            int single_profile = profile_list.get(i).getId();
+            if (single_profile > 0) {
+
+                for (int j = 0; j < fetched_allData.size(); j++) {
+                    if (fetched_allData.get(j).getSelectedProfileId().equalsIgnoreCase(String.valueOf(single_profile))) {
+                        particular_profile.add(fetched_allData.get(j));
+                    }
+
+
+                }
+                Collections.sort(particular_profile, new StringDateComparator());
+                Log.i("Sorted_list", particular_profile.toString());
+                if (particular_profile.size() > 0) {
+                    _monthlySets = monthlyDataSet(particular_profile);
+                    full_monthlySet = _monthlySets;
+                    particular_profile.clear();
+                }
+            }
+        }
+        weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, full_monthlySet);
+        _summaryBasedList.setAdapter(weeklySummaryAdapter);
+
+        return full_monthlySet;
+    }
+
+    ArrayList<DataBlocksSets> _singleSet = new ArrayList<>();
+
+    private ArrayList<DataBlocksSets> monthlyDataSet(ArrayList<AddDay> _particular_profile) {
+
+        String profileID = _particular_profile.get(0).getSelectedProfileId();
+        String profileName = _particular_profile.get(0).getProfile();
+
+        if (_particular_profile.size() > 0) {
+            long zeroth_date;
+
+            zeroth_date = _particular_profile.get(0).getStart_long();
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(zeroth_date);
+            int _month = calendar.get(Calendar.MONTH);
+            String month_name = getmonthName(_month);
+            int year = calendar.get(Calendar.YEAR);
+            int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+            System.out.println(String.valueOf(daysInMonth));
+
+
+            Calendar start_calendar = Calendar.getInstance();
+            start_calendar.set(Calendar.DAY_OF_MONTH, 1);
+
+            start_calendar.set(Calendar.HOUR, 0);
+            start_calendar.set(Calendar.MINUTE, 0);
+            start_calendar.set(Calendar.SECOND, 0);
+
+            Calendar end_calendar = Calendar.getInstance();
+            end_calendar.set(Calendar.DAY_OF_MONTH, daysInMonth);
+
+            Date start_date = start_calendar.getTime();
+            long start_date_long = start_date.getTime();
+
+            Date end_date = end_calendar.getTime();
+            long end_date_long = end_date.getTime();
+
+            addDayArrayList = new ArrayList<>();
+
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(start_date_long, end_date_long, profileName, Integer.parseInt(profileID));
+
+            if (addDayArrayList.size() > 0) {
+                DataBlocksSets dataBlocksSets;
+                String mLiveTips = "", mTournamentDown = "", mTipOut = "", mHrlWage = "", mTipsPerDown = "", mTotalIncome = "",
+                        mTotalTDown = "", mTipoutPercentage = "", blocks_date = "";
+                double totalLiveTips = 0, totalTDowns = 0, totalHrwage = 0, totalTipsDowns = 0, totalIncome = 0, totalDonws = 0, totalPercentage = 0;
+                int totalTounrmaneDonwns = 0;
+
+                //make profile data block from weekly data
+                for (int i = 0; i < addDayArrayList.size(); i++) {
+
+                    String mProfile = addDayArrayList.get(i).getProfile();
+
+                    double singleTip = Double.parseDouble(addDayArrayList.get(i).getTotal_tips().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tips());
+                    totalLiveTips = totalLiveTips + singleTip;
+
+                    double singlePerTDown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                    totalTDowns = totalTDowns + singlePerTDown;
+
+                    int singleTournamentCount = Integer.parseInt(addDayArrayList.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTounament_count());
+                    totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
+
+                    double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
+                    totalHrwage = singleHrWage;
+
+                    double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
+                    totalTipsDowns = totalTipsDowns + singleTipsPerdown;
+
+                    double singleProfileTotalTD = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                    totalDonws = totalDonws + singleProfileTotalTD;
+
+                    double singleProfileIncome = Double.parseDouble(addDayArrayList.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_earnings());
+                    totalIncome = totalIncome + singleProfileIncome;
+
+
+                }
+                mLiveTips = String.format("%.2f", totalLiveTips);
+                mTournamentDown = String.format("%.2f", totalTDowns);
+                mTipOut = String.valueOf(totalTounrmaneDonwns);
+                mHrlWage = String.format("%.2f", totalHrwage);
+                mTipsPerDown = String.format("%.2f", totalTipsDowns);
+                mTotalTDown = String.format("%.2f", totalDonws);
+                mTotalIncome = String.format("%.2f", totalIncome);
+                blocks_date = month_name + " " + String.valueOf(year);
+
+                dataBlocksSets = new DataBlocksSets();
+
+                dataBlocksSets.setmProfile(profileName);
+                dataBlocksSets.setmLiveTips("$"+mLiveTips);
+                dataBlocksSets.setmTournamentDowns(mTournamentDown);
+                dataBlocksSets.setmTipOut(mTipOut);
+                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmTipPerDown(mTipsPerDown);
+                dataBlocksSets.setmTotalTDDowns(mTotalTDown);
+                dataBlocksSets.setmTotalIncome("$"+mTotalIncome);
+                dataBlocksSets.setmDates(blocks_date);
+                dataBlocksSets.setmEndDateLong(end_date_long);
+
+                _singleSet.add(dataBlocksSets);
 
             }
         }
 
+        return _singleSet;
 
+    }
+
+    private ArrayList<DataBlocksSets> makeYearlyBlocks(ArrayList<Profiles> profiles) {
+        ArrayList<DataBlocksSets> _yearlySet = new ArrayList<>();
+        summary_parentlayout.setVisibility(View.VISIBLE);
+        ArrayList<AddDay> fetched_allData = new ArrayList<>();
+
+        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profiles);
+        ArrayList<AddDay> particular_profile = new ArrayList<>();
+        ArrayList<DataBlocksSets> full_yearlydata = new ArrayList<>();
+        for (int i = 0; i < profiles.size(); i++) {
+            int single_profile = profiles.get(i).getId();
+            if (single_profile > 0) {
+
+                for (int j = 0; j < fetched_allData.size(); j++) {
+                    if (fetched_allData.get(j).getSelectedProfileId().equalsIgnoreCase(String.valueOf(single_profile))) {
+                        particular_profile.add(fetched_allData.get(j));
+                    }
+
+
+                }
+                Collections.sort(particular_profile, new StringDateComparator());
+                Log.i("Sorted_list", particular_profile.toString());
+                if (particular_profile.size() > 0) {
+                    _yearlySet = yearlyDataSet(particular_profile);
+                    full_yearlydata = _yearlySet;
+                    particular_profile.clear();
+                }
+            }
+        }
+        weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, full_yearlydata);
+        _summaryBasedList.setAdapter(weeklySummaryAdapter);
+
+        return full_yearlydata;
+    }
+
+    private String getmonthName(int _month) {
+        String month_name = "";
+        switch (_month) {
+            case 0:
+                month_name = "January";
+                break;
+            case 1:
+                month_name = "February";
+                break;
+            case 2:
+                month_name = "March";
+                break;
+            case 3:
+                month_name = "April";
+                break;
+            case 4:
+                month_name = "May";
+                break;
+            case 5:
+                month_name = "June";
+                break;
+            case 6:
+                month_name = "July";
+                break;
+            case 7:
+                month_name = "August";
+                break;
+            case 8:
+                month_name = "September";
+                break;
+            case 9:
+                month_name = "October";
+                break;
+            case 10:
+                month_name = "November";
+                break;
+            case 11:
+                month_name = "December";
+                break;
+        }
+        return month_name;
+    }
+
+    ArrayList<DataBlocksSets> _singleYearly = new ArrayList<>();
+
+    private ArrayList<DataBlocksSets> yearlyDataSet(ArrayList<AddDay> _list) {
+
+
+        String profileID = _list.get(0).getSelectedProfileId();
+        String profileName = _list.get(0).getProfile();
+
+        if (_list.size() > 0) {
+            long zeroth_date;
+
+            zeroth_date = _list.get(0).getStart_long();
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(zeroth_date);
+            int year = calendar.get(Calendar.YEAR);
+            addDayArrayList = new ArrayList<>();
+
+            addDayArrayList = new DatabaseOperations(LandingActivity.this).yearlyData(String.valueOf(year), profileName, Integer.parseInt(profileID));
+
+            if (addDayArrayList.size() > 0) {
+                DataBlocksSets dataBlocksSets;
+                String mLiveTips = "", mTournamentDown = "", mTipOut = "", mHrlWage = "", mTipsPerDown = "", mTotalIncome = "",
+                        mTotalTDown = "", mTipoutPercentage = "", blocks_date = "";
+                double totalLiveTips = 0, totalTDowns = 0, totalHrwage = 0, totalTipsDowns = 0, totalIncome = 0, totalDonws = 0, totalPercentage = 0;
+                int totalTounrmaneDonwns = 0;
+
+                //make profile data block from weekly data
+                for (int i = 0; i < addDayArrayList.size(); i++) {
+
+                    String mProfile = addDayArrayList.get(i).getProfile();
+
+                    double singleTip = Double.parseDouble(addDayArrayList.get(i).getTotal_tips().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tips());
+                    totalLiveTips = totalLiveTips + singleTip;
+
+                    double singlePerTDown = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                    totalTDowns = totalTDowns + singlePerTDown;
+
+                    int singleTournamentCount = Integer.parseInt(addDayArrayList.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTounament_count());
+                    totalTounrmaneDonwns = totalTounrmaneDonwns + singleTournamentCount;
+
+                    double singleHrWage = Double.parseDouble(addDayArrayList.get(i).getProfile_wage_hourly().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getProfile_wage_hourly());
+                    totalHrwage = singleHrWage;
+
+                    double singleTipsPerdown = Double.parseDouble(addDayArrayList.get(i).getTournament_perday().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTournament_perday());
+                    totalTipsDowns = totalTipsDowns + singleTipsPerdown;
+
+                    double singleProfileTotalTD = Double.parseDouble(addDayArrayList.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_tournament_downs());
+                    totalDonws = totalDonws + singleProfileTotalTD;
+
+                    double singleProfileIncome = Double.parseDouble(addDayArrayList.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : addDayArrayList.get(i).getTotal_earnings());
+                    totalIncome = totalIncome + singleProfileIncome;
+
+
+                }
+                mLiveTips = String.format("%.2f", totalLiveTips);
+                mTournamentDown = String.format("%.2f", totalTDowns);
+                mTipOut = String.valueOf(totalTounrmaneDonwns);
+                mHrlWage = String.format("%.2f", totalHrwage);
+                mTipsPerDown = String.format("%.2f", totalTipsDowns);
+                mTotalTDown = String.format("%.2f", totalDonws);
+                mTotalIncome = String.format("%.2f", totalIncome);
+                blocks_date = String.valueOf(year);
+
+                dataBlocksSets = new DataBlocksSets();
+
+                dataBlocksSets.setmProfile(profileName);
+                dataBlocksSets.setmLiveTips("$"+mLiveTips);
+                dataBlocksSets.setmTournamentDowns(mTournamentDown);
+                dataBlocksSets.setmTipOut(mTipOut);
+                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmTipPerDown(mTipsPerDown);
+                dataBlocksSets.setmTotalTDDowns(mTotalTDown);
+                dataBlocksSets.setmTotalIncome("$"+mTotalIncome);
+                dataBlocksSets.setmDates(blocks_date);
+                dataBlocksSets.setmEndDateLong(year);
+
+                _singleYearly.add(dataBlocksSets);
+
+            }
+        }
+        return _singleYearly;
     }
 }

@@ -1066,7 +1066,7 @@ public class DatabaseOperations {
                                 addDay.setTotal_hours(cursor.getColumnIndex(DatabaseUtils.TotalHr) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalHr)) : 0);
                                 addDay.setTotal_minutes(cursor.getColumnIndex(DatabaseUtils.TotalMin) != -1 ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)) : 0);
                                 addDay.setTotal_minutes((cursor.getColumnIndex(DatabaseUtils.TotalMin) != -1) ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.TotalMin)) : 0);
-addDay.setSelectedProfileId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.SelectedProfile_ID)));
+                                addDay.setSelectedProfileId(cursor.getString(cursor.getColumnIndex(DatabaseUtils.SelectedProfile_ID)));
                                 addDay.setProfile_wage_hourly((cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage) != -1) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.PerHourProfileWage)) : "0");
 
                                 addDays.add(addDay);
