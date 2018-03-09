@@ -642,7 +642,7 @@ public class DatabaseOperations {
         if (profile.equalsIgnoreCase("All")) {
             query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%' Order By start_shift_long";
         } else {
-            query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%'  AND  id= '" + profileId + "' Order By start_shift_long";
+            query = "select * from add_table WHERE start_shift LIKE  '%" + year + "%'  AND  profile_id= '" + profileId + "' Order By start_shift_long";
         }
 
         try {
