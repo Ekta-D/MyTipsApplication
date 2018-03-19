@@ -41,6 +41,17 @@ public class AddDay implements Serializable {
 
     int dollar_checked;
 
+    public String getSummary_dates() {
+        return summary_dates;
+    }
+
+    public void setSummary_dates(String summary_dates) {
+        this.summary_dates = summary_dates;
+    }
+
+    String summary_dates="";
+
+
     public String getSelectedProfileId() {
         return selectedProfileId;
     }

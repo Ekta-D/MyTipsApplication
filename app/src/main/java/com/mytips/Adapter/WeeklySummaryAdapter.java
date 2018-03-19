@@ -77,14 +77,14 @@ public class WeeklySummaryAdapter extends BaseAdapter {
             viewHolder = (ViewHolder) convertView.getTag();
         }
         viewHolder._profile.setText(dataBlocksSetsArrayList.get(position).getmProfile());
-        viewHolder._liveTips.setText(dataBlocksSetsArrayList.get(position).getmLiveTips());
+        viewHolder._liveTips.setText("$" + dataBlocksSetsArrayList.get(position).getmLiveTips());
 //        viewHolder._TDowns.setText(dataBlocksSetsArrayList.get(position).getmTipOut());
 //        viewHolder._TipOuts.setText(dataBlocksSetsArrayList.get(position).getmTipOut());
         viewHolder._TipOutPercentage.setText("(" + dataBlocksSetsArrayList.get(position).getmTipoutPercentage() + ")");
         viewHolder._PerTournamentDown.setText(dataBlocksSetsArrayList.get(position).getmTDPerDay());
-        viewHolder._HrWages.setText(dataBlocksSetsArrayList.get(position).getmHrlyWage());
+        viewHolder._HrWages.setText("$" + dataBlocksSetsArrayList.get(position).getmHrlyWage());
         viewHolder._TDownsCount.setText(dataBlocksSetsArrayList.get(position).getmTotalTDDowns());
-        viewHolder._TotalIncome.setText("Total Income : " + " " + dataBlocksSetsArrayList.get(position).getmTotalIncome());
+        viewHolder._TotalIncome.setText("Total Income : " + " " + "$" + dataBlocksSetsArrayList.get(position).getmTotalIncome());
         viewHolder._TipOuts.setText("$" + dataBlocksSetsArrayList.get(position).getmTipOut());
         viewHolder._dates.setText(dataBlocksSetsArrayList.get(position).getmDates());
         viewHolder._totalHoursWorked.setText(dataBlocksSetsArrayList.get(position).getmTotalWorkedHr());

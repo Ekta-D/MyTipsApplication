@@ -136,10 +136,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     String pdfDates = "";
     String totalEarningPdf = "";
     String totalDays = "";
+    String days_type = "";
     WeeklySummaryAdapter weeklySummaryAdapter;
     ListView _summaryBasedList;
     RelativeLayout summary_parentlayout;
     RelativeLayout daily_layout, bottomEarning_layout;
+
+    boolean is_email = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -265,8 +268,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     if (_singleSet != null && _singleSet.size() > 0) {
                         _singleSet.clear();
                     }
-                    if (_singleYearly!=null && _singleYearly.size()>0)
-                    {
+                    if (_singleYearly != null && _singleYearly.size() > 0) {
                         _singleYearly.clear();
                     }
                     if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
@@ -312,8 +314,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 if (_singleSet != null && _singleSet.size() > 0) {
                     _singleSet.clear();
                 }
-                if (_singleYearly!=null && _singleYearly.size()>0)
-                {
+                if (_singleYearly != null && _singleYearly.size() > 0) {
                     _singleYearly.clear();
                 }
                 if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
@@ -412,8 +413,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (_singleSet != null && _singleSet.size() > 0) {
             _singleSet.clear();
         }
-        if (_singleYearly!=null && _singleYearly.size()>0)
-        {
+        if (_singleYearly != null && _singleYearly.size() > 0) {
             _singleYearly.clear();
         }
         if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
@@ -435,8 +435,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (_singleSet != null && _singleSet.size() > 0) {
             _singleSet.clear();
         }
-        if (_singleYearly!=null && _singleYearly.size()>0)
-        {
+        if (_singleYearly != null && _singleYearly.size() > 0) {
             _singleYearly.clear();
         }
         if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
@@ -629,8 +628,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         if (_singleSet != null && _singleSet.size() > 0) {
                             _singleSet.clear();
                         }
-                        if (_singleYearly!=null && _singleYearly.size()>0)
-                        {
+                        if (_singleYearly != null && _singleYearly.size() > 0) {
                             _singleYearly.clear();
                         }
                         if (!start_week.equalsIgnoreCase("") && !selected_profileName.equalsIgnoreCase("")) {
@@ -744,7 +742,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 break;*/
 
             case R.id.email_data:
-
+                is_email = true;
 
                 if (addDayArrayList.size() > 0) {
                     Thread run = new Thread(PdfThread);
@@ -909,12 +907,17 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             _dataSet = new ArrayList<>();
 
             _dataSet = setWeeklyData("Weekly", profiles);
+
+            addDayArrayList = new ArrayList<>();
+            addDayArrayList = combinedData(_dataSet);
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
             daily_layout.setVisibility(View.GONE);
             bottomEarning_layout.setVisibility(View.GONE);
             _dataSet = new ArrayList<>();
 
             _dataSet = setBiWeeklyBlocks(profiles);
+            addDayArrayList = new ArrayList<>();
+            addDayArrayList = combinedData(_dataSet);
         } else if (spinner_selected.equalsIgnoreCase("Monthly"))
 
         {
@@ -922,11 +925,15 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             _dataSet = new ArrayList<>();
             bottomEarning_layout.setVisibility(View.GONE);
             _dataSet = makeMonthlyBlocks(profiles);
+            addDayArrayList = new ArrayList<>();
+            addDayArrayList = combinedData(_dataSet);
         } else {
 
             daily_layout.setVisibility(View.GONE);
             _dataSet = new ArrayList<>();
             _dataSet = makeYearlyBlocks(profiles);
+            addDayArrayList = new ArrayList<>();
+            addDayArrayList = combinedData(_dataSet);
         }
         if (spinner_selected.equalsIgnoreCase("Daily")) {
             if (addDayArrayList.size() > 0)
@@ -939,9 +946,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 no_data.setVisibility(View.VISIBLE);
             }
         } else {
-            if (_dataSet.size() > 0)
-
-            {
+            if (_dataSet.size() > 0) {
                 _nodata.setVisibility(View.GONE);
             } else
 
@@ -1529,8 +1534,17 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 Font redFont = FontFactory.getFont(FontFactory.HELVETICA, 10, Font.NORMAL, BaseColor.RED);
 
                 totalDays = String.valueOf(addDayArrayList.size());
+                if (selected_summary_type.equalsIgnoreCase("Daily")) {
+                    days_type = "days";
+                } else if (selected_summary_type.equalsIgnoreCase("Weekly") || selected_summary_type.equalsIgnoreCase("Bi-Weekly")) {
+                    days_type = "weeks";
+                } else if (selected_summary_type.equalsIgnoreCase("Monthly")) {
+                    days_type = "months";
+                } else {
+                    days_type = "years";
+                }
 
-                bottomCell = new PdfPCell(new Phrase(totalDays + "days", redFont));
+                bottomCell = new PdfPCell(new Phrase(totalDays + days_type, redFont));
                 bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
                 bottomCell.setVerticalAlignment(Element.ALIGN_CENTER);
                 bottomCell.setBackgroundColor(BaseColor.WHITE);
@@ -1545,8 +1559,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 bottomCell.setBackgroundColor(BaseColor.WHITE);
                 bottomCell.setFixedHeight(40f);
                 bottomTable.addCell(bottomCell);
+                String hrs = "";
+                if (selected_summary_type.equalsIgnoreCase("Daily")) {
+                    hrs = getTotalCalculatedhr(addDayArrayList);
+                } else {
+                    hrs = getWorkingHrs(addDayArrayList);
+                }
 
-                String hrs = getTotalCalculatedhr(addDayArrayList);
                 System.out.println("Working hr " + hrs);
 
                 bottomCell = new PdfPCell(new Phrase(hrs, redFont));
@@ -2051,16 +2070,16 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         return dateFormat;
     }
 
+    // get calculated working hours in case of daily and sending email with daily summary type.
     public String getTotalCalculatedhr(ArrayList<AddDay> addDays) {
         String totalhr = "";
         int hr = 0, min = 0;
         for (int i = 0; i < addDays.size(); i++) {
             int h = addDays.get(i).getTotal_hours();
             hr = hr + h;
-
-
             int m = addDays.get(i).getTotal_minutes();
             min = min + m;
+
         }
 
         long hrToMin = hr * 60;
@@ -2068,10 +2087,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         double duration = totalMins / 60;
         int mins = (int) (totalMins % 60);
 
-      /*  if (dur.contains(".")) {
-            dur = dur.replace(".", "hr");
-
-        }*/
         long hrDuration = Math.round(duration);
         String dur = String.valueOf(hrDuration);
         totalhr = dur + "hr : " + String.valueOf(mins) + "min";
@@ -2079,11 +2094,49 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     }
 
+    // get calculated working hours in case of weekly,monthly,yearly,bi-weekly while sending email.
+    public String getWorkingHrs(ArrayList<AddDay> data_blocks) {
+        String total_hr = "";
+        int hr = 0, min = 0;
+        for (int i = 0; i < data_blocks.size(); i++) {
+            String string = data_blocks.get(i).getCalculated_hours();
+
+            String[] spilit = string.split(":");
+            String str1 = spilit[0];
+            String str2 = spilit[1];
+            if (str1.trim().contains("hr")) {
+                str1 = str1.replace("hr", "");
+                str1 = str1.trim();
+            }
+            if (str2.trim().contains("min")) {
+                str2 = str2.replace("min", "");
+                str2 = str2.trim();
+            }
+            int h = Integer.parseInt(str1.trim().equalsIgnoreCase("") ? "0" : str1);
+            hr = hr + h;
+            int m = Integer.parseInt(str2.trim().equalsIgnoreCase("") ? "0" : str2);
+            min = min + m;
+        }
+        long hrToMin = hr * 60;
+        long totalMins = hrToMin + min;
+        double duration = totalMins / 60;
+        int mins = (int) (totalMins % 60);
+
+        long hrDuration = Math.round(duration);
+        String dur = String.valueOf(hrDuration);
+        total_hr = dur + "hr : " + String.valueOf(mins) + "min";
+        return total_hr;
+    }
+
     public String calculateTotalLiveTips(ArrayList<AddDay> addDays) {
         String totalLiveTips = "";
         double totalTips = 0;
         for (int i = 0; i < addDays.size(); i++) {
+
             String str = addDays.get(i).getTotal_tips();
+            if (str.contains("$")) {
+                str = str.replace("$", "");
+            }
             totalTips = totalTips + Double.parseDouble(str);
         }
         totalLiveTips = String.valueOf(totalTips);
@@ -2097,6 +2150,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         for (int i = 0; i < addDays.size(); i++) {
             if (!addDays.get(i).getTounament_count().equalsIgnoreCase("")) {
                 tds = Integer.parseInt(addDays.get(i).getTounament_count());
+                td = td + tds;
+            } else {
+                tds = Integer.parseInt(addDays.get(i).getTounament_count().equalsIgnoreCase("") ? "0" : addDays.get(i).getTounament_count());
                 td = td + tds;
             }
 
@@ -2114,6 +2170,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             if (!addDays.get(i).getTotal_tournament_downs().equalsIgnoreCase("")) {
                 per_tournnt = Double.parseDouble(addDays.get(i).getTotal_tournament_downs());
                 tournments_total = tournments_total + per_tournnt;
+            } else {
+                per_tournnt = Double.parseDouble(addDays.get(i).getTotal_tournament_downs().equalsIgnoreCase("") ? "0" : addDays.get(i).getTotal_tournament_downs());
+                tournments_total = tournments_total + per_tournnt;
             }
 
         }
@@ -2130,6 +2189,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             if (!addDays.get(i).getTip_out().equalsIgnoreCase("")) {
                 d0 = Double.parseDouble(addDays.get(i).getTip_out());
                 d = d + d0;
+            } else {
+                d0 = Double.parseDouble(addDays.get(i).getTip_out().equalsIgnoreCase("") ? "0" : addDays.get(i).getTip_out());
+                d = d + d0;
             }
 
 
@@ -2143,10 +2205,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         String total = "";
         double wage = 0;
         for (int i = 0; i < addDays.size(); i++) {
-            /*if (!addDays.get(i).getWages_hourly().equalsIgnoreCase("")) {
 
-            }*/
-            d = d + Double.parseDouble(addDays.get(i).getWages_hourly().equals("") ? "0.0" : addDays.get(i).getWages_hourly());
+            if (addDays.get(i).getWages_hourly()!=null)
+            {
+                d = d + Double.parseDouble(addDays.get(i).getWages_hourly().equals("") ? "0.0" : addDays.get(i).getWages_hourly());
+            }
+
 
         }
         total = String.valueOf(String.format("%.2f", d));
@@ -2397,13 +2461,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
                     dataBlocksSets.setmTipoutPercentage(percentage);
                     dataBlocksSets.setmProfile(profileName);
-                    dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                    dataBlocksSets.setmLiveTips(mLiveTips);
                     dataBlocksSets.setmTournamentDowns(mTournamentDown);
                     dataBlocksSets.setmTipOut(tipsOut);
-                    dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                    dataBlocksSets.setmHrlyWage(mHrlWage);
                     dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                     dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                    dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                    dataBlocksSets.setmTotalIncome(mTotalIncome);
                     dataBlocksSets.setmDates(blocks_date);
                     dataBlocksSets.setmEndDateLong(reset_end_date);
                     dataBlocksSets.setSummary_type(selected_summary_type);
@@ -2507,13 +2571,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
                     dataBlocksSets.setmTipoutPercentage(percentage);
                     dataBlocksSets.setmProfile(profileName);
-                    dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                    dataBlocksSets.setmLiveTips(mLiveTips);
                     dataBlocksSets.setmTournamentDowns(mTournamentDown);
                     dataBlocksSets.setmTipOut(tipsOut);
-                    dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                    dataBlocksSets.setmHrlyWage(mHrlWage);
                     dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                     dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                    dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                    dataBlocksSets.setmTotalIncome(mTotalIncome);
                     dataBlocksSets.setmDates(blocks_date);
                     dataBlocksSets.setmEndDateLong(reset_end_date);
                     dataBlocksSets.setSummary_type(selected_summary_type);
@@ -2653,13 +2717,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
                 dataBlocksSets.setmTipoutPercentage(percentage);
                 dataBlocksSets.setmProfile(profileName);
-                dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                dataBlocksSets.setmLiveTips(mLiveTips);
                 dataBlocksSets.setmTournamentDowns(mTournamentDown);
                 dataBlocksSets.setmTipOut(tipsOut);
-                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmHrlyWage(mHrlWage);
                 dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                 dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                dataBlocksSets.setmTotalIncome(mTotalIncome);
                 dataBlocksSets.setmDates(blocks_date);
                 dataBlocksSets.setmEndDateLong(reset_end_date);
                 dataBlocksSets.setSummary_type(selected_summary_type);
@@ -2827,13 +2891,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
                     dataBlocksSets.setmTipoutPercentage(percentage);
                     dataBlocksSets.setmProfile(profileName);
-                    dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                    dataBlocksSets.setmLiveTips(mLiveTips);
                     dataBlocksSets.setmTournamentDowns(mTournamentDown);
                     dataBlocksSets.setmTipOut(tipsOut);
-                    dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                    dataBlocksSets.setmHrlyWage(mHrlWage);
                     dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                     dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                    dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                    dataBlocksSets.setmTotalIncome(mTotalIncome);
                     dataBlocksSets.setmDates(blocks_date);
                     dataBlocksSets.setmEndDateLong(reset_end_date);
                     dataBlocksSets.setSummary_type(selected_summary_type);
@@ -2938,13 +3002,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     dataBlocksSets.setmTotalWorkedHr(_workingHr);
                     dataBlocksSets.setmTipoutPercentage(percentage);
                     dataBlocksSets.setmProfile(profileName);
-                    dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                    dataBlocksSets.setmLiveTips(mLiveTips);
                     dataBlocksSets.setmTournamentDowns(mTournamentDown);
                     dataBlocksSets.setmTipOut(tipsOut);
-                    dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                    dataBlocksSets.setmHrlyWage(mHrlWage);
                     dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                     dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                    dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                    dataBlocksSets.setmTotalIncome(mTotalIncome);
                     dataBlocksSets.setmDates(blocks_date);
                     dataBlocksSets.setmEndDateLong(reset_end_date);
                     dataBlocksSets.setSummary_type(selected_summary_type);
@@ -3054,13 +3118,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 dataBlocksSets.setmTotalWorkedHr(_workingHr);
                 dataBlocksSets.setmTipoutPercentage(percentage);
                 dataBlocksSets.setmProfile(profileName);
-                dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                dataBlocksSets.setmLiveTips(mLiveTips);
                 dataBlocksSets.setmTournamentDowns(mTournamentDown);
                 dataBlocksSets.setmTipOut(tipsOut);
-                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmHrlyWage(mHrlWage);
                 dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                 dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                dataBlocksSets.setmTotalIncome(mTotalIncome);
                 dataBlocksSets.setmDates(blocks_date);
                 dataBlocksSets.setmEndDateLong(reset_end_date);
                 dataBlocksSets.setSummary_type(selected_summary_type);
@@ -3210,13 +3274,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 dataBlocksSets.setmTipoutPercentage(percentage);
                 dataBlocksSets.setmProfile(profileName);
-                dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                dataBlocksSets.setmLiveTips(mLiveTips);
                 dataBlocksSets.setmTournamentDowns(mTournamentDown);
                 dataBlocksSets.setmTipOut(tipsOut);
-                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmHrlyWage(mHrlWage);
                 dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                 dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                dataBlocksSets.setmTotalIncome(mTotalIncome);
                 dataBlocksSets.setmDates(blocks_date);
                 dataBlocksSets.setmEndDateLong(end_date_long);
                 dataBlocksSets.setmTotalWorkedHr(_workingHr);
@@ -3321,13 +3385,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 dataBlocksSets.setmTipoutPercentage(percentage);
                 dataBlocksSets.setmProfile(profileName);
-                dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                dataBlocksSets.setmLiveTips(mLiveTips);
                 dataBlocksSets.setmTournamentDowns(mTournamentDown);
                 dataBlocksSets.setmTipOut(tipsOut);
-                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmHrlyWage(mHrlWage);
                 dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                 dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                dataBlocksSets.setmTotalIncome(mTotalIncome);
                 dataBlocksSets.setmDates(blocks_date);
                 dataBlocksSets.setmEndDateLong(end_date_long);
                 dataBlocksSets.setmTotalWorkedHr(_workingHr);
@@ -3492,13 +3556,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 dataBlocksSets.setmTipoutPercentage(percentage);
                 dataBlocksSets.setmProfile(profileName);
-                dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                dataBlocksSets.setmLiveTips(mLiveTips);
                 dataBlocksSets.setmTournamentDowns(mTournamentDown);
                 dataBlocksSets.setmTipOut(tipsOut);
-                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmHrlyWage(mHrlWage);
                 dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                 dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                dataBlocksSets.setmTotalIncome(mTotalIncome);
                 dataBlocksSets.setmDates(blocks_date);
                 dataBlocksSets.setmEndDateLong(calendar.getTimeInMillis());
                 dataBlocksSets.setSummary_type(selected_summary_type);
@@ -3607,13 +3671,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 dataBlocksSets.setmTipoutPercentage(percentage);
                 dataBlocksSets.setmProfile(profileName);
-                dataBlocksSets.setmLiveTips("$" + mLiveTips);
+                dataBlocksSets.setmLiveTips(mLiveTips);
                 dataBlocksSets.setmTournamentDowns(mTournamentDown);
                 dataBlocksSets.setmTipOut(tipsOut);
-                dataBlocksSets.setmHrlyWage("$" + mHrlWage);
+                dataBlocksSets.setmHrlyWage(mHrlWage);
                 dataBlocksSets.setmTDPerDay(mTotalTournamnetPerDay);
                 dataBlocksSets.setmTotalTDDowns(mTDCounts);
-                dataBlocksSets.setmTotalIncome("$" + mTotalIncome);
+                dataBlocksSets.setmTotalIncome(mTotalIncome);
                 dataBlocksSets.setmDates(blocks_date);
                 dataBlocksSets.setmEndDateLong(year);
                 dataBlocksSets.setSummary_type(selected_summary_type);
@@ -3623,5 +3687,26 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 nextYearlyBlock(_singleYearly, _list);
             }
         }
+    }
+
+    public ArrayList<AddDay> combinedData(ArrayList<DataBlocksSets> _blockSets) {
+        ArrayList<AddDay> _combinedData = new ArrayList<>();
+        for (int i = 0; i < _blockSets.size(); i++) {
+            AddDay addDay = new AddDay();
+
+            addDay.setSummary_dates(_blockSets.get(i).getmDates());
+            addDay.setProfile(_blockSets.get(i).getmProfile());
+            addDay.setCalculated_hours(_blockSets.get(i).getmTotalWorkedHr());
+            addDay.setTotal_tips(_blockSets.get(i).getmLiveTips());
+
+            addDay.setTotal_tournament_downs(_blockSets.get(i).getmTDPerDay());
+            addDay.setTounament_count(_blockSets.get(i).getmTotalTDDowns());
+            addDay.setTip_out(_blockSets.get(i).getmTipOut());
+            addDay.setProfile_wage_hourly(_blockSets.get(i).getmHrlyWage());
+            addDay.setTotal_earnings(_blockSets.get(i).getmTotalIncome());
+            _combinedData.add(addDay);
+
+        }
+        return _combinedData;
     }
 }
