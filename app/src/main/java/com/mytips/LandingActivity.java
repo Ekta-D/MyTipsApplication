@@ -1234,7 +1234,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             Document document = null;
 
 
-            document = new Document(PageSize.A4, 36, 36, 160, 120);
+            if (selected_summary_type.equalsIgnoreCase("Daily")) {
+                document = new Document(PageSize.A4, 36, 36, 160, 120);
+            } else {
+                document = new Document(PageSize.A4, 36, 36, 100, 120);
+            }
+
 
             String root = Environment.getExternalStorageDirectory()
                     .toString();
@@ -1366,12 +1371,20 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             }
                             date = new SimpleDateFormat(date_format).format(date1);
 
+                            date = selected_summary_type.equalsIgnoreCase("Daily") ? date : addDayArrayList.get(i).getSummary_dates();
 
                             cell = new PdfPCell(new Phrase(date, font));
 
 
                             cell.setPaddingTop(3);
-                            cell.setFixedHeight(40f);
+                            float date_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                date_cell_height = 40f;
+                            } else {
+                                date_cell_height = 50f;
+                            }
+
+                            cell.setFixedHeight(date_cell_height);
                             cell.setNoWrap(false);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -1385,22 +1398,42 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
                             cell.setNoWrap(false);
-                            cell.setFixedHeight(40f);
+                            float _profile_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                _profile_cell_height = 40f;
+                            } else {
+                                _profile_cell_height = 50f;
+                            }
+                            cell.setFixedHeight(_profile_cell_height);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
+                            float _hrs_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                _hrs_cell_height = 40f;
+                            } else {
+                                _hrs_cell_height = 50f;
+                            }
 
                             cell = new PdfPCell(new Phrase(addDayArrayList.get(i).getCalculated_hours(), font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            cell.setFixedHeight(40f);
+                            cell.setFixedHeight(_hrs_cell_height);
                             cell.setNoWrap(false);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
+
+
+                            float _totalTips_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                _totalTips_cell_height = 40f;
+                            } else {
+                                _totalTips_cell_height = 50f;
+                            }
 
 
                             String tips = addDayArrayList.get(i).getTotal_tips();
@@ -1415,12 +1448,20 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingBottom(3);
                             cell.disableBorderSide(2);
                             cell.setNoWrap(false);
-                            cell.setFixedHeight(40f);
+                            cell.setFixedHeight(_totalTips_cell_height);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
 
                             tasktable.addCell(cell);
+
+                            float _tournament_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                _tournament_cell_height = 40f;
+                            } else {
+                                _tournament_cell_height = 50f;
+                            }
+
 
                             String tournament_downnTips = addDayArrayList.get(i).getTotal_tournament_downs();
                             if (tournament_downnTips.equalsIgnoreCase("")) {
@@ -1434,12 +1475,20 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingBottom(3);
                             cell.disableBorderSide(2);
                             cell.setNoWrap(false);
-                            cell.setFixedHeight(40f);
+                            cell.setFixedHeight(_tournament_cell_height);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
 
                             tasktable.addCell(cell);
+
+                            float _tournamentCount_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                _tournamentCount_cell_height = 40f;
+                            } else {
+                                _tournamentCount_cell_height = 50f;
+                            }
+
 
                             String count = addDayArrayList.get(i).getTounament_count();
                             if (count.equalsIgnoreCase("")) {
@@ -1450,13 +1499,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
                             cell.setNoWrap(false);
-                            cell.setFixedHeight(20f);
+                            cell.setFixedHeight(_tournamentCount_cell_height);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
 
                             tasktable.addCell(cell);
 
+                            float _tipOut_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                _tipOut_cell_height = 40f;
+                            } else {
+                                _tipOut_cell_height = 50f;
+                            }
 
                             String tip_out = addDayArrayList.get(i).getTip_out();
                             if (tip_out.equalsIgnoreCase("")) {
@@ -1466,7 +1521,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell = new PdfPCell(new Phrase(tip_out, font));
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
-                            cell.setFixedHeight(40f);
+                            cell.setFixedHeight(_tipOut_cell_height);
                             cell.setNoWrap(false);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
@@ -1474,6 +1529,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             tasktable.addCell(cell);
 
 
+                            float _wages_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                _wages_cell_height = 40f;
+                            } else {
+                                _wages_cell_height = 50f;
+                            }
                             String wages = addDayArrayList.get(i).getProfile_wage_hourly();
 
                             if (wages.equalsIgnoreCase("")) {
@@ -1489,12 +1550,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingBottom(3);
                             cell.setNoWrap(false);
 
-                            cell.setFixedHeight(40f);
+                            cell.setFixedHeight(_wages_cell_height);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
                             tasktable.addCell(cell);
 
+
+                            float _earnings_cell_height = 0;
+                            if (selected_summary_type.equalsIgnoreCase("Daily") || selected_summary_type.equalsIgnoreCase("Monthly") || selected_summary_type.equalsIgnoreCase("Yearly")) {
+                                _earnings_cell_height = 40f;
+                            } else {
+                                _earnings_cell_height = 50f;
+                            }
 
                             String total_earns = addDayArrayList.get(i).getTotal_earnings();
                             if (total_earns.equalsIgnoreCase("")) {
@@ -1505,7 +1573,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                             cell.setPaddingTop(3);
                             cell.setPaddingBottom(3);
                             cell.setNoWrap(false);
-                            cell.setFixedHeight(40f);
+                            cell.setFixedHeight(_earnings_cell_height);
                             cell.setHorizontalAlignment(Element.ALIGN_CENTER);
                             cell.setVerticalAlignment(Element.ALIGN_CENTER);
                             cell.setBackgroundColor(BaseColor.WHITE);
@@ -1618,6 +1686,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 bottomCell.setBackgroundColor(BaseColor.WHITE);
                 bottomCell.setFixedHeight(40f);
                 bottomTable.addCell(bottomCell);
+
+                String earnings_bottomPdf = getTotalearning(addDayArrayList);
+                totalEarningPdf = selected_summary_type.equalsIgnoreCase("Daily") ? totalEarningPdf : earnings_bottomPdf;
 
                 bottomCell = new PdfPCell(new Phrase("$" + totalEarningPdf, redFont));
                 bottomCell.setHorizontalAlignment(Element.ALIGN_CENTER);
@@ -1771,7 +1842,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 payPeriodTable.setTotalWidth(500f);
                 payPeriodTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
 
-
+                pdfDates = selected_summary_type.equals("Daily") ? pdfDates : "";
                 PdfPCell payCell = new PdfPCell(new Phrase(pdfDates, redFont));
                 payCell.setFixedHeight(40f);
                 payCell.setBorder(Rectangle.NO_BORDER);
@@ -2206,8 +2277,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         double wage = 0;
         for (int i = 0; i < addDays.size(); i++) {
 
-            if (addDays.get(i).getWages_hourly()!=null)
-            {
+            if (addDays.get(i).getWages_hourly() != null) {
                 d = d + Double.parseDouble(addDays.get(i).getWages_hourly().equals("") ? "0.0" : addDays.get(i).getWages_hourly());
             }
 
@@ -3708,5 +3778,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         }
         return _combinedData;
+    }
+
+    // calculate total earnings for pdf in case of weekly,bi-weekly,monthly and yearly.
+    public String getTotalearning(ArrayList<AddDay> _addDays) {
+
+        String earnings = "0";
+        double total = 0;
+        for (int i = 0; i < _addDays.size(); i++) {
+            double d = Double.parseDouble(_addDays.get(i).getTotal_earnings().equalsIgnoreCase("") ? "0" : _addDays.get(i).getTotal_earnings());
+            total = total + d;
+        }
+        earnings = String.format("%.2f", total);
+
+        return earnings;
     }
 }

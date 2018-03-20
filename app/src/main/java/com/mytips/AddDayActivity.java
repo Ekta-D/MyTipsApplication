@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -21,6 +23,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -65,7 +69,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class AddDayActivity extends AppCompatActivity implements View.OnClickListener {
+public class AddDayActivity extends AppCompatActivity implements View.OnClickListener, View.OnTouchListener {
 
     boolean isStartDateChanged = false, isEndDateChanged = false;
     boolean keyDel = false;
@@ -141,6 +145,10 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     List<String> checked;
     int totalsHours = 0, totalMinutes = 0;
 
+    LinearLayout back_save_btn;
+
+    RippleDrawable rippleDrawable;
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,10 +164,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         start_calendar = Calendar.getInstance();
         end_calendar = Calendar.getInstance();
 
-        total_earnings = (TextView) findViewById(R.id.total_earnings);
-        editText_new_count = (EditText) findViewById(R.id.editText_new_count);
-        new_count_textview = (TextView) findViewById(R.id.textViewnew_count);
-        label_total_earnings = (TextView) findViewById(R.id.lbl_total);
 
         findViewByIds();
 
@@ -709,6 +713,16 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void findViewByIds() {
+        total_earnings = (TextView) findViewById(R.id.total_earnings);
+        editText_new_count = (EditText) findViewById(R.id.editText_new_count);
+        new_count_textview = (TextView) findViewById(R.id.textViewnew_count);
+        label_total_earnings = (TextView) findViewById(R.id.lbl_total);
+        back_save_btn = (LinearLayout) findViewById(R.id.save_background);
+
+
+        //  rippleDrawable = (RippleDrawable) back_save_btn.getBackground();
+//        back_save_btn.setOnTouchListener(this);
+
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
         type_switch = (Switch) findViewById(R.id.type_switch);
         editext_manual_tips = (EditText) findViewById(R.id.manual_tip);
@@ -2763,6 +2777,17 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         Collections.sort(count_list, new CustomComparator());
 
         return count_list;
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        switch (v.getId()) {
+            case R.id.save_background:
+                rippleDrawable.setHotspot(event.getX(), event.getY());
+                rippleDrawable.setColor(ColorStateList.valueOf(getResources().getColor(R.color.red)));
+                break;
+        }
+        return false;
     }
 
 
