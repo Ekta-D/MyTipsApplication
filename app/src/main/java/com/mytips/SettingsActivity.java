@@ -1178,22 +1178,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
-                        // Process contents...
-                        // [START_EXCLUDE]
-                        // [START read_as_string]
-                        /*try (BufferedReader reader = new BufferedReader(
-                                new InputStreamReader(contents.getInputStream()))) {
-                            StringBuilder builder = new StringBuilder();
-                            String line;
-                            while ((line = reader.readLine()) != null) {
-                                builder.append(line).append("\n");
-                            }
-                            showMessage("File read success");
-                           // mFileContents.setText(builder.toString());
-                        }*/
-                        // [END read_as_string]
-                        // [END_EXCLUDE]
-                        // [START discard_contents]
+
                         Task<Void> discardTask = getDriveResourceClient().discardContents(contents);
                         // [END discard_contents]
                         return discardTask;
@@ -1246,7 +1231,9 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == SIGN_IN) {
+        if (requestCode == REQUEST_CODE_SIGN_IN) {
+
+        } else if (requestCode == SIGN_IN) {
             backupDataToDrive();
         }
     }

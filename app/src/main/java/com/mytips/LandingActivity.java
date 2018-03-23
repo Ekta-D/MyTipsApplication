@@ -2179,8 +2179,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 str1 = str1.replace("hr", "");
                 str1 = str1.trim();
             }
+            else{
+                str1 = str1.trim();
+            }
             if (str2.trim().contains("min")) {
                 str2 = str2.replace("min", "");
+                str2 = str2.trim();
+            }else{
                 str2 = str2.trim();
             }
             int h = Integer.parseInt(str1.trim().equalsIgnoreCase("") ? "0" : str1);
@@ -2773,7 +2778,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 String tipsOut = calculatTotatTipOut(addDayArrayList);
                 String percentage = getTipOutPercentage(totalLiveTips, Double.parseDouble(tipsOut.equalsIgnoreCase("") ? "0" : tipsOut));
 
-                _workingHr = calculatedTotalHourlyWages(addDayArrayList);
+                _workingHr = getTotalCalculatedhr(addDayArrayList);
                 mLiveTips = String.format("%.2f", totalLiveTips);
                 mTournamentDown = String.format("%.2f", totalTDowns);
                 mTDCounts = String.valueOf(totalTounrmaneDonwnsCount);
