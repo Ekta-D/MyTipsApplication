@@ -145,7 +145,7 @@ public abstract class BaseDemoActivity extends AppCompatPreferenceActivity {
      * Continues the sign-in process, initializing the Drive clients with the current
      * user's account.
      */
-    private void initializeDriveClient(GoogleSignInAccount signInAccount) {
+    public void initializeDriveClient(GoogleSignInAccount signInAccount) {
         mDriveClient = Drive.getDriveClient(getApplicationContext(), signInAccount);
         mDriveResourceClient = Drive.getDriveResourceClient(getApplicationContext(), signInAccount);
         onDriveClientReady();

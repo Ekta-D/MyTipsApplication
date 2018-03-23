@@ -1232,7 +1232,14 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_SIGN_IN) {
-
+            Task<GoogleSignInAccount> getAccountTask =
+                    GoogleSignIn.getSignedInAccountFromIntent(data);
+            if (getAccountTask.isSuccessful()) {
+                initializeDriveClient(getAccountTask.getResult());
+            } else {
+                Log.e(TAG, "Sign-in failed.");
+                finish();
+            }
         } else if (requestCode == SIGN_IN) {
             backupDataToDrive();
         }

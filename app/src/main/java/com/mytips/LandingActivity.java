@@ -905,8 +905,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             daily_layout.setVisibility(View.GONE);
             bottomEarning_layout.setVisibility(View.GONE);
             _dataSet = new ArrayList<>();
-
-            _dataSet = setWeeklyData("Weekly", profiles);
+            if (selected_profileName.equalsIgnoreCase("All")) {
+                _dataSet = setWeeklyData("Weekly", profiles);
+            } else {
+                ArrayList<Profiles> particularProfile = new ArrayList<>();
+                particularProfile = selected_profile(profiles, profileID);
+                _dataSet = setWeeklyData("Weekly", particularProfile);
+            }
 
             addDayArrayList = new ArrayList<>();
             addDayArrayList = combinedData(_dataSet);
@@ -915,7 +920,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             bottomEarning_layout.setVisibility(View.GONE);
             _dataSet = new ArrayList<>();
 
-            _dataSet = setBiWeeklyBlocks(profiles);
+            if (selected_profileName.equalsIgnoreCase("All")) {
+                ArrayList<Profiles> saparated_profiles = new ArrayList<>();
+                saparated_profiles = saparate_profile_asper_payperiod(profiles, "Every 2 Weeks ");
+                _dataSet = setBiWeeklyBlocks(saparated_profiles);
+            } else {
+
+                ArrayList<Profiles> particularProfile = new ArrayList<>();
+                particularProfile = selected_profile(profiles, profileID);
+                _dataSet = setBiWeeklyBlocks(particularProfile);
+            }
+
+
             addDayArrayList = new ArrayList<>();
             addDayArrayList = combinedData(_dataSet);
         } else if (spinner_selected.equalsIgnoreCase("Monthly"))
@@ -936,13 +952,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             addDayArrayList = combinedData(_dataSet);
         }
         if (spinner_selected.equalsIgnoreCase("Daily")) {
-            if (addDayArrayList.size() > 0)
-
-            {
+            if (addDayArrayList.size() > 0) {
                 no_data.setVisibility(View.GONE);
-            } else
-
-            {
+            } else {
                 no_data.setVisibility(View.VISIBLE);
             }
         } else {
@@ -2178,14 +2190,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             if (str1.trim().contains("hr")) {
                 str1 = str1.replace("hr", "");
                 str1 = str1.trim();
-            }
-            else{
+            } else {
                 str1 = str1.trim();
             }
             if (str2.trim().contains("min")) {
                 str2 = str2.replace("min", "");
                 str2 = str2.trim();
-            }else{
+            } else {
                 str2 = str2.trim();
             }
             int h = Integer.parseInt(str1.trim().equalsIgnoreCase("") ? "0" : str1);
@@ -2298,7 +2309,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         summary_parentlayout.setVisibility(View.VISIBLE);
         ArrayList<AddDay> fetched_allData = new ArrayList<>();
 
-        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profiles);
+        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profileID, profiles, selected_profileName);
         ArrayList<AddDay> particular_profile = new ArrayList<>();
         dataBlocksSetsArrayList = new ArrayList<>();
         for (int i = 0; i < all_profiles.size(); i++) {
@@ -2330,12 +2341,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public ArrayList<DataBlocksSets> setWeeklyData(String summary_type, ArrayList<Profiles> profiles) {
         summary_parentlayout.setVisibility(View.VISIBLE);
 
-        addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profiles);
+        addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profileID, profiles, selected_profileName);
 
 
         if (summary_type.equalsIgnoreCase("Weekly")) {
             dataBlocksSetsArrayList = new ArrayList<>();
-            dataBlocksSetsArrayList = saparateProfilesData(addDayArrayList, profiles);
+            ArrayList<Profiles> saparate_profiles = new ArrayList<>();
+            saparate_profiles = saparate_profile_asper_payperiod(profiles, "Weekly");
+            dataBlocksSetsArrayList = saparateProfilesData(addDayArrayList, saparate_profiles);
             weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, dataBlocksSetsArrayList);
             _summaryBasedList.setAdapter(weeklySummaryAdapter);
         }
@@ -3217,7 +3230,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         summary_parentlayout.setVisibility(View.VISIBLE);
         ArrayList<AddDay> fetched_allData = new ArrayList<>();
 
-        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profiles);
+        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profileID, profiles, selected_profileName);
         ArrayList<AddDay> particular_profile = new ArrayList<>();
         ArrayList<DataBlocksSets> full_monthlySet = new ArrayList<>();
         for (int i = 0; i < profile_list.size(); i++) {
@@ -3483,7 +3496,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         summary_parentlayout.setVisibility(View.VISIBLE);
         ArrayList<AddDay> fetched_allData = new ArrayList<>();
 
-        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profiles);
+        fetched_allData = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profileID, profiles, selected_profileName);
         ArrayList<AddDay> particular_profile = new ArrayList<>();
         ArrayList<DataBlocksSets> full_yearlydata = new ArrayList<>();
         for (int i = 0; i < profiles.size(); i++) {
@@ -3797,5 +3810,31 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         earnings = String.format("%.2f", total);
 
         return earnings;
+    }
+
+    public ArrayList<Profiles> saparate_profile_asper_payperiod(ArrayList<Profiles> fetched_all_profiles, String summary) {
+        ArrayList<Profiles> saparated_profiles = new ArrayList<>();
+        if (fetched_all_profiles != null && fetched_all_profiles.size() > 0) {
+            for (int i = 0; i < fetched_all_profiles.size(); i++) {
+                if (fetched_all_profiles.get(i).getPay_period() != null && !fetched_all_profiles.get(i).getPay_period().equalsIgnoreCase("")) {
+                    if (fetched_all_profiles.get(i).getPay_period().equalsIgnoreCase(summary)) {
+                        saparated_profiles.add(fetched_all_profiles.get(i));
+                    }
+                }
+            }
+        }
+        return saparated_profiles;
+    }
+
+    public ArrayList<Profiles> selected_profile(ArrayList<Profiles> profiles_1, int selectedProfile) {
+        ArrayList<Profiles> selected_profile = new ArrayList<>();
+        for (int i = 0; i < profiles_1.size(); i++) {
+            if (selectedProfile != 0) {
+                if (profiles_1.get(i).getId() == selectedProfile) {
+                    selected_profile.add(profiles_1.get(i));
+                }
+            }
+        }
+        return selected_profile;
     }
 }
