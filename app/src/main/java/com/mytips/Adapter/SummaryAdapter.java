@@ -117,6 +117,10 @@ public class SummaryAdapter extends BaseAdapter {
             holder.working_hours.setText("Day off");
             holder.time.setBackgroundResource(R.drawable.ic_timer_icon);
             holder.layoutEarningDetails.setVisibility(View.GONE);
+        } else {
+            holder.working_hours.setText(addDayArrayList.get(position).getCalculated_hours());
+            holder.time.setBackgroundResource(R.drawable.ic_clock);
+            holder.layoutEarningDetails.setVisibility(View.VISIBLE);
         }
 
         String totaltips = "";
