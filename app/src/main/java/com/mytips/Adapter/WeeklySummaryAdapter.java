@@ -82,7 +82,7 @@ public class WeeklySummaryAdapter extends BaseAdapter {
 //        viewHolder._TipOuts.setText(dataBlocksSetsArrayList.get(position).getmTipOut());
         viewHolder._TipOutPercentage.setText("(" + dataBlocksSetsArrayList.get(position).getmTipoutPercentage() + ")");
         viewHolder._PerTournamentDown.setText(dataBlocksSetsArrayList.get(position).getmTDPerDay());
-        viewHolder._HrWages.setText("$" + dataBlocksSetsArrayList.get(position).getmHrlyWage());
+        viewHolder._HrWages.setText(" ($" + dataBlocksSetsArrayList.get(position).getmHrlyWage()+")");
         viewHolder._TDownsCount.setText(dataBlocksSetsArrayList.get(position).getmTotalTDDowns());
         viewHolder._TotalIncome.setText("Total Income : " + " " + "$" + dataBlocksSetsArrayList.get(position).getmTotalIncome());
         viewHolder._TipOuts.setText("$" + dataBlocksSetsArrayList.get(position).getmTipOut());

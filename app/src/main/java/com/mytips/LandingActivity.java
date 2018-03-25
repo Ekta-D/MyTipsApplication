@@ -2424,7 +2424,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         ArrayList<String> _stringDates;
         String profileID = profileData.get(0).getSelectedProfileId();
         String profileName = profileData.get(0).getProfile();
-        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+        DateFormat dateFormat = new SimpleDateFormat("EEEE MM/dd/yyyy", Locale.ENGLISH);
         String starting_date = dateFormat.format(profileData.get(0).getStart_long());
 
         if (profileData.size() > 0) {
@@ -2472,7 +2472,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 _stringDates.clear();
                 _weeklyDates.clear();
                 // make week with start day of week
-                for (int j = 0; j < 7; j++) {
+                for (int j = 0; j < 8; j++) {
                     String str_date = dateFormat.format(calendar.getTime().getTime());
 
                     Date date = calendar.getTime();
@@ -2491,7 +2491,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 System.out.println(_stringDates.toString());
 
                 long reset_start_date = _weeklyDates.get(0);
-                long reset_end_date = _weeklyDates.get(6);
+                long reset_end_date = _weeklyDates.get(7);
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -2543,7 +2543,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     mTotalTournamnetPerDay = String.format("%.2f", totalTournamentDownsPerDay);
                     mTotalTDown = String.format("%.2f", totalDonws);
                     mTotalIncome = String.format("%.2f", totalIncome);
-                    blocks_date = _stringDates.get(0) + " -" + " \n" + _stringDates.get(6);
+                    blocks_date = _stringDates.get(0) + " - " + _stringDates.get(6);
 
                     dataBlocksSets = new DataBlocksSets();
                     _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
@@ -2582,7 +2582,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 calendar.setTimeInMillis(zeroth_date);
                 // make a week from zeroth date
 
-                for (int j = 0; j < 7; j++) {
+                for (int j = 0; j < 8; j++) {
                     String str_date = dateFormat.format(calendar.getTime().getTime());
 
                     Date date = calendar.getTime();
@@ -2600,7 +2600,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 System.out.println(_stringDates.toString());
 
                 long reset_start_date = _weeklyDates.get(0);
-                long reset_end_date = _weeklyDates.get(6);
+                long reset_end_date = _weeklyDates.get(7);
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -2653,7 +2653,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     mTotalTournamnetPerDay = String.format("%.2f", totalTournamentDownsPerDay);
                     mTotalTDown = String.format("%.2f", totalDonws);
                     mTotalIncome = String.format("%.2f", totalIncome);
-                    blocks_date = _stringDates.get(0) + " -" + " \n" + _stringDates.get(6);
+                    blocks_date = _stringDates.get(0) + " - " + _stringDates.get(6);
 
                     dataBlocksSets = new DataBlocksSets();
                     _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
@@ -2718,7 +2718,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     public void addNextBlock(ArrayList<AddDay> _list) {
         /*dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size()-1).getmEndDateLong();
         _list.get(_list.size()-1).getStart_long();*/
-        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+        DateFormat dateFormat = new SimpleDateFormat("EEEE MM/dd/yyyy", Locale.ENGLISH);
         ArrayList<Long> _weeklyDates = null;
         ArrayList<String> _stringDates;
         _weeklyDates = new ArrayList<>();
@@ -2732,7 +2732,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         calendar.setTimeInMillis(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong());
         calendar.add(Calendar.DATE, 1);
         if (new Date(_list.get(_list.size() - 1).getStart_long()).after(new Date(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong()))) {
-            for (int j = 0; j < 7; j++) {
+            for (int j = 0; j < 8; j++) {
 
                 String str_date = dateFormat.format(calendar.getTime().getTime());
 
@@ -2748,7 +2748,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 _weeklyDates.add(lon);
             }
             long reset_start_date = _weeklyDates.get(0);
-            long reset_end_date = _weeklyDates.get(6);
+            long reset_end_date = _weeklyDates.get(7);
 
             // data between day of week
             addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -2799,7 +2799,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 mTotalTournamnetPerDay = String.format("%.2f", totalTournamentDownsPerDay);
                 mTotalTDown = String.format("%.2f", totalDonws);
                 mTotalIncome = String.format("%.2f", totalIncome);
-                blocks_date = _stringDates.get(0) + " -" + " \n" + _stringDates.get(6);
+                blocks_date = _stringDates.get(0) + " - " + _stringDates.get(6);
 
                 dataBlocksSets = new DataBlocksSets();
                 _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
@@ -2848,7 +2848,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         String profileID = single_profile.get(0).getSelectedProfileId();
         String profileName = single_profile.get(0).getProfile();
 
-        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+        DateFormat dateFormat = new SimpleDateFormat("EEEE MM/dd/yyyy", Locale.ENGLISH);
         String starting_date = dateFormat.format(single_profile.get(0).getStart_long());
 
 
@@ -2902,7 +2902,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 _stringDates.clear();
                 _weeklyDates.clear();
                 // make week with start day of week
-                for (int j = 0; j < 14; j++) {
+                for (int j = 0; j < 15; j++) {
                     String str_date = dateFormat.format(calendar.getTime().getTime());
 
                     Date date = calendar.getTime();
@@ -2921,7 +2921,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 System.out.println(_stringDates.toString());
 
                 long reset_start_date = _weeklyDates.get(0);
-                long reset_end_date = _weeklyDates.get(13);
+                long reset_end_date = _weeklyDates.get(14);
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -2973,7 +2973,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     mTotalTournamnetPerDay = String.format("%.2f", totalTournamentDownsPerDay);
                     mTotalTDown = String.format("%.2f", totalDonws);
                     mTotalIncome = String.format("%.2f", totalIncome);
-                    blocks_date = _stringDates.get(0) + " -" + " \n" + _stringDates.get(13);
+                    blocks_date = _stringDates.get(0) + " - " + _stringDates.get(13);
 
                     dataBlocksSets = new DataBlocksSets();
                     _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
@@ -3011,7 +3011,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 calendar.set(Calendar.DAY_OF_WEEK, _day);
                 calendar.setTimeInMillis(zeroth_date);
 
-                for (int j = 0; j < 14; j++) {
+                for (int j = 0; j < 15; j++) {
                     String str_date = dateFormat.format(calendar.getTime().getTime());
 
                     Date date = calendar.getTime();
@@ -3030,7 +3030,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 System.out.println(_stringDates.toString());
 
                 long reset_start_date = _weeklyDates.get(0);
-                long reset_end_date = _weeklyDates.get(13);
+                long reset_end_date = _weeklyDates.get(14);
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -3084,7 +3084,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     mTotalTournamnetPerDay = String.format("%.2f", totalTournamentDownsPerDay);
                     mTotalTDown = String.format("%.2f", totalDonws);
                     mTotalIncome = String.format("%.2f", totalIncome);
-                    blocks_date = _stringDates.get(0) + " - " + " \n" + _stringDates.get(13);
+                    blocks_date = _stringDates.get(0) + " - " + _stringDates.get(13);
                     _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
                     dataBlocksSets = new DataBlocksSets();
                     dataBlocksSets.setmTotalWorkedHr(_workingHr);
@@ -3116,7 +3116,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void addNextBiWeeklyBlock(ArrayList<AddDay> _list) {
-        DateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", Locale.ENGLISH);
+        DateFormat dateFormat = new SimpleDateFormat("EEEE MM/dd/yyyy", Locale.ENGLISH);
         ArrayList<Long> _weeklyDates = null;
         ArrayList<String> _stringDates;
         _weeklyDates = new ArrayList<>();
@@ -3132,7 +3132,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         calendar.setTimeInMillis(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong());
         calendar.add(Calendar.DATE, 1);
         if (new Date(_list.get(_list.size() - 1).getStart_long()).after(new Date(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong()))) {
-            for (int j = 0; j < 14; j++) {
+            for (int j = 0; j < 15; j++) {
 
                 String str_date = dateFormat.format(calendar.getTime().getTime());
 
@@ -3148,7 +3148,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 _weeklyDates.add(lon);
             }
             long reset_start_date = _weeklyDates.get(0);
-            long reset_end_date = _weeklyDates.get(13);
+            long reset_end_date = _weeklyDates.get(14);
 
             // data between day of week
             addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -3200,7 +3200,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 mTotalTournamnetPerDay = String.format("%.2f", totalTournamentDownsPerDay);
                 mTotalTDown = String.format("%.2f", totalDonws);
                 mTotalIncome = String.format("%.2f", totalIncome);
-                blocks_date = _stringDates.get(0) + " -" + " \n" + _stringDates.get(13);
+                blocks_date = _stringDates.get(0) + " - " + _stringDates.get(13);
                 _additionDowns = getAdditionDowns(Integer.parseInt(mTDCounts.equalsIgnoreCase("") ? "0" : mTDCounts), totalTournamentDownsPerDay);
                 dataBlocksSets = new DataBlocksSets();
                 dataBlocksSets.setmTotalWorkedHr(_workingHr);
