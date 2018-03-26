@@ -1221,6 +1221,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void setAdapter(ArrayList<AddDay> array) {
+        Collections.sort(array, new StringDateComparator());
         adapter = new SummaryAdapter(default_date_format, LandingActivity.this, array);
         adapter.notifyDataSetChanged();
         mListView.setAdapter(adapter);
@@ -3817,9 +3818,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         if (fetched_all_profiles != null && fetched_all_profiles.size() > 0) {
             for (int i = 0; i < fetched_all_profiles.size(); i++) {
                 if (fetched_all_profiles.get(i).getPay_period() != null && !fetched_all_profiles.get(i).getPay_period().equalsIgnoreCase("")) {
-                    if (fetched_all_profiles.get(i).getPay_period().equalsIgnoreCase(summary)) {
+                    //if (fetched_all_profiles.get(i).getPay_period().equalsIgnoreCase(summary)) {
                         saparated_profiles.add(fetched_all_profiles.get(i));
-                    }
+                    //}
                 }
             }
         }
