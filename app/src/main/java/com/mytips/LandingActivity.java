@@ -351,6 +351,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         } else if (which == 1) {
                             deleteProfile(addDay);
                             addDayArrayList.remove(position);
+                            System.out.println(addDayArrayList);
+                            if (addDayArrayList.size() > 0) {
+                                Collections.sort(addDayArrayList, new SortComparator());
+                            }
 
                             setAdapter(addDayArrayList);
                             adapter.notifyDataSetChanged();
@@ -602,6 +606,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
                         filter_search = true;
+                        System.out.println(addDayArrayList);
+                        if (addDayArrayList.size() > 0) {
+                            Collections.sort(addDayArrayList, new SortComparator());
+                        }
                         setAdapter(addDayArrayList);
                         updateBottom(addDayArrayList);
                         adapter.notifyDataSetChanged();
@@ -897,6 +905,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             //String current_date = String.valueOf(cal.getTimeInMillis());
             addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(selected_profileName, profileID);
             //addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDailyData(selected_profileName);
+            System.out.println(addDayArrayList);
+            if (addDayArrayList.size() > 0) {
+                Collections.sort(addDayArrayList, new SortComparator());
+            }
             setAdapter(addDayArrayList);
             updateBottom(addDayArrayList);
 
@@ -1221,7 +1233,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void setAdapter(ArrayList<AddDay> array) {
-        Collections.sort(array, new StringDateComparator());
+
+
         adapter = new SummaryAdapter(default_date_format, LandingActivity.this, array);
         adapter.notifyDataSetChanged();
         mListView.setAdapter(adapter);
@@ -2384,39 +2397,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    public class CustomComparator implements Comparator<AddDay> {
-        @Override
-        public int compare(AddDay o1, AddDay o2) {
-            return o2.getId().compareTo(o1.getId());
-        }
-    }
-
 
     private class SortComparator implements Comparator<AddDay> {
         @Override
         public int compare(AddDay o1, AddDay o2) {
             SimpleDateFormat dateFormat = new SimpleDateFormat(date_format);
-            Date o1Date = new Date();
-            Date o2Date = new Date();
-
-            Calendar calO2 = Calendar.getInstance();
-            Calendar calO1 = Calendar.getInstance();
-
+            int return_val = -1;
             try {
-                o1Date = dateFormat.parse(String.valueOf(o1.getStart_long()));
-                o2Date = dateFormat.parse(String.valueOf(o2.getStart_long()));
-
-                calO1.setTime(o1Date);
-                calO2.setTime(o2Date);
+                return_val = dateFormat.parse(o1.getStart_shift()).compareTo(dateFormat.parse(o2.getStart_shift()));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-//            if (calO1.getTimeInMillis() < calO2.getTimeInMillis())// for sorting of old date
-            if (calO1.getTimeInMillis() > calO2.getTimeInMillis())// for sorting of latest date
-                return -1;
-            else
-                return 1;
-
+            return return_val;
         }
     }
 
@@ -3819,7 +3811,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             for (int i = 0; i < fetched_all_profiles.size(); i++) {
                 if (fetched_all_profiles.get(i).getPay_period() != null && !fetched_all_profiles.get(i).getPay_period().equalsIgnoreCase("")) {
                     //if (fetched_all_profiles.get(i).getPay_period().equalsIgnoreCase(summary)) {
-                        saparated_profiles.add(fetched_all_profiles.get(i));
+                    saparated_profiles.add(fetched_all_profiles.get(i));
                     //}
                 }
             }
