@@ -879,6 +879,7 @@
                                 android:layout_centerHorizontal="true"
                                 android:layout_centerVertical="true"
                                 android:inputType="numberDecimal"
+                                android:imeOptions="actionDone"
                                 android:maxLength="8" />
                         </RelativeLayout>
 

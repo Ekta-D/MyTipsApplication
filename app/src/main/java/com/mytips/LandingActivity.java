@@ -927,6 +927,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             addDayArrayList = new ArrayList<>();
             addDayArrayList = combinedData(_dataSet);
+
         } else if (spinner_selected.equalsIgnoreCase("Bi-Weekly")) {
             daily_layout.setVisibility(View.GONE);
             bottomEarning_layout.setVisibility(View.GONE);
@@ -946,6 +947,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
             addDayArrayList = new ArrayList<>();
             addDayArrayList = combinedData(_dataSet);
+
         } else if (spinner_selected.equalsIgnoreCase("Monthly"))
 
         {
@@ -955,6 +957,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             _dataSet = makeMonthlyBlocks(profiles);
             addDayArrayList = new ArrayList<>();
             addDayArrayList = combinedData(_dataSet);
+
         } else {
 
             daily_layout.setVisibility(View.GONE);
@@ -962,6 +965,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             _dataSet = makeYearlyBlocks(profiles);
             addDayArrayList = new ArrayList<>();
             addDayArrayList = combinedData(_dataSet);
+
         }
         if (spinner_selected.equalsIgnoreCase("Daily")) {
             if (addDayArrayList.size() > 0) {
@@ -2347,6 +2351,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         }
+        Collections.sort(dataBlocksSetsArrayList, new SortBlockData());
         weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, dataBlocksSetsArrayList);
         _summaryBasedList.setAdapter(weeklySummaryAdapter);
         return dataBlocksSetsArrayList;
@@ -2363,6 +2368,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             ArrayList<Profiles> saparate_profiles = new ArrayList<>();
             saparate_profiles = saparate_profile_asper_payperiod(profiles, "Weekly");
             dataBlocksSetsArrayList = saparateProfilesData(addDayArrayList, saparate_profiles);
+            Collections.sort(dataBlocksSetsArrayList, new SortBlockData());
             weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, dataBlocksSetsArrayList);
             _summaryBasedList.setAdapter(weeklySummaryAdapter);
         }
@@ -2397,7 +2403,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-
     private class SortComparator implements Comparator<AddDay> {
         @Override
         public int compare(AddDay o1, AddDay o2) {
@@ -2408,6 +2413,25 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            return return_val;
+        }
+    }
+
+    private class SortBlockData implements Comparator<DataBlocksSets> {
+        @Override
+        public int compare(DataBlocksSets o1, DataBlocksSets o2) {
+            int return_val = 0;
+
+            Date _date = new Date(o1.getmEndDateLong());
+            Date _date1 = new Date(o2.getmEndDateLong());
+
+            if (_date.getTime() > _date1.getTime())// for sorting of latest date
+            {
+                return_val = -1;
+            } else {
+                return_val = 1;
+            }
+
             return return_val;
         }
     }
@@ -2833,6 +2857,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
+
     private ArrayList<DataBlocksSets> makeBiWeeklyBlocksData(ArrayList<AddDay> single_profile) {
 
         ArrayList<DataBlocksSets> blocksSetsArrayList = new ArrayList<>();
@@ -3246,6 +3271,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         }
+        Collections.sort(full_monthlySet, new SortBlockData());
         weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, full_monthlySet);
         _summaryBasedList.setAdapter(weeklySummaryAdapter);
 
@@ -3512,6 +3538,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         }
+        Collections.sort(full_yearlydata, new SortBlockData());
         weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, full_yearlydata);
         _summaryBasedList.setAdapter(weeklySummaryAdapter);
 

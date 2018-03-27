@@ -120,6 +120,13 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
             profiles = (Profiles) b.getSerializable(Constants.ProfileData);
 
             selected_tipeesID = new ArrayList<>(Arrays.asList(convertStringToArray(String.valueOf(profiles.getTipees_name()))).get(0));
+
+            if (selected_tipeesID.size() > 0) {
+                for (int j = 0; j < selected_tipeesID.size(); j++) {
+                    String id = selected_tipeesID.get(j);
+                    temp_arraylist.put(id, true);
+                }
+            }
             fillAllFields(profiles, selected_tipeesID);
         }
         getAllTipees();
@@ -555,8 +562,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
 
         image_name = profiles.getProfile_pic();
         profileColors = profiles.getProfile_color();
-        if (profileColors==0)
-        {
+        if (profileColors == 0) {
             selected01.setVisibility(View.VISIBLE);
             selected02.setVisibility(View.GONE);
             selected03.setVisibility(View.GONE);
@@ -564,9 +570,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
             selected05.setVisibility(View.GONE);
             selected06.setVisibility(View.GONE);
 
-        }
-        else if (profileColors==1)
-        {
+        } else if (profileColors == 1) {
             selected02.setVisibility(View.VISIBLE);
             selected01.setVisibility(View.GONE);
             selected03.setVisibility(View.GONE);
@@ -574,8 +578,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
             selected05.setVisibility(View.GONE);
             selected06.setVisibility(View.GONE);
 
-        }else if (profileColors==2)
-        {
+        } else if (profileColors == 2) {
             selected03.setVisibility(View.VISIBLE);
 
             selected02.setVisibility(View.GONE);
@@ -584,8 +587,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
             selected05.setVisibility(View.GONE);
             selected06.setVisibility(View.GONE);
 
-        }else if (profileColors==3)
-        {
+        } else if (profileColors == 3) {
             selected04.setVisibility(View.VISIBLE);
             selected02.setVisibility(View.GONE);
             selected01.setVisibility(View.GONE);
@@ -593,8 +595,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
             selected05.setVisibility(View.GONE);
             selected06.setVisibility(View.GONE);
 
-        }else if (profileColors==4)
-        {
+        } else if (profileColors == 4) {
             selected05.setVisibility(View.VISIBLE);
             selected02.setVisibility(View.GONE);
             selected01.setVisibility(View.GONE);
@@ -602,8 +603,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
             selected04.setVisibility(View.GONE);
             selected06.setVisibility(View.GONE);
 
-        }else if (profileColors==5)
-        {
+        } else if (profileColors == 5) {
             selected06.setVisibility(View.VISIBLE);
             selected02.setVisibility(View.GONE);
             selected01.setVisibility(View.GONE);

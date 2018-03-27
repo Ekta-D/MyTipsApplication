@@ -282,19 +282,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             }
         });
 
-        editText_new_count.setOnKeyListener(new View.OnKeyListener() {
-
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-                if (keyCode == KeyEvent.KEYCODE_DEL) {
-                    keyDel = true;
-                } else {
-                    keyDel = false;
-                }
-                return false;
-            }
-        });
 
         editText_new_count.addTextChangedListener(new TextWatcher() {
             @Override
@@ -309,8 +296,18 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             public void afterTextChanged(Editable s) {
                 String str = s.toString();
                 int manually_total_counting = 0;
+                if (str.equalsIgnoreCase(".")) {
+                    str = str.replace(".", "");
+                }
+                if (!str.equalsIgnoreCase("") && Integer.parseInt(str) > 0) {
+                    new_count = Integer.parseInt(str);
 
-                if (!keyDel) {
+                    manually_total_counting = stable_count + Integer.parseInt(str);
+                    edittext_count.setText(String.valueOf(manually_total_counting));
+                } else {
+                    edittext_count.setText(String.valueOf(stable_count));
+                }
+                /*if (!keyDel) {
                     if (!str.equalsIgnoreCase("") && s.length() > 1) {
                         if (str.contains(".")) {
                             str = str.replace(".", "");
@@ -356,9 +353,11 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                         }
 
                         edittext_count.setText(String.valueOf(Math.abs(manually_total_counting)));
+                    } else if (s.equals("")) {
+                        keyDel = false;
                     }
                     keyDel = false;
-                }
+                }*/
 
 
             }
@@ -546,7 +545,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 if (!wage.equalsIgnoreCase("")) {
                     wage_hourly = Double.parseDouble(wage); // hourly wage of profile
                 }
-                profile.getIs_supervisor();
+                is_supervisor = profile.getIs_supervisor();
                 getting_tips = profile.getGet_tips();
 
                 getting_tournament = profile.getGet_tournamenttip();
@@ -2163,14 +2162,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         addDayID = addDay.getId();
 
         selected_profile_color = addDay.getProfile_color();
-     /*   String payperiodTds_str = addDay.getT();
-        if (payperiodTds_str != null && !payperiodTds_str.equals("")) {
-            totalPayperiodCount = Integer.parseInt(payperiodTds_str);
-        }*/
-     /*   if (!addDay.getTounament_count().equals("")) {
-            stable_count = Integer.parseInt(addDay.getTounament_count());
-        }*/
-
         selected_profile = addDay.getProfile();
         int pos = 0;
         if (profilesArrayList.size() > 0) {
@@ -2256,10 +2247,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             text_tip_out_percent.setText(addDay.getTip_out_percentage());
             tipeePercent = Double.parseDouble(addDay.getTip_out_percentage().replace('%', ' ').trim());
             total_tipout.setText(addDay.getTip_out());
-
-        /*    if (!addDay.getTounament_count().equalsIgnoreCase("")) {
-                stable_count = Integer.parseInt(addDay.getTounament_count());
-            }*/
 
             if (!addDay.getTounament_count().equalsIgnoreCase("")) {
                 new_count = Integer.parseInt(addDay.getTounament_count());
@@ -2843,14 +2830,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     public void hideTournamentView() {
-        checkBoxEndofPayPeriod.setVisibility(View.GONE);
+        // checkBoxEndofPayPeriod.setVisibility(View.GONE);
         editText_new_count.setVisibility(View.GONE);
         new_count_textview.setVisibility(View.GONE);
 
     }
 
     public void showTournamentView() {
-        checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
+        //   checkBoxEndofPayPeriod.setVisibility(View.VISIBLE);
         editText_new_count.setVisibility(View.VISIBLE);
         new_count_textview.setVisibility(View.VISIBLE);
     }
