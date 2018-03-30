@@ -72,6 +72,7 @@ import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.AddDay;
 import com.mytips.Model.DataBlocksSets;
 import com.mytips.Model.Profiles;
+import com.mytips.Preferences.Preferences;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
@@ -94,7 +95,7 @@ import java.util.Random;
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private LinearLayout mRevealView;
     private boolean hidden = true;
-    private ImageButton profile, share, invite, preferences, backup, emailData;
+    private ImageButton profile, share, invite, preferences, emailData, about_app;
     Spinner spinnerProfile, spinnerReportType;
     ListView mListView;
     String[] reportTypeArray = new String[]{"Daily", "Weekly", "Bi-Weekly", "Monthly", "Yearly"};
@@ -202,9 +203,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         profile = (ImageButton) findViewById(R.id.profile);
         share = (ImageButton) findViewById(R.id.share);
         invite = (ImageButton) findViewById(R.id.invite);
+        about_app = (ImageButton) findViewById(R.id.about);
         preferences = (ImageButton) findViewById(R.id.preferences);
         //backup = (ImageButton) findViewById(R.id.backup);
-
+        about_app.setOnClickListener(this);
         textView_total_earnings = (TextView) findViewById(R.id.total_earnings);
         textView_hour_wage = (TextView) findViewById(R.id.hour_wage);
         textView_summaryTips = (TextView) findViewById(R.id.summery_tips);
@@ -681,6 +683,21 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.invite:
                 sharedPreferences.edit().putBoolean("showOnBoarding", true).commit();
                 startActivity(new Intent(LandingActivity.this, ScreenSlideActivity.class));
+                break;
+            case R.id.about:
+
+                AlertDialog.Builder alert_build=new AlertDialog.Builder(LandingActivity.this);
+                alert_build.setTitle("App Info");
+                alert_build.setMessage("My Tips Ledger version 1.0");
+                alert_build.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alertDialog=alert_build.create();
+                alertDialog.show();
+
                 break;
             /*case R.id.backup:
 
@@ -1264,11 +1281,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             Document document = null;
 
 
-            if (selected_summary_type.equalsIgnoreCase("Daily")) {
-                document = new Document(PageSize.A4, 36, 36, 160, 120);
-            } else {
-                document = new Document(PageSize.A4, 36, 36, 100, 120);
-            }
+            document = new Document(PageSize.A4, 36, 36, 100, 120);
 
 
             String root = Environment.getExternalStorageDirectory()
@@ -1766,13 +1779,17 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         //arrayList.add("ekta@beesolvertechnology.com");
         arrayList.add(stored_email);
 //
+        final String user_name = sharedPreferences.getString("user_name", "");
         final File pdf = new File(Environment.getExternalStorageDirectory()
                 .toString() + "/MyTipsDocument/" + file_name);
         LandingActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+
                 new SendMailTask(LandingActivity.this).execute(fromEmail,
-                        Constants.fromPassword, arrayList, "Subject", "body", pdf.getAbsolutePath());
+                        Constants.fromPassword, arrayList, selected_summary_type + " " + "Payroll", "Hi " + user_name + "," + "\n" + "\n" + "A copy of your " + selected_summary_type + " " + "payroll is attached in PDF file available " +
+                                "for viewing. \n \nBest Regards," + "\n" + "My Tips Ledger"
+                        , pdf.getAbsolutePath());
             }
         });
 
@@ -1873,6 +1890,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 payPeriodTable.getDefaultCell().setBorder(Rectangle.NO_BORDER);
 
                 pdfDates = selected_summary_type.equals("Daily") ? pdfDates : "";
+                pdfDates = "";
                 PdfPCell payCell = new PdfPCell(new Phrase(pdfDates, redFont));
                 payCell.setFixedHeight(40f);
                 payCell.setBorder(Rectangle.NO_BORDER);
@@ -2478,8 +2496,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 int index_startDay = 0;
                 long start_date = 0;
+
                 if (_stringDates.size() > 0) {
-                    index_startDay = Collections.binarySearch(_stringDates, start_week);
+                    for (int i = 0; i < 7; i++) {
+                        if (_stringDates.get(i).contains(start_week)) {
+                            index_startDay = i;
+                            break;
+                        }
+                    }
                 }
                 index_startDay = Math.abs(index_startDay);
                 if (_weeklyDates.size() > 0) {

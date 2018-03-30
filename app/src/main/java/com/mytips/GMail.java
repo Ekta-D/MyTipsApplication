@@ -80,7 +80,7 @@ public class GMail {
         multipart = new MimeMultipart();
         bodyPart = new MimeBodyPart();
         bodyPart.setText(emailBody);
-        String file_name = "DailyTips.pdf";
+        String file_name = "Payroll.pdf";
 
         source = new FileDataSource(email_file_name);
 
