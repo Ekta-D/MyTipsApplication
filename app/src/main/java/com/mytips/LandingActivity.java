@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -21,6 +22,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,6 +46,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.billingclient.api.Purchase;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -68,6 +71,11 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.mytips.Adapter.SpinnerProfile;
 import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Adapter.WeeklySummaryAdapter;
+import com.mytips.BillingUtils.IabBroadcastReceiver;
+import com.mytips.BillingUtils.IabHelper;
+import com.mytips.BillingUtils.IabResult;
+import com.mytips.BillingUtils.Inventory;
+import com.mytips.BillingUtils.Security;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.AddDay;
 import com.mytips.Model.DataBlocksSets;
@@ -78,6 +86,7 @@ import com.mytips.Utils.Constants;
 
 
 import java.io.FileNotFoundException;
+import java.security.PublicKey;
 import java.text.DateFormat;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -92,7 +101,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-public class LandingActivity extends AppCompatActivity implements View.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+public class LandingActivity extends AppCompatActivity implements View.OnClickListener,
+        DialogInterface.OnClickListener  ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, IabBroadcastReceiver.IabBroadcastListener {
     private LinearLayout mRevealView;
     private boolean hidden = true;
     private ImageButton profile, share, invite, preferences, emailData, about_app;
@@ -126,10 +136,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     long start_shift_long, end_shift_long;
     ArrayList<AddDay> data;
     SharedPreferences.Editor editor;
-    private static final String TAG = "drive-quickstart";
-    private static final int REQUEST_CODE_CAPTURE_IMAGE = 1;
-    private static final int REQUEST_CODE_CREATOR = 2;
-    private static final int REQUEST_CODE_RESOLUTION = 3;
+    public static final int RC_REQUEST = 1001;
+
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingError = false;
     public static final int MY_PERMISSIONS_REQUEST_ACCOUNTS = 1;
@@ -145,6 +153,22 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     boolean is_email = false;
 
+
+    boolean nSubscribbeTobeDelay = false;
+    boolean mAutoRenewEnable = false;
+    String mSelectedSubscriberPeriod = "";
+
+    String mUserSky = "";
+    String mFirstChoiceSku = "";
+    String mSecondChoiceSku = "";
+    String mThirdChoiceSku = "";
+    String mFourthChoiceSku = "";
+
+    IabHelper helper;
+    IabBroadcastReceiver iabBroadcastReceiver;
+    String TAG1 = "com.mytips.billing";
+    static final String ITEM_SKU = "android.tip.purchased";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +182,11 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
             //only api 23 above
         }
+
+        // for in-app subscription
+
+        check_payment_subscriptions();
+
         if (mGoogleSignInClient == null)
             mGoogleSignInClient = buildGoogleSignInClient();
 
@@ -383,7 +412,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+                //     startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+
+                onSubscriberClick();
             }
         });
 
@@ -686,7 +717,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.about:
 
-                AlertDialog.Builder alert_build=new AlertDialog.Builder(LandingActivity.this);
+                AlertDialog.Builder alert_build = new AlertDialog.Builder(LandingActivity.this);
                 alert_build.setTitle("App Info");
                 alert_build.setMessage("My Tips Ledger version 1.0");
                 alert_build.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -695,7 +726,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         dialog.dismiss();
                     }
                 });
-                AlertDialog alertDialog=alert_build.create();
+                AlertDialog alertDialog = alert_build.create();
                 alertDialog.show();
 
                 break;
@@ -1797,31 +1828,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-
-       /* Log.i("drive", "connected called");
-        if (mGoogleApiClient.isConnected()) {
-            if (!is_first) {
-                progressDialog.dismiss();
-                uploadToDrive();
-            }
-
-        } else {
-            if (mGoogleApiClient == null) {
-                try {
-                    mGoogleApiClient = new GoogleApiClient.Builder(this)
-                            .addApi(Drive.API)
-                            .addScope(Drive.SCOPE_FILE)
-                            .addConnectionCallbacks(this)
-                            .addOnConnectionFailedListener(this)
-                            .build();
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-            mGoogleApiClient.connect();
-        }*/
-
     }
 
     @Override
@@ -1832,22 +1838,30 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+    }
 
+    @Override
+    public void receivedBroadcast() {
 
-        /*Log.i("drive", "connected failed");
+        Log.d(TAG1, "Received broadcast notification. Querying inventory.");
+        try {
+            helper.queryInventoryAsync(mGotInventoryListener);
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            complain("Error querying inventory. Another async operation in progress.");
+        }
+    }
 
-        if (connectionResult.hasResolution()) {
-            try {
-                connectionResult.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-                progressDialog.dismiss();
-            } catch (IntentSender.SendIntentException e) {
-                // Unable to resolve, message user appropriately
-            }
-        } else {
-            GooglePlayServicesUtil.getErrorDialog(connectionResult.getErrorCode(), this, 0).show();
-            progressDialog.dismiss();
-        }*/
+    void complain(String message) {
+        Log.e(TAG1, "**** Error: " + message);
+        alert("Error: " + message);
+    }
 
+    void alert(String message) {
+        android.app.AlertDialog.Builder bld = new android.app.AlertDialog.Builder(this);
+        bld.setMessage(message);
+        bld.setNeutralButton("OK", null);
+        Log.d(TAG1, "Showing alert dialog: " + message);
+        bld.create().show();
     }
 
     private class HeaderFooterTable extends PdfPageEventHelper {
@@ -1963,40 +1977,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        switch (requestCode) {
+       /* switch (requestCode) {
             case REQUEST_CODE_RESOLUTION:
                 if (resultCode == RESULT_OK) {
                     //   uploadToDrive();
 
                 }
                 break;
+        }*/
+        if (helper != null && !helper.handleActivityResult(requestCode, resultCode, data)) {
+            super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-    ProgressDialog progressDialog;
-
-    /*public void uploadToDrive() {
-
-        create_file_in_folder();
-    }
-
-    ProgressDialog progressDialog;
-
-    public void create_file_in_folder() {
-
-        progressDialog = new ProgressDialog(LandingActivity.this);
-        progressDialog.setMessage("Uploading database!");
-        progressDialog.show();
-        Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-            @Override
-            public void onResult(@NonNull DriveApi.DriveContentsResult driveContentsResult) {
-
-
-                saveToDrive(Drive.DriveApi.getRootFolder(mGoogleApiClient), "tipeesDB.db", "text/plain", backupDB, driveContentsResult);
-
-            }
-        });
-    }*/
 
     boolean filter_search = false;
 
@@ -3881,4 +3873,343 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
         return selected_profile;
     }
+
+
+    public void check_payment_subscriptions() {
+        String base64EncodePublickey = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsAML4UXe945wM8tzUAzsQ+09ijFR1gH4migveFc5I7mLc+JfT3ppVxTGJ2VlaoP/SS2DzN0auTzA8PdrnbNJFOeJHyclY92E6viO2yapKmun2fSdj9g+zgViFi6J6/gJOVXhwojk/KM5LK3kzHs7u0btWcBWJ41RaRoqht2r0+ZzdmdDJL6aGfWGylzFnYB0h3ExOZE98Aw04WROlV/K82G3GC9AISoVA6rpE4vAXdSSu76wJ07WhqdWi0InGmqMhfh+PdUNwpBnUz4oFUKU/Pf+aM7p0NXo9Wqq1qaZZTFvUkhcq8s2Df3Z5hr9PSQ81XyCtrjXpsKmTyNRGGtR0QIDAQAB";
+
+        helper = new IabHelper(this, base64EncodePublickey);
+        helper.enableDebugLogging(true);
+        helper.startSetup(new IabHelper.OnIabSetupFinishedListener() {
+            @Override
+            public void onIabSetupFinished(IabResult result) {
+
+                if (!result.isSuccess()) {
+                    System.out.println("In app Billing failed!");
+                    return;
+                } /*else {
+                    System.out.println("In app Billing set up!");
+                }*/
+                if (helper == null) return;
+
+
+                iabBroadcastReceiver = new IabBroadcastReceiver(LandingActivity.this);
+                IntentFilter broadcastFilter = new IntentFilter(IabBroadcastReceiver.ACTION);
+                registerReceiver(iabBroadcastReceiver, broadcastFilter);
+                System.out.println("In app Billing setup!");
+
+                try {
+                    helper.queryInventoryAsync(mGotInventoryListener);
+                } catch (IabHelper.IabAsyncInProgressException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+     /*   try {
+            helper.queryInventoryAsync(mGotInventoryListener);
+        } catch (IabHelper.IabAsyncInProgressException e) {
+            e.printStackTrace();
+        }*/
+    }
+
+    IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+        @Override
+        public void onQueryInventoryFinished(IabResult result, Inventory inv) {
+
+            if (helper == null) return;
+            if (result.isFailure()) {
+                System.out.println("Failed to query " + result);
+            }
+            System.out.println("Successfull query");
+
+            com.mytips.BillingUtils.Purchase monthly_purchase = inv.getPurchase(Constants.SUB_MONTHLY);
+            com.mytips.BillingUtils.Purchase six_months = inv.getPurchase(Constants.SUB_SIXMONTHS);
+            com.mytips.BillingUtils.Purchase three_months = inv.getPurchase(Constants.SUB_THREE_MONTHS);
+            com.mytips.BillingUtils.Purchase yearly = inv.getPurchase(Constants.SUB_YEARLY);
+
+            if (monthly_purchase != null && monthly_purchase.isAutoRenewing()) {
+                mUserSky = Constants.SUB_MONTHLY;
+                mAutoRenewEnable = true;
+
+            } else if (three_months != null && three_months.isAutoRenewing()) {
+                mUserSky = Constants.SUB_THREE_MONTHS;
+                mAutoRenewEnable = true;
+            } else if (six_months != null && six_months.isAutoRenewing()) {
+                mUserSky = Constants.SUB_SIXMONTHS;
+                mAutoRenewEnable = true;
+            } else if (yearly != null && yearly.isAutoRenewing()) {
+                mUserSky = Constants.SUB_YEARLY;
+                mAutoRenewEnable = true;
+            } else {
+                mUserSky = "";
+                mAutoRenewEnable = false;
+            }
+
+
+            nSubscribbeTobeDelay = (monthly_purchase != null && verifyPurchase(monthly_purchase)) || (three_months != null && verifyPurchase(three_months))
+                    || (six_months != null && verifyPurchase(six_months)) || (yearly != null && verifyPurchase(yearly));
+            System.out.println("User" + (nSubscribbeTobeDelay ? "HAS" : "DOES NOT EXIST") + "Infinit subrscription");
+        }
+    };
+
+   /* IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
+        @Override
+        public void onQueryInventoryFinished(final IabResult result,
+                                             final Inventory inventory) {
+            Log.d(TAG1, "Query inventory finished.");
+
+// Have we been disposed of in the meantime? If so, quit.
+            if (helper == null) {
+                return;
+            }
+
+// Is it a failure?
+            if (result.isFailure()) {
+                Toast.makeText(LandingActivity.this,
+                        "Failed to query inventory: " + result,
+                        Toast.LENGTH_LONG).show();
+                return;
+            } else {
+                try {
+                    helper.consumeAsync(inventory.getPurchase(ITEM_SKU), mConsumeFinishedListener);
+                } catch (IabHelper.IabAsyncInProgressException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            Log.d(TAG1, "Query inventory was successful.");
+
+*//*
+* Check for items we own. Notice that for each purchase, we check
+* the developer payload to see if it's correct! See
+* verifyDeveloperPayload().
+*//*
+
+// Do we have the premium upgrade?
+
+
+           *//* Purchase premiumPurchase = inventory.getPurchase(SKU_PREMIUM);
+            isFullVersion = premiumPurchase != null
+                    && verifyDeveloperPayload(premiumPurchase);
+            Log.d(TAG1, "User is " + (isFullVersion ? "PREMIUM" : "NOT PREMIUM"));
+
+// // Do we have the subscibtion?
+            Purchase subscriptionForFullVersion = inventory
+                    .getPurchase(SKU_SUBSCRIBED);
+            isSubscribe = subscriptionForFullVersion != null
+                    && verifyDeveloperPayload(subscriptionForFullVersion);
+            Log.d(TAG1, "User " + (isSubscribe ? "HAS" : "DOES NOT HAVE")
+                    + " full version subscription.");*//*
+
+
+// Check for coins -- you can get coins
+// tank immediately
+
+
+          *//*  Purchase coinsPurchase = inventory.getPurchase(SKU_COINS);
+            if (coinsPurchase != null && verifyDeveloperPayload(coinsPurchase)) {
+                Log.d(TAG1, "We have Coins. Consuming it.");
+                mHelper.consumeAsync(inventory.getPurchase(SKU_COINS),
+                        mConsumeFinishedListener);
+                return;
+            }
+
+            Log.d(TAG1, "Initial inventory query finished; enabling main UI.");*//*
+
+
+        }
+    };
+    IabHelper.OnConsumeFinishedListener mConsumeFinishedListener = new IabHelper.OnConsumeFinishedListener() {
+        @Override
+        public void onConsumeFinished(com.mytips.BillingUtils.Purchase purchase, IabResult result) {
+
+            if (result.isSuccess()) {
+                System.out.println("Purchased!");
+            } else {
+                System.out.println("Fail");
+            }
+        }
+    };
+
+    public static boolean verifyPurchase(String base64PublicKey,
+                                         String signedData, String signature, Purchase purchase) {
+        if (TextUtils.isEmpty(signedData) ||
+                TextUtils.isEmpty(base64PublicKey) ||
+                TextUtils.isEmpty(signature)) {
+            Log.e("", "Purchase verification failed: missing data.");
+            if (BuildConfig.DEBUG) {
+                return true;
+            }
+            return false;
+        }
+
+        PublicKey key = Security.generatePublicKey(base64PublicKey);
+        return Security.verify(key, signedData, signature);
+    }*/
+
+    public static boolean verifyPurchase(com.mytips.BillingUtils.Purchase purchase) {
+        String payLoad = purchase.getDeveloperPayload();
+        return true;
+    }
+
+    public void onSubscriberClick() {
+        if (!helper.subscriptionsSupported()) {
+            complain("Subscriptions not supported on your device yet. Sorry!");
+            return;
+        }
+
+        CharSequence[] options;
+        if (!nSubscribbeTobeDelay || !mAutoRenewEnable) {
+            // Both subscription options should be available
+            options = new CharSequence[4];
+            options[0] = "Monthly $1.99";
+            options[1] = "Three Month $4.99";
+            options[2] = "Six Month $6.99";
+            options[3] = "Yearly $11.99";
+            mFirstChoiceSku = Constants.SUB_MONTHLY;
+            mSecondChoiceSku = Constants.SUB_THREE_MONTHS;
+            mThirdChoiceSku = Constants.SUB_SIXMONTHS;
+            mFourthChoiceSku = Constants.SUB_YEARLY;
+        } else {
+            // This is the subscription upgrade/downgrade path, so only one option is valid
+            options = new CharSequence[3];
+            if (mUserSky.equals(Constants.SUB_MONTHLY)) {
+                // Give the option to upgrade below
+                options[0] = "Three Month $4.99";
+                options[1] = "Six Month $6.99";
+                options[2] = "Yearly $11.99";
+                mFirstChoiceSku = Constants.SUB_THREE_MONTHS;
+                mSecondChoiceSku = Constants.SUB_SIXMONTHS;
+                mThirdChoiceSku = Constants.SUB_YEARLY;
+            } else if (mUserSky.equals( Constants.SUB_THREE_MONTHS)) {
+                // Give the option to upgrade or downgrade below
+                options[0] = "Monthly $1.99";
+                options[1] = "Six Month $6.99";
+                options[2] = "Yearly $11.99";
+                mFirstChoiceSku = Constants.SUB_MONTHLY;
+                mSecondChoiceSku = Constants.SUB_SIXMONTHS;
+                mThirdChoiceSku = Constants.SUB_YEARLY;
+            } else if (mUserSky.equals(Constants.SUB_SIXMONTHS)) {
+                // Give the option to upgrade or downgrade below
+                options[0] = "Monthly $1.99";
+                options[1] =  "Three Month $4.99";
+                options[2] = "Yearly $11.99";
+                mFirstChoiceSku = Constants.SUB_MONTHLY;
+                mSecondChoiceSku = Constants.SUB_THREE_MONTHS;
+                mThirdChoiceSku = Constants.SUB_YEARLY;
+
+            } else {
+                // Give the option to upgrade or downgrade below
+                options[0] = "Monthly $1.99";
+                options[1] =  "Three Month $4.99";
+                options[2] =  "Six Month $6.99";
+                mFirstChoiceSku = Constants.SUB_MONTHLY;
+                mSecondChoiceSku = Constants.SUB_THREE_MONTHS;
+                mThirdChoiceSku = Constants.SUB_SIXMONTHS;
+            }
+            mFourthChoiceSku = "";
+        }
+
+        int titleResId;
+        if (!nSubscribbeTobeDelay) {
+            titleResId = R.string.subscription_period_prompt;
+        } else if (!mAutoRenewEnable) {
+            titleResId = R.string.subscription_resignup_prompt;
+        } else {
+            titleResId = R.string.subscription_update_prompt;
+        }
+
+        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
+        builder.setTitle(titleResId)
+                .setSingleChoiceItems(options, 0 /* checkedItem */, this)
+                .setPositiveButton(R.string.subscription_prompt_continue, this)
+                .setNegativeButton(R.string.subscription_prompt_cancel, this);
+        android.app.AlertDialog dialog = builder.create();
+        dialog.show();
+
+    }
+    @Override
+    public void onClick(DialogInterface dialog, int id) {
+        if (id == 0 /* First choice item */) {
+            mSelectedSubscriberPeriod = mFirstChoiceSku;
+        } else if (id == 1 /* Second choice item */) {
+            mSelectedSubscriberPeriod = mSecondChoiceSku;
+        }else if (id == 2) {
+            mSelectedSubscriberPeriod = mThirdChoiceSku;
+        }else if (id == 3){
+            mSelectedSubscriberPeriod = mFourthChoiceSku;
+        } else if (id == DialogInterface.BUTTON_POSITIVE /* continue button */) {
+
+            String payload = "";
+
+            if (TextUtils.isEmpty(mSelectedSubscriberPeriod)) {
+                // The user has not changed from the default selection
+                mSelectedSubscriberPeriod = mFirstChoiceSku;
+            }
+
+            List<String> oldSkus = null;
+            if (!TextUtils.isEmpty(mUserSky)
+                    && !mUserSky.equals(mSelectedSubscriberPeriod)) {
+                // The user currently has a valid subscription, any purchase action is going to
+                // replace that subscription
+                oldSkus = new ArrayList<String>();
+                oldSkus.add(mUserSky);
+            }
+
+           // setWaitScreen(true);
+            try {
+                helper.launchPurchaseFlow(this, mSelectedSubscriberPeriod, IabHelper.ITEM_TYPE_SUBS,
+                        oldSkus, RC_REQUEST, mPurchaseFinishedListener, payload);
+            } catch (IabHelper.IabAsyncInProgressException e) {
+                complain("Error launching purchase flow. Another async operation in progress.");
+             //   setWaitScreen(false);
+            }
+            // Reset the dialog options
+            mSelectedSubscriberPeriod = "";
+            mFirstChoiceSku = "";
+            mSecondChoiceSku = "";
+        } else if (id != DialogInterface.BUTTON_NEGATIVE) {
+            // There are only four buttons, this should not happen
+            Log.e(TAG1, "Unknown button clicked in subscription dialog: " + id);
+        }
+    }
+    IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
+
+
+        public void onIabPurchaseFinished(IabResult result, com.mytips.BillingUtils.Purchase purchase) {
+            Log.d(TAG1, "Purchase finished: " + result + ", purchase: " + purchase);
+
+            // if we were disposed of in the meantime, quit.
+            if (helper == null) return;
+
+            if (result.isFailure()) {
+                complain("Error purchasing: " + result);
+             //   setWaitScreen(false);
+                return;
+            }
+            if (!verifyPurchase(purchase)) {
+                complain("Error purchasing. Authenticity verification failed.");
+           //     setWaitScreen(false);
+                return;
+            }
+
+            Log.d(TAG1, "Purchase successful.");
+
+            if (purchase.getSku().equals(Constants.SUB_MONTHLY)
+                    || purchase.getSku().equals(Constants.SUB_THREE_MONTHS)
+                    || purchase.getSku().equals(Constants.SUB_SIXMONTHS)
+                    || purchase.getSku().equals(Constants.SUB_YEARLY)){
+                // bought the rasbita subscription
+                Log.d(TAG1, "Delaroy subscription purchased.");
+                alert("Thank you for subscribing to Delaroy!");
+                nSubscribbeTobeDelay = true;
+                mAutoRenewEnable = purchase.isAutoRenewing();
+                mUserSky = purchase.getSku();
+               // updateUi();
+                //setWaitScreen(false);
+            }
+        }
+    };
+
 }

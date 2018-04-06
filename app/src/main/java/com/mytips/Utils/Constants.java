@@ -20,5 +20,13 @@ public class Constants {
     public static final String SharedDriveId = "drive_id";
     public static final String FetchedData = "FetchedData.db";
 
+    /*For billing subscriptions*/
+
+    public static final String SUB_MONTHLY="Weekly";
+    public static final String SUB_THREE_MONTHS="three_months";
+    public static final String SUB_YEARLY="yearly";
+    public static final String SUB_SIXMONTHS="six_months";
+
+
 
 }

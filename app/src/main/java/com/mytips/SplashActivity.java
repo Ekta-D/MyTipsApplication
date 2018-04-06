@@ -10,6 +10,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -26,6 +28,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
+import com.mytips.BillingUtils.IabHelper;
+import com.mytips.BillingUtils.IabResult;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
@@ -33,7 +37,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SplashActivity extends GoogleAuthorizationActivity/* implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener */ {
+public class SplashActivity extends GoogleAuthorizationActivity {
 
 
     public static final String ISFIRST_TIME = "Isfirst_time";
@@ -48,6 +52,7 @@ public class SplashActivity extends GoogleAuthorizationActivity/* implements Goo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
 
         sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
         if (sharedPreferences != null)
