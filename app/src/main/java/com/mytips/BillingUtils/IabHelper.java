@@ -461,10 +461,10 @@ public class IabHelper {
                     if (listener != null) listener.onIabPurchaseFinished(r, null);
                     return;
                 }
-                buyIntentBundle = mService.getBuyIntentToReplaceSkus(5, mContext.getPackageName(),
-                        oldSkus, sku, itemType, extraData);
+               /* buyIntentBundle = mService.getBuyIntentToReplaceSkus(5, mContext.getPackageName(),
+                        oldSkus, sku, itemType, extraData);*/
             }
-            int response = getResponseCodeFromBundle(buyIntentBundle);
+            /*int response = getResponseCodeFromBundle(buyIntentBundle);
             if (response != BILLING_RESPONSE_RESULT_OK) {
                 logError("Unable to buy item, Error response: " + getResponseDesc(response));
                 flagEndAsync();
@@ -473,25 +473,16 @@ public class IabHelper {
                 return;
             }
 
-            PendingIntent pendingIntent = buyIntentBundle.getParcelable(RESPONSE_BUY_INTENT);
+            PendingIntent pendingIntent = buyIntentBundle.getParcelable(RESPONSE_BUY_INTENT);*/
             logDebug("Launching buy intent for " + sku + ". Request code: " + requestCode);
             mRequestCode = requestCode;
             mPurchaseListener = listener;
             mPurchasingItemType = itemType;
-            act.startIntentSenderForResult(pendingIntent.getIntentSender(),
+           /* act.startIntentSenderForResult(pendingIntent.getIntentSender(),
                     requestCode, new Intent(),
                     Integer.valueOf(0), Integer.valueOf(0),
-                    Integer.valueOf(0));
-        }
-        catch (SendIntentException e) {
-            logError("SendIntentException while launching purchase flow for sku " + sku);
-            e.printStackTrace();
-            flagEndAsync();
-
-            result = new IabResult(IABHELPER_SEND_INTENT_FAILED, "Failed to send intent.");
-            if (listener != null) listener.onIabPurchaseFinished(result, null);
-        }
-        catch (RemoteException e) {
+                    Integer.valueOf(0));*/
+        } catch (RemoteException e) {
             logError("RemoteException while launching purchase flow for sku " + sku);
             e.printStackTrace();
             flagEndAsync();

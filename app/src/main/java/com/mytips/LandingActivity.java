@@ -4,19 +4,20 @@ import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -46,7 +47,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.billingclient.api.Purchase;
+import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.SkuDetails;
+import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -71,25 +74,26 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.mytips.Adapter.SpinnerProfile;
 import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Adapter.WeeklySummaryAdapter;
+import com.mytips.BillingUtils.BillingManager;
+import com.mytips.BillingUtils.BillingProvider;
 import com.mytips.BillingUtils.IabBroadcastReceiver;
 import com.mytips.BillingUtils.IabHelper;
 import com.mytips.BillingUtils.IabResult;
 import com.mytips.BillingUtils.Inventory;
-import com.mytips.BillingUtils.Security;
+import com.mytips.BillingUtils.SkuRowData;
+import com.mytips.BillingUtils.SkusAdapter;
+import com.mytips.BillingUtils.UiManager;
 import com.mytips.Database.DatabaseOperations;
 import com.mytips.Model.AddDay;
 import com.mytips.Model.DataBlocksSets;
 import com.mytips.Model.Profiles;
-import com.mytips.Preferences.Preferences;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
-
-import java.io.FileNotFoundException;
-import java.security.PublicKey;
-import java.text.DateFormat;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -101,8 +105,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
-public class LandingActivity extends AppCompatActivity implements View.OnClickListener,
+public class LandingActivity extends AppCompatActivity implements View.OnClickListener, BillingProvider,
         DialogInterface.OnClickListener  ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, IabBroadcastReceiver.IabBroadcastListener {
+    private static final String TAG = "TAG";
     private LinearLayout mRevealView;
     private boolean hidden = true;
     private ImageButton profile, share, invite, preferences, emailData, about_app;
@@ -169,6 +174,11 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     String TAG1 = "com.mytips.billing";
     static final String ITEM_SKU = "android.tip.purchased";
 
+    private BillingManager mBillingManager;
+    private MainViewController mViewController;
+    private AcquireFragment mAcquireFragment;
+    private static final String DIALOG_TAG = "dialog";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -184,8 +194,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
 
         // for in-app subscription
-
-        check_payment_subscriptions();
+        mViewController = new MainViewController(this);
+        if (savedInstanceState != null) {
+            mAcquireFragment = (AcquireFragment) getSupportFragmentManager()
+                    .findFragmentByTag(DIALOG_TAG);
+        }
+        mBillingManager = new BillingManager(this, mViewController.getUpdateListener());
+        //check_payment_subscriptions();
 
         if (mGoogleSignInClient == null)
             mGoogleSignInClient = buildGoogleSignInClient();
@@ -437,6 +452,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
         //Connect the client. Once connected, the camera is launched.
         mGoogleApiClient.connect();*/
+        if (mBillingManager != null
+                && mBillingManager.getBillingClientResponseCode() == BillingClient.BillingResponse.OK) {
+            mBillingManager.queryPurchases();
+        }
 
         default_date_format = sharedPreferences.getInt("selected_date", 2);
 
@@ -1864,6 +1883,21 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         bld.create().show();
     }
 
+    @Override
+    public BillingManager getBillingManager() {
+        return mBillingManager;
+    }
+
+    @Override
+    public boolean isGoldMonthlySubscribed() {
+        return mViewController.isGoldMonthlySubscribed();
+    }
+
+    @Override
+    public boolean isGoldYearlySubscribed() {
+        return mViewController.isGoldYearlySubscribed() ;
+    }
+
     private class HeaderFooterTable extends PdfPageEventHelper {
         private HeaderFooterTable() {
 
@@ -1991,91 +2025,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     boolean filter_search = false;
-
-    /*void saveToDrive(final DriveFolder pFldr, final String titl,
-                     final String mime, final java.io.File file, DriveApi.DriveContentsResult driveContentsResult) {
-
-        // makeFolder();
-       *//* MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                .setTitle(Constants.DatabaseFileName)
-                .setMimeType(mime)
-                .setStarred(false)
-                .build();*//*
-        if (mGoogleApiClient != null && pFldr != null && titl != null && mime != null && file != null)
-            try {
-                // create content from file
-                String drive_folder_created_id = getResources().getString(R.string.folder_id);
-                DriveId drivers_folder_id = DriveId.decodeFromString(drive_folder_created_id);
-
-                Drive.DriveApi.newDriveContents(mGoogleApiClient).setResultCallback(new ResultCallback<DriveApi.DriveContentsResult>() {
-                    @Override
-                    public void onResult(DriveApi.DriveContentsResult driveContentsResult) {
-                        DriveContents cont = driveContentsResult != null && driveContentsResult.getStatus().isSuccess() ?
-                                driveContentsResult.getDriveContents() : null;
-
-                        // write file to content, chunk by chunk
-                        if (cont != null) try {
-                            OutputStream oos = cont.getOutputStream();
-                            if (oos != null) try {
-                                InputStream is = new FileInputStream(file);
-                                byte[] buf = new byte[4096];
-                                int c;
-                                while ((c = is.read(buf, 0, buf.length)) > 0) {
-                                    oos.write(buf, 0, c);
-                                    oos.flush();
-                                }
-                            } finally {
-                                oos.close();
-                                progressDialog.dismiss();
-                            }
-
-                            // content's COOL, create metadata
-                            MetadataChangeSet meta = new MetadataChangeSet.Builder().setTitle(titl).setMimeType(mime).build();
-
-                            // now create file on GooDrive
-                            pFldr.createFile(mGoogleApiClient, meta, cont).setResultCallback(new ResultCallback<DriveFolder.DriveFileResult>() {
-                                @Override
-                                public void onResult(DriveFolder.DriveFileResult driveFileResult) {
-                                    if (driveFileResult != null && driveFileResult.getStatus().isSuccess()) {
-                                        DriveFile dFil = driveFileResult != null && driveFileResult.getStatus().isSuccess() ?
-                                                driveFileResult.getDriveFile() : null;
-                                        if (dFil != null) {
-                                            // BINGO , file uploaded
-                                            dFil.getMetadata(mGoogleApiClient).setResultCallback(new ResultCallback<DriveResource.MetadataResult>() {
-                                                @Override
-                                                public void onResult(DriveResource.MetadataResult metadataResult) {
-                                                    if (metadataResult != null && metadataResult.getStatus().isSuccess()) {
-                                                        is_completed = true;
-                                                        DriveId mDriveId = metadataResult.getMetadata().getDriveId();
-
-                                                        editor.putString(Constants.SharedDriveId, mDriveId.encodeToString());
-                                                        editor.commit();
-                                                    }
-                                                    progressDialog.dismiss();
-                                                    if (is_completed) {
-                                                        progressDialog.dismiss();
-                                                    }
-                                                }
-                                            });
-
-
-                                        }
-                                    } else { *//* report error *//* }
-                                }
-
-                            });
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-        progressDialog.dismiss();
-
-    }*/
 
     public boolean checkPermissions() {
         int permissionWrite = ContextCompat.checkSelfPermission(this,
@@ -3953,100 +3902,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         }
     };
 
-   /* IabHelper.QueryInventoryFinishedListener mGotInventoryListener = new IabHelper.QueryInventoryFinishedListener() {
-        @Override
-        public void onQueryInventoryFinished(final IabResult result,
-                                             final Inventory inventory) {
-            Log.d(TAG1, "Query inventory finished.");
-
-// Have we been disposed of in the meantime? If so, quit.
-            if (helper == null) {
-                return;
-            }
-
-// Is it a failure?
-            if (result.isFailure()) {
-                Toast.makeText(LandingActivity.this,
-                        "Failed to query inventory: " + result,
-                        Toast.LENGTH_LONG).show();
-                return;
-            } else {
-                try {
-                    helper.consumeAsync(inventory.getPurchase(ITEM_SKU), mConsumeFinishedListener);
-                } catch (IabHelper.IabAsyncInProgressException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            Log.d(TAG1, "Query inventory was successful.");
-
-*//*
-* Check for items we own. Notice that for each purchase, we check
-* the developer payload to see if it's correct! See
-* verifyDeveloperPayload().
-*//*
-
-// Do we have the premium upgrade?
-
-
-           *//* Purchase premiumPurchase = inventory.getPurchase(SKU_PREMIUM);
-            isFullVersion = premiumPurchase != null
-                    && verifyDeveloperPayload(premiumPurchase);
-            Log.d(TAG1, "User is " + (isFullVersion ? "PREMIUM" : "NOT PREMIUM"));
-
-// // Do we have the subscibtion?
-            Purchase subscriptionForFullVersion = inventory
-                    .getPurchase(SKU_SUBSCRIBED);
-            isSubscribe = subscriptionForFullVersion != null
-                    && verifyDeveloperPayload(subscriptionForFullVersion);
-            Log.d(TAG1, "User " + (isSubscribe ? "HAS" : "DOES NOT HAVE")
-                    + " full version subscription.");*//*
-
-
-// Check for coins -- you can get coins
-// tank immediately
-
-
-          *//*  Purchase coinsPurchase = inventory.getPurchase(SKU_COINS);
-            if (coinsPurchase != null && verifyDeveloperPayload(coinsPurchase)) {
-                Log.d(TAG1, "We have Coins. Consuming it.");
-                mHelper.consumeAsync(inventory.getPurchase(SKU_COINS),
-                        mConsumeFinishedListener);
-                return;
-            }
-
-            Log.d(TAG1, "Initial inventory query finished; enabling main UI.");*//*
-
-
-        }
-    };
-    IabHelper.OnConsumeFinishedListener mConsumeFinishedListener = new IabHelper.OnConsumeFinishedListener() {
-        @Override
-        public void onConsumeFinished(com.mytips.BillingUtils.Purchase purchase, IabResult result) {
-
-            if (result.isSuccess()) {
-                System.out.println("Purchased!");
-            } else {
-                System.out.println("Fail");
-            }
-        }
-    };
-
-    public static boolean verifyPurchase(String base64PublicKey,
-                                         String signedData, String signature, Purchase purchase) {
-        if (TextUtils.isEmpty(signedData) ||
-                TextUtils.isEmpty(base64PublicKey) ||
-                TextUtils.isEmpty(signature)) {
-            Log.e("", "Purchase verification failed: missing data.");
-            if (BuildConfig.DEBUG) {
-                return true;
-            }
-            return false;
-        }
-
-        PublicKey key = Security.generatePublicKey(base64PublicKey);
-        return Security.verify(key, signedData, signature);
-    }*/
 
     public static boolean verifyPurchase(com.mytips.BillingUtils.Purchase purchase) {
         String payLoad = purchase.getDeveloperPayload();
@@ -4054,7 +3909,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void onSubscriberClick() {
-        if (!helper.subscriptionsSupported()) {
+       /* if (!helper.subscriptionsSupported()) {
             complain("Subscriptions not supported on your device yet. Sorry!");
             return;
         }
@@ -4122,13 +3977,36 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
         builder.setTitle(titleResId)
-                .setSingleChoiceItems(options, 0 /* checkedItem */, this)
+                .setSingleChoiceItems(options, 0 *//* checkedItem *//*, this)
                 .setPositiveButton(R.string.subscription_prompt_continue, this)
                 .setNegativeButton(R.string.subscription_prompt_cancel, this);
         android.app.AlertDialog dialog = builder.create();
-        dialog.show();
+        dialog.show();*/
+        if (mAcquireFragment == null) {
+            mAcquireFragment = new AcquireFragment();
+        }
+        if (!isAcquireFragmentShown()) {
+            mAcquireFragment.show(getSupportFragmentManager(), DIALOG_TAG);
 
+            if (mBillingManager != null
+                    && mBillingManager.getBillingClientResponseCode()
+                    > BILLING_MANAGER_NOT_INITIALIZED) {
+                mAcquireFragment.onManagerReady(this);
+            }
+        }
+
+        //querySkuDetails();
     }
+    public boolean isAcquireFragmentShown() {
+        return mAcquireFragment != null && mAcquireFragment.isVisible();
+    }
+    public static final int BILLING_MANAGER_NOT_INITIALIZED  = -1;
+SkusAdapter mAdapter;
+
+    protected UiManager createUiManager(SkusAdapter adapter, BillingProvider provider) {
+        return new UiManager(adapter, provider);
+    }
+
     @Override
     public void onClick(DialogInterface dialog, int id) {
         if (id == 0 /* First choice item */) {

@@ -160,4 +160,13 @@
     <string name="subscription_prompt_continue">Continue</string>
     <string name="subscription_prompt_cancel">Cancel</string>
     <string name="licence_key">MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAsAML4UXe945wM8tzUAzsQ+09ijFR1gH4migveFc5I7mLc+JfT3ppVxTGJ2VlaoP/SS2DzN0auTzA8PdrnbNJFOeJHyclY92E6viO2yapKmun2fSdj9g+zgViFi6J6/gJOVXhwojk/KM5LK3kzHs7u0btWcBWJ41RaRoqht2r0+ZzdmdDJL6aGfWGylzFnYB0h3ExOZE98Aw04WROlV/K82G3GC9AISoVA6rpE4vAXdSSu76wJ07WhqdWi0InGmqMhfh+PdUNwpBnUz4oFUKU/Pf+aM7p0NXo9Wqq1qaZZTFvUkhcq8s2Df3Z5hr9PSQ81XyCtrjXpsKmTyNRGGtR0QIDAQAB</string>
+
+
+    <string name="header_inapp">One-time deals</string>
+    <string name="header_subscriptions">Subscriptions</string>
+    <string name="error_no_skus">We didn\'t find any SKUs to display&#8230; Check your internet
+        connection and make sure your Google Developer Console was setup correctly.</string>
+    <string name="error_billing_unavailable">Billing unavailable. Make sure your Google Play app
+        is setup correctly</string>
+    <string name="error_billing_default">Billing unavailable. Please check your device.</string>
 </resources>

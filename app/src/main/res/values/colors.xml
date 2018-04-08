@@ -69,4 +69,8 @@
     <color name="profile_color6">#7EC0EE</color>
     <color name="profile_color7">#FFA500</color>
     <color name="profile_color8">#808000</color>
+
+    <color name="row_bg_color">#ffffff</color>
+    <color name="row_header_bg_color">#ffffff</color>
+    <color name="ascent_color">#4285F4</color>
 </resources>
