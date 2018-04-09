@@ -3,7 +3,6 @@ package com.mytips;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,14 +10,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -51,16 +48,16 @@ import android.widget.Toast;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.Purchase;
 import com.android.billingclient.api.PurchaseHistoryResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
-import com.android.billingclient.api.SkuDetails;
-import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
+import com.google.gson.JsonObject;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -80,13 +77,12 @@ import com.mytips.Adapter.SpinnerProfile;
 import com.mytips.Adapter.SummaryAdapter;
 import com.mytips.Adapter.WeeklySummaryAdapter;
 import com.mytips.BillingUtils.BillingManager;
+import com.mytips.BillingUtils.BillingManager.BillingUpdatesListener;
 import com.mytips.BillingUtils.BillingProvider;
 import com.mytips.BillingUtils.IabBroadcastReceiver;
 import com.mytips.BillingUtils.IabHelper;
 import com.mytips.BillingUtils.IabResult;
 import com.mytips.BillingUtils.Inventory;
-import com.mytips.BillingUtils.Purchase;
-import com.mytips.BillingUtils.SkuRowData;
 import com.mytips.BillingUtils.SkusAdapter;
 import com.mytips.BillingUtils.UiManager;
 import com.mytips.Database.DatabaseOperations;
@@ -97,6 +93,7 @@ import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -116,7 +113,7 @@ import java.util.Random;
 import static com.mytips.BillingUtils.IabHelper.ITEM_TYPE_INAPP;
 
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener, BillingProvider,
-        DialogInterface.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, IabBroadcastReceiver.IabBroadcastListener, PurchasesUpdatedListener {
+        DialogInterface.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, IabBroadcastReceiver.IabBroadcastListener, BillingUpdatesListener, PurchasesUpdatedListener {
     private static final String TAG = "TAG";
     private LinearLayout mRevealView;
     private boolean hidden = true;
@@ -453,8 +450,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             @Override
             public void onClick(View v) {
                 //   startActivity(new Intent(getBaseContext(), AddDayActivity.class));
-
-                onSubscriberClick();
+                if(isSubscriptionActive) startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+                else onSubscriberClick();
             }
         });
 
@@ -1912,7 +1909,22 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onPurchasesUpdated(int responseCode, @Nullable List<com.android.billingclient.api.Purchase> purchases) {
+        //System.out.println(purchases.toString());
+    }
 
+    @Override
+    public void onBillingClientSetupFinished() {
+
+    }
+
+    @Override
+    public void onConsumeFinished(String token, int result) {
+
+    }
+
+    @Override
+    public void onPurchasesUpdated(List<Purchase> purchases) {
+        System.out.println(purchases.toString());
     }
 
     private class HeaderFooterTable extends PdfPageEventHelper {
@@ -3945,6 +3957,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     > BILLING_MANAGER_NOT_INITIALIZED) {
                 mAcquireFragment.onManagerReady(this);
             }
+        }
+    }
+boolean isSubscriptionActive;
+    public void showRefreshedUi(List<Purchase> purchaseList) {
+        try {
+            if(new JSONObject(purchaseList.get(0).getOriginalJson()).getBoolean("autoRenewing"))
+            isSubscriptionActive = true;
+            else isSubscriptionActive = false;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (mAcquireFragment != null) {
+            mAcquireFragment.refreshUI();
         }
     }
 

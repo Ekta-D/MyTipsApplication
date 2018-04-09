@@ -155,7 +155,7 @@ public class MainViewController {
                 }
             }
 
-            //mActivity.showRefreshedUi();
+            mActivity.showRefreshedUi(purchaseList);
         }
     }
 
