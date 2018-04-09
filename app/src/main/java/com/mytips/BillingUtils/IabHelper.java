@@ -856,10 +856,12 @@ public class IabHelper {
     // Workaround to bug where sometimes response codes come as Long instead of Integer
     int getResponseCodeFromBundle(Bundle b) {
         Object o = b.get(RESPONSE_CODE);
+        System.out.println(o.toString());
         if (o == null) {
             logDebug("Bundle with null response code, assuming OK (known issue)");
             return BILLING_RESPONSE_RESULT_OK;
         }
+
         else if (o instanceof Integer) return ((Integer)o).intValue();
         else if (o instanceof Long) return (int)((Long)o).longValue();
         else {
@@ -924,7 +926,7 @@ public class IabHelper {
         }
     }
 
-    int queryPurchases(Inventory inv, String itemType) throws JSONException, RemoteException {
+   public int queryPurchases(Inventory inv, String itemType) throws JSONException, RemoteException {
         // Query purchases
         logDebug("Querying owned items, item type: " + itemType);
         logDebug("Package name: " + mContext.getPackageName());

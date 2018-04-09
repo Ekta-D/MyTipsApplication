@@ -169,4 +169,5 @@
     <string name="error_billing_unavailable">Billing unavailable. Make sure your Google Play app
         is setup correctly</string>
     <string name="error_billing_default">Billing unavailable. Please check your device.</string>
+
 </resources>

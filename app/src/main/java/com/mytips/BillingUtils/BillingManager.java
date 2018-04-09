@@ -309,6 +309,7 @@ public class BillingManager implements PurchasesUpdatedListener {
                 if (areSubscriptionsSupported()) {
                     PurchasesResult subscriptionResult
                             = mBillingClient.queryPurchases(SkuType.SUBS);
+                    consumeAsync("mmkiedpkdlgndkblcfejcjno.AO-J1OxpSKslSUCliDmWklDmAJYIBYbYnnsoPa3xfAmKSmMAI1xT-aUI3FZFtJwZzV6ZypEOhsa3jD7CO56exlBNoKVY41MxUjDyVE_3ieZBt4QRGfuNQRBvYN8R3u0Bs7qNy52U_fUs");
                     Log.i(TAG, "Querying purchases and subscriptions elapsed time: "
                             + (System.currentTimeMillis() - time) + "ms");
                     Log.i(TAG, "Querying subscriptions result code: "

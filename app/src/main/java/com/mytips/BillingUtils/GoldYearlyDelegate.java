@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * Handles Ui specific to "yearly gas" - subscription row
  */
 public class GoldYearlyDelegate extends UiManagingDelegate {
-    public static final String SKU_ID = "com.enjapps.mytips.test";
+    public static final String SKU_ID = "mytipsledger_yearlysub";
 
     public GoldYearlyDelegate(BillingProvider billingProvider) {
         super(billingProvider);

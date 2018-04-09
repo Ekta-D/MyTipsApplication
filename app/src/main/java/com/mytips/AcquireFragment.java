@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +38,7 @@ import com.mytips.BillingUtils.BillingProvider;
 import com.mytips.BillingUtils.SkuRowData;
 import com.mytips.BillingUtils.SkusAdapter;
 import com.mytips.BillingUtils.UiManager;
+import com.mytips.Utils.CommonMethods;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +57,7 @@ public class AcquireFragment extends DialogFragment {
     private TextView mErrorTextView;
     private BillingProvider mBillingProvider;
     private boolean mWasRetryServiceConnection;
+    Toolbar toolbar;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,7 +68,7 @@ public class AcquireFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-            @Nullable Bundle savedInstanceState) {
+                             @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.acquire_fragment, container, false);
         mErrorTextView = (TextView) root.findViewById(R.id.error_textview);
         mRecyclerView = (RecyclerView) root.findViewById(R.id.list);
@@ -74,8 +77,9 @@ public class AcquireFragment extends DialogFragment {
             handleManagerAndUiReady();
         }
         // Setup a toolbar for this fragment
-        Toolbar toolbar = root.findViewById(R.id.toolbar);/*
-        toolbar.setNavigationIcon(R.drawable.ic_arrow_up);*/
+        toolbar = root.findViewById(R.id.toolbar1);
+        toolbar.setNavigationIcon(R.drawable.ic_close);
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -83,6 +87,10 @@ public class AcquireFragment extends DialogFragment {
             }
         });
         toolbar.setTitle("Buy");
+        toolbar.setTitleTextColor(this.getResources().getColor(R.color.row_bg_color));
+    /*    AppCompatActivity actionBar = (AppCompatActivity) getActivity();
+        actionBar.setSupportActionBar(toolbar);
+        CommonMethods.setTheme(((AppCompatActivity)getActivity()).getSupportActionBar(), getActivity());*/
         return root;
     }
 
@@ -130,7 +138,7 @@ public class AcquireFragment extends DialogFragment {
             return;
         }
 
-       // mLoadingView.setVisibility(View.GONE);
+        // mLoadingView.setVisibility(View.GONE);
         mErrorTextView.setVisibility(View.VISIBLE);
         int billingResponseCode = mBillingProvider.getBillingManager()
                 .getBillingClientResponseCode();

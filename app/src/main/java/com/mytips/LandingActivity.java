@@ -3,6 +3,7 @@ package com.mytips;
 import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -14,6 +15,7 @@ import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
@@ -48,6 +50,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.billingclient.api.BillingClient;
+import com.android.billingclient.api.BillingClientStateListener;
+import com.android.billingclient.api.PurchaseHistoryResponseListener;
+import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.SkuDetails;
 import com.android.billingclient.api.SkuDetailsResponseListener;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -80,6 +85,7 @@ import com.mytips.BillingUtils.IabBroadcastReceiver;
 import com.mytips.BillingUtils.IabHelper;
 import com.mytips.BillingUtils.IabResult;
 import com.mytips.BillingUtils.Inventory;
+import com.mytips.BillingUtils.Purchase;
 import com.mytips.BillingUtils.SkuRowData;
 import com.mytips.BillingUtils.SkusAdapter;
 import com.mytips.BillingUtils.UiManager;
@@ -89,6 +95,8 @@ import com.mytips.Model.DataBlocksSets;
 import com.mytips.Model.Profiles;
 import com.mytips.Utils.CommonMethods;
 import com.mytips.Utils.Constants;
+
+import org.json.JSONException;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -105,8 +113,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
+import static com.mytips.BillingUtils.IabHelper.ITEM_TYPE_INAPP;
+
 public class LandingActivity extends AppCompatActivity implements View.OnClickListener, BillingProvider,
-        DialogInterface.OnClickListener  ,GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, IabBroadcastReceiver.IabBroadcastListener {
+        DialogInterface.OnClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, IabBroadcastReceiver.IabBroadcastListener, PurchasesUpdatedListener {
     private static final String TAG = "TAG";
     private LinearLayout mRevealView;
     private boolean hidden = true;
@@ -137,6 +147,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     FloatingActionButton floatingActionButton;
 //FloatingActionButton floatingActionButton;
 
+    BillingProvider billingProvider;
     int profileID;
     long start_shift_long, end_shift_long;
     ArrayList<AddDay> data;
@@ -162,13 +173,13 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     boolean nSubscribbeTobeDelay = false;
     boolean mAutoRenewEnable = false;
     String mSelectedSubscriberPeriod = "";
-
+    Inventory inv;
     String mUserSky = "";
     String mFirstChoiceSku = "";
     String mSecondChoiceSku = "";
     String mThirdChoiceSku = "";
     String mFourthChoiceSku = "";
-
+    private BillingClient mBillingClient;
     IabHelper helper;
     IabBroadcastReceiver iabBroadcastReceiver;
     String TAG1 = "com.mytips.billing";
@@ -200,8 +211,22 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     .findFragmentByTag(DIALOG_TAG);
         }
         mBillingManager = new BillingManager(this, mViewController.getUpdateListener());
-        //check_payment_subscriptions();
+        mBillingClient = BillingClient.newBuilder(LandingActivity.this).setListener(this).build();
+        mBillingClient.startConnection(new BillingClientStateListener() {
+            @Override
+            public void onBillingSetupFinished(int responseCode) {
+                if (responseCode == BillingClient.BillingResponse.OK) {
 
+                }
+            }
+
+            @Override
+            public void onBillingServiceDisconnected() {
+
+            }
+        });
+        //   check_payment_subscriptions();
+        purchaseResult();
         if (mGoogleSignInClient == null)
             mGoogleSignInClient = buildGoogleSignInClient();
 
@@ -427,7 +452,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //     startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+                //   startActivity(new Intent(getBaseContext(), AddDayActivity.class));
 
                 onSubscriberClick();
             }
@@ -438,20 +463,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onResume() {
         super.onResume();
-      /*  if (mGoogleApiClient == null) {
-            // Create the API client and bind it to an instance variable.
-            // We use this instance as the callback for connection and connection
-            // failures.
-            // Since no account name is passed, the user is prompted to choose.
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
-                    .addApi(Drive.API)
-                    .addScope(Drive.SCOPE_FILE)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this)
-                    .build();
-        }
-        //Connect the client. Once connected, the camera is launched.
-        mGoogleApiClient.connect();*/
+
         if (mBillingManager != null
                 && mBillingManager.getBillingClientResponseCode() == BillingClient.BillingResponse.OK) {
             mBillingManager.queryPurchases();
@@ -1895,7 +1907,12 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public boolean isGoldYearlySubscribed() {
-        return mViewController.isGoldYearlySubscribed() ;
+        return mViewController.isGoldYearlySubscribed();
+    }
+
+    @Override
+    public void onPurchasesUpdated(int responseCode, @Nullable List<com.android.billingclient.api.Purchase> purchases) {
+
     }
 
     private class HeaderFooterTable extends PdfPageEventHelper {
@@ -3847,11 +3864,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 registerReceiver(iabBroadcastReceiver, broadcastFilter);
                 System.out.println("In app Billing setup!");
 
+                inv = new Inventory();
                 try {
+                    helper.queryPurchases(inv, ITEM_TYPE_INAPP);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+               /* try {
                     helper.queryInventoryAsync(mGotInventoryListener);
                 } catch (IabHelper.IabAsyncInProgressException e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         });
 
@@ -3909,79 +3934,6 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void onSubscriberClick() {
-       /* if (!helper.subscriptionsSupported()) {
-            complain("Subscriptions not supported on your device yet. Sorry!");
-            return;
-        }
-
-        CharSequence[] options;
-        if (!nSubscribbeTobeDelay || !mAutoRenewEnable) {
-            // Both subscription options should be available
-            options = new CharSequence[4];
-            options[0] = "Monthly $1.99";
-            options[1] = "Three Month $4.99";
-            options[2] = "Six Month $6.99";
-            options[3] = "Yearly $11.99";
-            mFirstChoiceSku = Constants.SUB_MONTHLY;
-            mSecondChoiceSku = Constants.SUB_THREE_MONTHS;
-            mThirdChoiceSku = Constants.SUB_SIXMONTHS;
-            mFourthChoiceSku = Constants.SUB_YEARLY;
-        } else {
-            // This is the subscription upgrade/downgrade path, so only one option is valid
-            options = new CharSequence[3];
-            if (mUserSky.equals(Constants.SUB_MONTHLY)) {
-                // Give the option to upgrade below
-                options[0] = "Three Month $4.99";
-                options[1] = "Six Month $6.99";
-                options[2] = "Yearly $11.99";
-                mFirstChoiceSku = Constants.SUB_THREE_MONTHS;
-                mSecondChoiceSku = Constants.SUB_SIXMONTHS;
-                mThirdChoiceSku = Constants.SUB_YEARLY;
-            } else if (mUserSky.equals( Constants.SUB_THREE_MONTHS)) {
-                // Give the option to upgrade or downgrade below
-                options[0] = "Monthly $1.99";
-                options[1] = "Six Month $6.99";
-                options[2] = "Yearly $11.99";
-                mFirstChoiceSku = Constants.SUB_MONTHLY;
-                mSecondChoiceSku = Constants.SUB_SIXMONTHS;
-                mThirdChoiceSku = Constants.SUB_YEARLY;
-            } else if (mUserSky.equals(Constants.SUB_SIXMONTHS)) {
-                // Give the option to upgrade or downgrade below
-                options[0] = "Monthly $1.99";
-                options[1] =  "Three Month $4.99";
-                options[2] = "Yearly $11.99";
-                mFirstChoiceSku = Constants.SUB_MONTHLY;
-                mSecondChoiceSku = Constants.SUB_THREE_MONTHS;
-                mThirdChoiceSku = Constants.SUB_YEARLY;
-
-            } else {
-                // Give the option to upgrade or downgrade below
-                options[0] = "Monthly $1.99";
-                options[1] =  "Three Month $4.99";
-                options[2] =  "Six Month $6.99";
-                mFirstChoiceSku = Constants.SUB_MONTHLY;
-                mSecondChoiceSku = Constants.SUB_THREE_MONTHS;
-                mThirdChoiceSku = Constants.SUB_SIXMONTHS;
-            }
-            mFourthChoiceSku = "";
-        }
-
-        int titleResId;
-        if (!nSubscribbeTobeDelay) {
-            titleResId = R.string.subscription_period_prompt;
-        } else if (!mAutoRenewEnable) {
-            titleResId = R.string.subscription_resignup_prompt;
-        } else {
-            titleResId = R.string.subscription_update_prompt;
-        }
-
-        android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(this);
-        builder.setTitle(titleResId)
-                .setSingleChoiceItems(options, 0 *//* checkedItem *//*, this)
-                .setPositiveButton(R.string.subscription_prompt_continue, this)
-                .setNegativeButton(R.string.subscription_prompt_cancel, this);
-        android.app.AlertDialog dialog = builder.create();
-        dialog.show();*/
         if (mAcquireFragment == null) {
             mAcquireFragment = new AcquireFragment();
         }
@@ -3994,14 +3946,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 mAcquireFragment.onManagerReady(this);
             }
         }
-
-        //querySkuDetails();
     }
+
     public boolean isAcquireFragmentShown() {
         return mAcquireFragment != null && mAcquireFragment.isVisible();
     }
-    public static final int BILLING_MANAGER_NOT_INITIALIZED  = -1;
-SkusAdapter mAdapter;
+
+    public static final int BILLING_MANAGER_NOT_INITIALIZED = -1;
+    SkusAdapter mAdapter;
 
     protected UiManager createUiManager(SkusAdapter adapter, BillingProvider provider) {
         return new UiManager(adapter, provider);
@@ -4013,9 +3965,9 @@ SkusAdapter mAdapter;
             mSelectedSubscriberPeriod = mFirstChoiceSku;
         } else if (id == 1 /* Second choice item */) {
             mSelectedSubscriberPeriod = mSecondChoiceSku;
-        }else if (id == 2) {
+        } else if (id == 2) {
             mSelectedSubscriberPeriod = mThirdChoiceSku;
-        }else if (id == 3){
+        } else if (id == 3) {
             mSelectedSubscriberPeriod = mFourthChoiceSku;
         } else if (id == DialogInterface.BUTTON_POSITIVE /* continue button */) {
 
@@ -4035,13 +3987,13 @@ SkusAdapter mAdapter;
                 oldSkus.add(mUserSky);
             }
 
-           // setWaitScreen(true);
+            // setWaitScreen(true);
             try {
                 helper.launchPurchaseFlow(this, mSelectedSubscriberPeriod, IabHelper.ITEM_TYPE_SUBS,
                         oldSkus, RC_REQUEST, mPurchaseFinishedListener, payload);
             } catch (IabHelper.IabAsyncInProgressException e) {
                 complain("Error launching purchase flow. Another async operation in progress.");
-             //   setWaitScreen(false);
+                //   setWaitScreen(false);
             }
             // Reset the dialog options
             mSelectedSubscriberPeriod = "";
@@ -4052,6 +4004,7 @@ SkusAdapter mAdapter;
             Log.e(TAG1, "Unknown button clicked in subscription dialog: " + id);
         }
     }
+
     IabHelper.OnIabPurchaseFinishedListener mPurchaseFinishedListener = new IabHelper.OnIabPurchaseFinishedListener() {
 
 
@@ -4063,12 +4016,12 @@ SkusAdapter mAdapter;
 
             if (result.isFailure()) {
                 complain("Error purchasing: " + result);
-             //   setWaitScreen(false);
+                //   setWaitScreen(false);
                 return;
             }
             if (!verifyPurchase(purchase)) {
                 complain("Error purchasing. Authenticity verification failed.");
-           //     setWaitScreen(false);
+                //     setWaitScreen(false);
                 return;
             }
 
@@ -4077,17 +4030,33 @@ SkusAdapter mAdapter;
             if (purchase.getSku().equals(Constants.SUB_MONTHLY)
                     || purchase.getSku().equals(Constants.SUB_THREE_MONTHS)
                     || purchase.getSku().equals(Constants.SUB_SIXMONTHS)
-                    || purchase.getSku().equals(Constants.SUB_YEARLY)){
+                    || purchase.getSku().equals(Constants.SUB_YEARLY)) {
                 // bought the rasbita subscription
                 Log.d(TAG1, "Delaroy subscription purchased.");
                 alert("Thank you for subscribing to Delaroy!");
                 nSubscribbeTobeDelay = true;
                 mAutoRenewEnable = purchase.isAutoRenewing();
                 mUserSky = purchase.getSku();
-               // updateUi();
+                // updateUi();
                 //setWaitScreen(false);
             }
         }
     };
 
+
+    public void purchaseResult() {
+        com.android.billingclient.api.Purchase.PurchasesResult purchasesResult = mBillingClient.queryPurchases(BillingClient.SkuType.INAPP);
+        mBillingClient.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, new PurchaseHistoryResponseListener() {
+            @Override
+            public void onPurchaseHistoryResponse(int responseCode, List<com.android.billingclient.api.Purchase> purchasesList) {
+
+                if (responseCode == BillingClient.BillingResponse.OK && purchasesList != null) {
+                    for (com.android.billingclient.api.Purchase purchase : purchasesList) {
+                        System.out.println(purchase);
+                    }
+                }
+            }
+        });
+
+    }
 }
