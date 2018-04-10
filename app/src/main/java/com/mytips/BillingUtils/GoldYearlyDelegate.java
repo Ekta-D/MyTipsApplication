@@ -24,14 +24,16 @@ import java.util.ArrayList;
  * Handles Ui specific to "yearly gas" - subscription row
  */
 public class GoldYearlyDelegate extends UiManagingDelegate {
-    public static final String SKU_ID = "mytipsledger_yearlysub";
+        public static final String SKU_ID = "mytipsledger_yearlysub";
+  //  public static final String SKU_ID = "com.enjapps.mytips.test";// testing
 
     public GoldYearlyDelegate(BillingProvider billingProvider) {
         super(billingProvider);
     }
 
     @Override
-    public @SkuType String getType() {
+    public @SkuType
+    String getType() {
         return SkuType.SUBS;
     }
 

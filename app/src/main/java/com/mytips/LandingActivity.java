@@ -166,7 +166,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
     boolean is_email = false;
 
-
+    Date _currentDate;
     boolean nSubscribbeTobeDelay = false;
     boolean mAutoRenewEnable = false;
     String mSelectedSubscriberPeriod = "";
@@ -201,6 +201,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             //only api 23 above
         }
 
+
+        _currentDate = new Date();
         // for in-app subscription
         mViewController = new MainViewController(this);
         if (savedInstanceState != null) {
@@ -224,6 +226,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         });
         //   check_payment_subscriptions();
         purchaseResult();
+
+        // for assign direct long value 1397125800000L
+//        subscription_blocks(1397125800000L, _currentDate.getTime());
         if (mGoogleSignInClient == null)
             mGoogleSignInClient = buildGoogleSignInClient();
 
@@ -449,9 +454,19 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //   startActivity(new Intent(getBaseContext(), AddDayActivity.class));
-                if(isSubscriptionActive) startActivity(new Intent(getBaseContext(), AddDayActivity.class));
-                else onSubscriberClick();
+
+                if (purchase_list != null && purchase_list.size() > 0) {
+                    if (isSubscriptionActive) {
+                        startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+                    } else if (!isSubscriptionActive && !isExpired) {
+                        startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+                    } else if (isExpired) {
+                        start_sub();
+                    }
+                } else {
+                    start_sub();
+                }
+
             }
         });
 
@@ -3959,12 +3974,41 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
         }
     }
-boolean isSubscriptionActive;
+
+    boolean isSubscriptionActive;
+    long purchaseTime;
+    boolean isExpired;
+    List<Purchase> purchase_list;
+
     public void showRefreshedUi(List<Purchase> purchaseList) {
         try {
-            if(new JSONObject(purchaseList.get(0).getOriginalJson()).getBoolean("autoRenewing"))
-            isSubscriptionActive = true;
-            else isSubscriptionActive = false;
+            purchase_list = purchaseList;
+            if (purchaseList.size() > 0) {
+                if (new JSONObject(purchaseList.get(0).getOriginalJson()).getBoolean("autoRenewing")) {
+                    purchaseTime = purchaseList.get(0).getPurchaseTime();
+                    isSubscriptionActive = true;
+                    _dates_subs = new ArrayList<>();
+                    _dates_subs = subscription_blocks(purchaseTime, _currentDate.getTime());
+                    //   next_year = CommonMethods.nextOneYear(purchaseTime);
+                } else {
+                    _dates_subs = new ArrayList<>();
+                    _dates_subs = subscription_blocks(purchaseTime, _currentDate.getTime());
+                    purchaseTime = purchaseList.get(0).getPurchaseTime();
+                    //   next_year = CommonMethods.nextOneYear(purchaseTime);
+                    isSubscriptionActive = false;
+                }
+            }
+            if (_dates_subs != null && _dates_subs.size() > 0) {
+
+                long _sub_start = _dates_subs.get(_dates_subs.size() - 1);
+                if (_currentDate.getTime() > _sub_start) {
+                    isExpired = true;
+                } else {
+                    isExpired = false;
+                }
+
+            }
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -4071,6 +4115,7 @@ boolean isSubscriptionActive;
 
     public void purchaseResult() {
         com.android.billingclient.api.Purchase.PurchasesResult purchasesResult = mBillingClient.queryPurchases(BillingClient.SkuType.INAPP);
+
         mBillingClient.queryPurchaseHistoryAsync(BillingClient.SkuType.INAPP, new PurchaseHistoryResponseListener() {
             @Override
             public void onPurchaseHistoryResponse(int responseCode, List<com.android.billingclient.api.Purchase> purchasesList) {
@@ -4083,5 +4128,32 @@ boolean isSubscriptionActive;
             }
         });
 
+    }
+
+    ArrayList<Date> _dates_loop = new ArrayList<>();
+    ArrayList<Long> _dates_subs;
+
+    public ArrayList<Long> subscription_blocks(long purchaseTime, long currentTime) {
+        _dates_subs = new ArrayList<>();
+        if (purchaseTime > 0) {
+            long _nextyr = CommonMethods.nextOneYear(purchaseTime);
+            _dates_subs.add(_nextyr);
+            _dates_loop.add(new Date(_nextyr));
+            if (currentTime > _nextyr) {
+                subscription_blocks(_nextyr, currentTime);
+            }
+
+            System.out.println(_dates_loop.toString());
+        }
+
+        return _dates_subs;
+    }
+
+    public void start_sub() {
+        if (CommonMethods.isNetworkAvailable(LandingActivity.this)) {
+            onSubscriberClick();
+        } else if (!CommonMethods.isNetworkAvailable(LandingActivity.this)) {
+            alert("Please check your internet connection");
+        }
     }
 }

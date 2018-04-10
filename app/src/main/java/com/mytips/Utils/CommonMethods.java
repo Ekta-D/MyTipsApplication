@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.ColorDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.view.Window;
@@ -124,5 +126,24 @@ public class CommonMethods {
     public static int numDays(int month, int year) {
         Calendar monthStart = new GregorianCalendar(year, month, 1);
         return monthStart.getActualMaximum(Calendar.DAY_OF_MONTH);
+    }
+
+    public static long nextOneYear(long current_date) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(current_date);
+        calendar.add(Calendar.YEAR, 1);
+        long next_date = calendar.getTime().getTime();
+
+        return next_date;
+    }
+    public static boolean isNetworkAvailable(Context context) {
+
+        ConnectivityManager connectivityManager = (ConnectivityManager) context
+                .getSystemService(context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetworkInfo = connectivityManager
+                .getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+
     }
 }
