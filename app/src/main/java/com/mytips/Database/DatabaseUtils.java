@@ -7,7 +7,7 @@ package com.mytips.Database;
 public class DatabaseUtils {
 
     public static final String db_Name = "tipseeDB";
-    public static final int dbVersion = 1;
+    public static final int dbVersion = 2;
     public static final String CREATE_TABLE = "CREATE TABLE ";
 
     public static final String PROFILE_TABLE = "profile";
@@ -30,6 +30,7 @@ public class DatabaseUtils {
     public static final String ProfilePic = "profile_pic";
     public static final String IsActive = "is_active";
     public static final String ProfileColor = "profile_color";
+    public static final String BiWeeklyStartDay = "start_day";
 
 
     //tipees fields

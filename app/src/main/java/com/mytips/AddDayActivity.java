@@ -1376,86 +1376,54 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
     public void save_add_day() {
         StringBuilder joinedString = new StringBuilder();
-        if (!selected_profile.equals("Select Profile") && !selected_profile.equals("") && !editText_startShift.getText().toString().trim().equals("") &&
-                ((day_off == 0 && !texview_hours.getText().toString().trim().equals("")) || day_off == 1)) {
+        if((start_dateCalendar.before(Calendar.getInstance()) || start_dateCalendar.equals(Calendar.getInstance())) && end_dateCalendar.before(Calendar.getInstance()) || end_dateCalendar.equals(Calendar.getInstance())) {
+            if (!selected_profile.equals("Select Profile") && !selected_profile.equals("") && !editText_startShift.getText().toString().trim().equals("") &&
+                    ((day_off == 0 && !texview_hours.getText().toString().trim().equals("")) || day_off == 1)) {
 
-            if (b == null) {
-                if (selected_tipeesIDs == null || selected_tipeesIDs.size() == 0) {
+                if (b == null) {
+                    if (selected_tipeesIDs == null || selected_tipeesIDs.size() == 0) {
 
-                } else {
-                    if (adapter != null) {
-                        if (adapter.checkedItems == null) {
+                    } else {
+                        if (adapter != null) {
+                            if (adapter.checkedItems == null) {
 
-                        } else if (adapter.checkedItems != null && adapter.checkedItems.size() > 0) {
-                            for (int i = 0; i < adapter.checkedItems.size(); i++) {
-                                if (adapter.checkedItems.get(i) == true) {
-                                    joinedString.append(tipeeInfos.get(i).getId());
-                                    joinedString.append(",");
-                                }
-//                            }
-                                Log.i("insert_joinedString", joinedString.toString());
-                            }
-                        }
-                    }
-
-                    //  joinedString = convertArrayToString(selected_tipeesIDs);
-                }
-
-                try {
-
-                    new DatabaseOperations(AddDayActivity.this).insertAddDayInfo(selected_profile, selected_profile_id, startDateDb,
-                            start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
-                            texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
-                            total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
-                            day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTimeInMillis(), calEndDay.getTimeInMillis(),
-                            switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes, String.valueOf(wage_hourly));
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-
-                // Don't require this check,
-                // if (!addDay.getTip_out_tipees().equalsIgnoreCase("")) {
-                if (addDay.getTip_out_tipees().equalsIgnoreCase(""))
-                    selected_tipeesIDs = new ArrayList<>();
-                else
-                    selected_tipeesIDs = new ArrayList<>(Arrays.asList(convertStringToArray(addDay.getTip_out_tipees())).get(0));
-                if (selected_tipeesIDs.size() == 0) {
-                    if (temp_arraylist != null && temp_arraylist.size() > 0) {
-                        for (Map.Entry<String, Boolean> newTippee : temp_arraylist.entrySet()) {
-                            if (newTippee.getValue() == true) {
-                                if (!selected_tipeesIDs.contains(newTippee.getKey()))
-                                    selected_tipeesIDs.add(newTippee.getKey());
-
-                            } else {
-                                selected_tipeesIDs.remove(newTippee.getKey());
-                                //unselectedTipees.add(newTippee.getKey());
-                            }
-                        }
-                        if (selected_tipeesIDs.size() > 0) {
-                            for (int i = 0; i < selected_tipeesIDs.size(); i++) {
-                                joinedString.append(selected_tipeesIDs.get(i));
-                                joinedString.append(",");
-                            }
-
-                        }
-                    }
-                } else if (selected_tipeesIDs != null && selected_tipeesIDs.size() > 0) {
-                    if (temp_arraylist != null && temp_arraylist.size() > 0) {
-
-                        if (tipeeInfos.size() > 0) {
-                            //if selected comes again
-                            for (int j = 0; j < selected_tipeesIDs.size(); j++) {
-                                if (temp_arraylist.containsKey(selected_tipeesIDs.get(j))) {
-                                    if (temp_arraylist.get(selected_tipeesIDs.get(j)) == true) {
-                                        joinedString.append(temp_arraylist.get(selected_tipeesIDs.get(j)));
+                            } else if (adapter.checkedItems != null && adapter.checkedItems.size() > 0) {
+                                for (int i = 0; i < adapter.checkedItems.size(); i++) {
+                                    if (adapter.checkedItems.get(i) == true) {
+                                        joinedString.append(tipeeInfos.get(i).getId());
                                         joinedString.append(",");
                                     }
+//                            }
+                                    Log.i("insert_joinedString", joinedString.toString());
                                 }
                             }
-                            List<String> unselectedTipees = new ArrayList<>();
-                            //if a new tippee is selected
+                        }
+
+                        //  joinedString = convertArrayToString(selected_tipeesIDs);
+                    }
+
+                    try {
+
+                        new DatabaseOperations(AddDayActivity.this).insertAddDayInfo(selected_profile, selected_profile_id, startDateDb,
+                                start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
+                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
+                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
+                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTimeInMillis(), calEndDay.getTimeInMillis(),
+                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes, String.valueOf(wage_hourly));
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else {
+
+                    // Don't require this check,
+                    // if (!addDay.getTip_out_tipees().equalsIgnoreCase("")) {
+                    if (addDay.getTip_out_tipees().equalsIgnoreCase(""))
+                        selected_tipeesIDs = new ArrayList<>();
+                    else
+                        selected_tipeesIDs = new ArrayList<>(Arrays.asList(convertStringToArray(addDay.getTip_out_tipees())).get(0));
+                    if (selected_tipeesIDs.size() == 0) {
+                        if (temp_arraylist != null && temp_arraylist.size() > 0) {
                             for (Map.Entry<String, Boolean> newTippee : temp_arraylist.entrySet()) {
                                 if (newTippee.getValue() == true) {
                                     if (!selected_tipeesIDs.contains(newTippee.getKey()))
@@ -1466,7 +1434,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                     //unselectedTipees.add(newTippee.getKey());
                                 }
                             }
-
                             if (selected_tipeesIDs.size() > 0) {
                                 for (int i = 0; i < selected_tipeesIDs.size(); i++) {
                                     joinedString.append(selected_tipeesIDs.get(i));
@@ -1474,80 +1441,117 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                                 }
 
                             }
+                        }
+                    } else if (selected_tipeesIDs != null && selected_tipeesIDs.size() > 0) {
+                        if (temp_arraylist != null && temp_arraylist.size() > 0) {
 
+                            if (tipeeInfos.size() > 0) {
+                                //if selected comes again
+                                for (int j = 0; j < selected_tipeesIDs.size(); j++) {
+                                    if (temp_arraylist.containsKey(selected_tipeesIDs.get(j))) {
+                                        if (temp_arraylist.get(selected_tipeesIDs.get(j)) == true) {
+                                            joinedString.append(temp_arraylist.get(selected_tipeesIDs.get(j)));
+                                            joinedString.append(",");
+                                        }
+                                    }
+                                }
+                                List<String> unselectedTipees = new ArrayList<>();
+                                //if a new tippee is selected
+                                for (Map.Entry<String, Boolean> newTippee : temp_arraylist.entrySet()) {
+                                    if (newTippee.getValue() == true) {
+                                        if (!selected_tipeesIDs.contains(newTippee.getKey()))
+                                            selected_tipeesIDs.add(newTippee.getKey());
+
+                                    } else {
+                                        selected_tipeesIDs.remove(newTippee.getKey());
+                                        //unselectedTipees.add(newTippee.getKey());
+                                    }
+                                }
+
+                                if (selected_tipeesIDs.size() > 0) {
+                                    for (int i = 0; i < selected_tipeesIDs.size(); i++) {
+                                        joinedString.append(selected_tipeesIDs.get(i));
+                                        joinedString.append(",");
+                                    }
+
+                                }
+
+                            }
                         }
                     }
-                }
-                // }
+                    // }
 
 
-                // joinedString = convertArrayToString(selected_tipeesIDs);
+                    // joinedString = convertArrayToString(selected_tipeesIDs);
 
-                try {
-                    if (isStartDateChanged && isEndDateChanged) {
+                    try {
+                        if (isStartDateChanged && isEndDateChanged) {
 
-                        new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
-                                start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
-                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
-                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
-                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes
-                                , String.valueOf(wage_hourly));
+                            new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
+                                    start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
+                                    texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
+                                    total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
+                                    day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
+                                    switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes
+                                    , String.valueOf(wage_hourly));
 
-                        isStartDateChanged = false;
-                        isEndDateChanged = false;
-                    } else if (!isStartDateChanged && !isEndDateChanged) {
-                        new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
-                                updated_start_values, editText_endShift.getText().toString().trim(), updated_end_values,
-                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
-                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
-                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes
-                                , String.valueOf(wage_hourly));
-                    } else if (!isStartDateChanged && isEndDateChanged) {
-                        new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
-                                d.getTime(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
-                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
-                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
-                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes
-                                , String.valueOf(wage_hourly));
-                        isEndDateChanged = false;
-                    } else {
-                        new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
-                                start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), d1.getTime(),
-                                texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
-                                total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
-                                day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
-                                switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes
-                                , String.valueOf(wage_hourly));
-                        isStartDateChanged = false;
+                            isStartDateChanged = false;
+                            isEndDateChanged = false;
+                        } else if (!isStartDateChanged && !isEndDateChanged) {
+                            new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
+                                    updated_start_values, editText_endShift.getText().toString().trim(), updated_end_values,
+                                    texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
+                                    total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
+                                    day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
+                                    switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes
+                                    , String.valueOf(wage_hourly));
+                        } else if (!isStartDateChanged && isEndDateChanged) {
+                            new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
+                                    d.getTime(), editText_endShift.getText().toString().trim(), end_dateCalendar.getTimeInMillis(),
+                                    texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
+                                    total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
+                                    day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
+                                    switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes
+                                    , String.valueOf(wage_hourly));
+                            isEndDateChanged = false;
+                        } else {
+                            new DatabaseOperations(AddDayActivity.this).updateAddDayInfo(addDayID, selected_profile, startDateDb,
+                                    start_dateCalendar.getTimeInMillis(), editText_endShift.getText().toString().trim(), d1.getTime(),
+                                    texview_hours.getText().toString().trim(), holidayPay, String.valueOf(total_tipsInput), joinedString.toString(), text_tip_out_percent.getText().toString().trim(),
+                                    total_tipout.getText().toString().trim(), editText_new_count.getText().toString().trim(), edittext_perTD.getText().toString().trim(), edittext_TournamentTotal.getText().toString().trim(),
+                                    day_off, calculated_wages_hourly, earns, getting_tips, getting_tournament, start_week, calStartDay.getTime().getTime(), calEndDay.getTime().getTime(),
+                                    switch_value, manually_added_tips, selected_profile_color, isEndDay, totalsHours, totalMinutes
+                                    , String.valueOf(wage_hourly));
+                            isStartDateChanged = false;
 
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
 
+                }
 
-                } catch (Exception e) {
-                    e.printStackTrace();
+                startActivity(new Intent(AddDayActivity.this, LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
+                this.finish();
+            } else {
+                if (selected_profile.equals("") || selected_profile.equalsIgnoreCase("Select Profile")) {
+                    Snackbar.make(spinnerProfile, "Please select profile!", Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+                if (editText_startShift.getText().toString().trim().equals("")) {
+                    Snackbar.make(spinnerProfile, "Please enter start shift!", Snackbar.LENGTH_LONG).show();
+                    return;
+                }
+                if (((day_off == 0 && texview_hours.getText().toString().trim().equals("")) || day_off == 1)) {
+                    Snackbar.make(spinnerProfile, "Need more details to save the day!", Snackbar.LENGTH_LONG).show();
+                    return;
                 }
 
             }
-
-            startActivity(new Intent(AddDayActivity.this, LandingActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP));
-            this.finish();
         } else {
-            if (selected_profile.equals("") || selected_profile.equalsIgnoreCase("Select Profile")) {
-                Snackbar.make(spinnerProfile, "Please select profile!", Snackbar.LENGTH_LONG).show();
-                return;
-            }
-            if (editText_startShift.getText().toString().trim().equals("")) {
-                Snackbar.make(spinnerProfile, "Please enter start shift!", Snackbar.LENGTH_LONG).show();
-                return;
-            }
-            if (((day_off == 0 && texview_hours.getText().toString().trim().equals("")) || day_off == 1)) {
-                Snackbar.make(spinnerProfile, "Need more details to save the day!", Snackbar.LENGTH_LONG).show();
-                return;
-            }
-
+            Snackbar.make(spinnerProfile, "Invalid dates! You cannot add data for future dates.", Snackbar.LENGTH_LONG).show();
         }
     }
 

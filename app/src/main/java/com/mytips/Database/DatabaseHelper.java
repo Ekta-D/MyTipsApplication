@@ -36,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + DatabaseUtils.ProfileColor + " INTEGER,  "
                 + DatabaseUtils.HolidayPay + " TEXT, "
                 + DatabaseUtils.ProfilePic + " TEXT, "
+                + DatabaseUtils.BiWeeklyStartDay + " TEXT, "
                 + DatabaseUtils.Tipees + " TEXT );"
 
         );
@@ -93,9 +94,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        dropIfTableExist(DatabaseUtils.PROFILE_TABLE, db);
+
+        if (oldVersion > 1)
+            dbUpgradeVersion2(db);
+        /*dropIfTableExist(DatabaseUtils.PROFILE_TABLE, db);
         dropIfTableExist(DatabaseUtils.TIPEE_TABLE, db);
-        dropIfTableExist(DatabaseUtils.ADD_DAY_TABLE, db);
+        dropIfTableExist(DatabaseUtils.ADD_DAY_TABLE, db);*/
+    }
+
+    private void dbUpgradeVersion2(SQLiteDatabase db) {
+        db.execSQL("ALTER TABLE " + DatabaseUtils.PROFILE_TABLE + " ADD COLUMN " + DatabaseUtils.BiWeeklyStartDay + " TEXT;");
     }
 
     public void dropIfTableExist(String table_name, SQLiteDatabase db) {

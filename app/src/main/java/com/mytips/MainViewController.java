@@ -121,12 +121,12 @@ public class MainViewController {
                 Log.d(TAG, "Consumption successful. Provisioning.");
                 mTank = mTank == TANK_MAX ? TANK_MAX : mTank + 1;
                 saveData();
-                //mActivity.alert(R.string.alert_fill_gas, mTank);
+               //mActivity.alert(R.string.alert_fill_gas, mTank);
             } else {
-               // mActivity.alert(R.string.alert_error_consuming, result);
+              // mActivity.alert(R.string.alert_error_consuming, result);
             }
 
-           // mActivity.showRefreshedUi();
+            mActivity.showRefreshedUi(null);
             Log.d(TAG, "End consumption flow.");
         }
 

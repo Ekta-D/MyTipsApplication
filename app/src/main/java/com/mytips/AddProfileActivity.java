@@ -1,6 +1,7 @@
 package com.mytips;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseBooleanArray;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -29,6 +31,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -52,9 +56,12 @@ import com.mytips.Utils.Constants;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +74,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
     ImageButton imageButton;
     String profile_name = "";
     double hourly_pay = 0;
-    EditText editText_profilename, editText_hourly_pay;
+    EditText editText_profilename, editText_hourly_pay, editText_startDay;
     CheckBox checkBox_supervisor, checkBox_getTournament, checkBox_getTips;
     Spinner spinner_payperiod, spinner_startday, spinner_holiday_pay;
     boolean isSupervisor = false, isGettingTournament = false, isGetTips = false;
@@ -85,10 +92,11 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
     Bundle b;
     Profiles profiles;
     FetchedTipeeAdapter adapter;
-    TextView no_data;
+    TextView no_data, tv_biweeklystart;
     int[] profile_colors;
     ArrayList<Integer> clicked_positions;
     HashMap<String, Boolean> temp_arraylist = new HashMap<>();
+    int default_date_format = 0;
 
     LinearLayout color01, color02, color03, color04, color05, color06;
     ImageView selected01, selected02, selected03, selected04, selected05, selected06;
@@ -98,7 +106,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_profile);
 
-        sharedPreferences = getSharedPreferences("Pref", MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences("MyTipsPreferences", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putBoolean(ISFIRST_TIME, true);
         editor.commit();
@@ -111,6 +119,8 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
         CommonMethods.setTheme(getSupportActionBar(), AddProfileActivity.this);
 
         initView();
+        default_date_format = sharedPreferences.getInt("selected_date", 2);
+        toggleBiweeklyView(false);
 
         Intent i = getIntent();
         b = i.getExtras();
@@ -135,6 +145,17 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
             clicked_positions = new ArrayList<>();
         }
 
+
+    }
+
+    private void toggleBiweeklyView(boolean show) {
+        if (show) {
+            editText_startDay.setVisibility(View.VISIBLE);
+            tv_biweeklystart.setVisibility(View.VISIBLE);
+        } else {
+            editText_startDay.setVisibility(View.GONE);
+            tv_biweeklystart.setVisibility(View.GONE);
+        }
 
     }
 
@@ -175,6 +196,10 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
         spinner_holiday_pay = (Spinner) findViewById(R.id.spinner_holiday_pay);
         editText_hourly_pay = (EditText) findViewById(R.id.editText_houly_pay);
 
+        editText_startDay = (EditText) findViewById(R.id.editText_biweeklystart);
+        tv_biweeklystart = (TextView) findViewById(R.id.textView_biweeklystart);
+        editText_startDay.setOnClickListener(this);
+
 
         payAdapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.spinner_text_view, R.id.text_spinner, pay_period_array);
         spinner_payperiod.setAdapter(payAdapter);
@@ -185,6 +210,10 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
 
                 payPeriod = parent.getItemAtPosition(position).toString();
                 spinner_payperiod.setSelection(position);
+                if (payPeriod.trim().equals("Every 2 Weeks"))
+                    toggleBiweeklyView(true);
+                else
+                    toggleBiweeklyView(false);
             }
 
             @Override
@@ -329,7 +358,8 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
 
                 if (profile_name.equalsIgnoreCase("")) {
                     Toast.makeText(this, "Please enter profile name!", Toast.LENGTH_SHORT).show();
-
+                } else if (payPeriod.trim().equals("Every 2 Weeks") && editText_startDay.getText().toString().trim().equals("")) {
+                    Toast.makeText(this, "Choose a start date for biweekly pay period!", Toast.LENGTH_SHORT).show();
                 } else {
                     String profile_id = "";
                     if (b == null) {
@@ -359,7 +389,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
 
                             dbOperations.insertProfileInfoIntoDatabase(profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString(), image_name, chosen_color);
+                                    joinedString.toString(), image_name, chosen_color, selectedDate);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -414,7 +444,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
                         try {
                             dbOperations.updateProfileValues(id, profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString(), image_name, profileColors);
+                                    joinedString.toString(), image_name, profileColors, selectedDate);
 
 
                         } catch (Exception e) {
@@ -528,6 +558,8 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
 
     public void fillAllFields(Profiles profiles, final List<String> selected) {
         editText_profilename.setText(profiles.getProfile_name());
+        selectedDate = profiles.getBiWeeklyStartDate();
+        editText_startDay.setText(selectedDate);
         if (profiles.getIs_supervisor() == 1) {
             checkBox_supervisor.setChecked(true);
             isSupervisor = true;
@@ -542,6 +574,10 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
         }
         int payperiod = payAdapter.getPosition(profiles.getPay_period());
         spinner_payperiod.setSelection(payperiod);
+        if (profiles.getPay_period().trim().equals("Every 2 Weeks"))
+            toggleBiweeklyView(true);
+        else
+            toggleBiweeklyView(false);
 
         int startday = dayAdapter.getPosition(profiles.getStartday());
         spinner_startday.setSelection(startday);
@@ -769,7 +805,132 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
                 selected04.setVisibility(View.GONE);
                 selected05.setVisibility(View.GONE);
                 break;
+            case R.id.editText_biweeklystart:
+                getDatePicker(default_date_format, R.id.editText_start_shift);
+                break;
         }
 
+    }
+
+    String date_format = "MMMM d, yyyy";
+    String selectedDate, date;
+
+    private String getDatePicker(int format_index, final int viewId) {
+        // Infalating Dialog for Date Picker
+        final Dialog datePicker = new Dialog(AddProfileActivity.this);
+        datePicker.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View viewDatePicker = inflater.inflate(R.layout.date_picker, null);
+        datePicker.setContentView(viewDatePicker);
+
+        if (format_index == 2) {
+            date_format = "MM/dd/yyyy";
+        } else if (format_index == 1) {
+            date_format = "E, MMM dd yyyy"; // E is for short name for Mon-Sun and EEEE full name of Monday-Sunday
+        } else {
+            date_format = "MMM dd,yyyy";
+        }
+
+        // Getting date from Calendar View
+        final CalendarView calendar = (CalendarView) viewDatePicker
+                .findViewById(R.id.datePicker);
+        final Button selectDate = (Button) viewDatePicker
+                .findViewById(R.id.dateSelect);
+        calendar.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+
+            @Override
+            public void onSelectedDayChange(CalendarView view, int year,
+                                            int month, int dayOfMonth) {
+
+                Log.i("info_date", String.valueOf(dayOfMonth));
+                selectedDate = String.valueOf(month + 1) + "/"
+                        + String.valueOf(dayOfMonth) + "/"
+                        + String.valueOf(year);
+                System.out.println("Selected date: " + selectedDate);
+                date = new SimpleDateFormat(date_format).format(new Date(
+                        selectedDate));
+                   /* if (viewId == R.id.editText_biweeklystart) {
+                        startDay = dayOfMonth;
+                        startMonth = month;
+                        startYear = year;
+
+                    *//*start_calendar.set(Calendar.MONTH, startMonth);
+                    start_calendar.set(Calendar.DAY_OF_MONTH, startDay);*//*
+                        calStartDay.set(startYear, startMonth, startDay);
+                   *//* calStartDay.set(Calendar.HOUR_OF_DAY, 0);
+                    calStartDay.set(Calendar.MINUTE, 0);
+                    calStartDay.set(Calendar.SECOND, 0);
+                    calStartDay.set(Calendar.MILLISECOND, 0);*//*
+
+
+                        start_dateCalendar.set(startYear, startMonth, startDay);
+
+//                    selectedDate = String.valueOf(startMonth + 1) + "/"
+//                            + String.valueOf(startDay) + "/"
+//                            + String.valueOf(startYear);
+
+                    }
+
+                    selectedDate = String.valueOf(month + 1) + "/"
+                            + String.valueOf(dayOfMonth) + "/"
+                            + String.valueOf(year);
+                    System.out.println("Selected date: " + selectedDate);
+
+
+                    date = new SimpleDateFormat(date_format).format(new Date(
+                            selectedDate));
+
+
+                    SimpleDateFormat sdfDate = new SimpleDateFormat(date_format);
+                    String currentDateString = sdfDate.format(new Date());
+                    Date currentDate = null;
+                    Date parsedStartDate = null;
+
+                    start_date = selectedDate;
+                    startDateDb = selectedDate;
+//                startDateDb = currentDateString;
+                    String date1 = new SimpleDateFormat(date_format).format(new Date(selectedDate));
+                    end_date = date1;
+                    try {
+                        currentDate = sdfDate.parse(currentDateString);
+                        parsedStartDate = sdfDate.parse(date);
+                    } catch (ParseException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                    date = new SimpleDateFormat(date_format)
+                            .format(new Date(date));
+                    if (viewId == R.id.editText_start_shift) {
+                        start_date = selectedDate;
+                        editText_startShift.setText(selectedDate);
+
+                    } else if (viewId == R.id.editText_end_shift) {
+                        date1 = new SimpleDateFormat(date_format).format(new Date(date));
+                        end_date = date1;
+//                        end_date = date;
+                        editText_endShift.setText(date);
+                    }*/
+
+//                }
+
+            }
+        });
+
+        selectDate.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+
+                editText_startDay.setText(date);
+                datePicker.dismiss();
+
+            }
+        });
+
+        // Selecting date from Date Dialog
+
+        datePicker.show();
+        return "";
     }
 }

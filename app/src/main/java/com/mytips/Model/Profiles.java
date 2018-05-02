@@ -40,6 +40,16 @@ public class Profiles implements Serializable {
     String pay_period;
     String hourly_pay;
 
+    public String getBiWeeklyStartDate() {
+        return biWeeklyStartDate;
+    }
+
+    public void setBiWeeklyStartDate(String biWeeklyStartDate) {
+        this.biWeeklyStartDate = biWeeklyStartDate;
+    }
+
+    String biWeeklyStartDate;
+
     public String getProfile_pic() {
         return profile_pic;
     }

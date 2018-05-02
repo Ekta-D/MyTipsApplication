@@ -33,8 +33,8 @@ public class DatabaseOperations {
 
     public void insertProfileInfoIntoDatabase(String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
                                               boolean isGetTips, String payPeriod, String startDay, double hourPay, String holidayPay
-            , String tipees, String profile_pic, int profile_color
-    ) {
+            , String tipees, String profile_pic, int profile_color,
+                                              String selectedDate) {
 
         int supervisor = 0, tournamentTips = 0, getTips = 0;
         if (isSupervisor) {
@@ -59,6 +59,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.IsActive, 1);
         contentValues.put(DatabaseUtils.ProfileColor, profile_color);
         contentValues.put(DatabaseUtils.ProfilePic, profile_pic);
+        contentValues.put(DatabaseUtils.BiWeeklyStartDay, selectedDate);
         try {
             db.insert(DatabaseUtils.PROFILE_TABLE, null, contentValues);
         } catch (Exception e) {
@@ -82,7 +83,7 @@ public class DatabaseOperations {
 
     public void updateProfileValues(int id, String profile_id, String profile_name, boolean isSupervisor, boolean isTournamentTips,
                                     boolean isGetTips, String payPeriod, String startDay, double hourPay, String holidayPay
-            , String tipees, String profileImage, int profile_color) {
+            , String tipees, String profileImage, int profile_color, String selectedDate) {
 
         int supervisor = 0, tournamentTips = 0, getTips = 0;
         if (isSupervisor) {
@@ -106,6 +107,7 @@ public class DatabaseOperations {
         contentValues.put(DatabaseUtils.ProfileColor, profile_color);
         contentValues.put(DatabaseUtils.HolidayPay, holidayPay);
         contentValues.put(DatabaseUtils.ProfilePic, profileImage);
+        contentValues.put(DatabaseUtils.BiWeeklyStartDay, selectedDate);
         try {
             int changedRecord = db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.Profile_ID + " =? ", new String[]{String.valueOf(id)});
             System.out.println("updated" + changedRecord);

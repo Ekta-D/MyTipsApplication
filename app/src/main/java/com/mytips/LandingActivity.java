@@ -458,9 +458,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 if (purchase_list != null && purchase_list.size() > 0) {
                     if (isSubscriptionActive) {
                         startActivity(new Intent(getBaseContext(), AddDayActivity.class));
-                    } else if (!isSubscriptionActive && !isExpired) {
+                    } else if (!isSubscriptionActive && !sharedPreferences.getBoolean("IsExpired", false)) {
                         startActivity(new Intent(getBaseContext(), AddDayActivity.class));
-                    } else if (isExpired) {
+                    } else if (sharedPreferences.getBoolean("IsExpired", false)) {
                         start_sub();
                     }
                 } else {
@@ -745,9 +745,9 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 try {
                     Intent i = new Intent(Intent.ACTION_SEND);
                     i.setType("text/plain");
-                    i.putExtra(Intent.EXTRA_SUBJECT, "My application name");
+                    i.putExtra(Intent.EXTRA_SUBJECT, "My Tips Ledger");
                     String sAux = "\nLet me recommend you this application\n\n";
-                    sAux = sAux + "https://play.google.com/store/apps/details?id=Orion.Soft \n\n";
+                    sAux = sAux + "https://play.google.com/store/apps/details?id=com.mytips \n\n";
                     i.putExtra(Intent.EXTRA_TEXT, sAux);
                     startActivity(Intent.createChooser(i, "choose one"));
                 } catch (Exception e) {
@@ -1867,7 +1867,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
             }
         });
 
-    }
+}
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
@@ -1940,6 +1940,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onPurchasesUpdated(List<Purchase> purchases) {
         System.out.println(purchases.toString());
+    }
+
+    public void alert(int alert_fill_gas, int mTank) {
+        android.app.AlertDialog.Builder bld = new android.app.AlertDialog.Builder(this);
+        bld.setMessage(mTank);
+        bld.setNeutralButton("OK", null);
+        Log.d(TAG1, "Showing alert dialog: " + R.string.alert_fill_gas);
+        bld.create().show();
     }
 
     private class HeaderFooterTable extends PdfPageEventHelper {
@@ -2354,10 +2362,15 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 }
             }
         }
+        ArrayList<DataBlocksSets> validSets = new ArrayList<>();
         Collections.sort(dataBlocksSetsArrayList, new SortBlockData());
-        weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, dataBlocksSetsArrayList);
+        for(int i=0; i<dataBlocksSetsArrayList.size();i++){
+            if(dataBlocksSetsArrayList.get(i).getmProfile()!=null)
+                validSets.add(dataBlocksSetsArrayList.get(i));
+        }
+        weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, validSets);
         _summaryBasedList.setAdapter(weeklySummaryAdapter);
-        return dataBlocksSetsArrayList;
+        return validSets;
     }
 
     public ArrayList<DataBlocksSets> setWeeklyData(String summary_type, ArrayList<Profiles> profiles) {
@@ -2365,17 +2378,22 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
         addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchAddDayDaysAlldetails(profileID, profiles, selected_profileName);
 
-
+        ArrayList<DataBlocksSets> validSets = new ArrayList<>();
         if (summary_type.equalsIgnoreCase("Weekly")) {
             dataBlocksSetsArrayList = new ArrayList<>();
             ArrayList<Profiles> saparate_profiles = new ArrayList<>();
             saparate_profiles = saparate_profile_asper_payperiod(profiles, "Weekly");
             dataBlocksSetsArrayList = saparateProfilesData(addDayArrayList, saparate_profiles);
             Collections.sort(dataBlocksSetsArrayList, new SortBlockData());
-            weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, dataBlocksSetsArrayList);
+
+            for(int i=0; i<dataBlocksSetsArrayList.size();i++){
+                if(dataBlocksSetsArrayList.get(i).getmProfile()!=null)
+                    validSets.add(dataBlocksSetsArrayList.get(i));
+            }
+            weeklySummaryAdapter = new WeeklySummaryAdapter(LandingActivity.this, validSets);
             _summaryBasedList.setAdapter(weeklySummaryAdapter);
         }
-        return dataBlocksSetsArrayList;
+        return validSets;
     }
 
     public ArrayList<DataBlocksSets> saparateProfilesData(ArrayList<AddDay> list, ArrayList<Profiles> all_profiles) {
@@ -2846,6 +2864,11 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 dataBlocksSetsArrayList.add(dataBlocksSets);
                 addNextBlock(_list);
 
+            } else {
+                DataBlocksSets dataBlocksSets = new DataBlocksSets();
+                dataBlocksSets.setmEndDateLong(reset_end_date);
+                dataBlocksSetsArrayList.add(dataBlocksSets);
+                addNextBlock(_list);
             }
         }
 
@@ -3244,6 +3267,11 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 dataBlocksSets.setmEndDateLong(reset_end_date);
                 dataBlocksSets.setSummary_type(selected_summary_type);
                 dataBlocksSets.setmAdditionOfDowns(_additionDowns);
+                dataBlocksSetsArrayList.add(dataBlocksSets);
+                addNextBiWeeklyBlock(_list);
+            } else {
+                DataBlocksSets dataBlocksSets = new DataBlocksSets();
+                dataBlocksSets.setmEndDateLong(reset_end_date);
                 dataBlocksSetsArrayList.add(dataBlocksSets);
                 addNextBiWeeklyBlock(_list);
             }
@@ -3981,39 +4009,46 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     List<Purchase> purchase_list;
 
     public void showRefreshedUi(List<Purchase> purchaseList) {
-        try {
-            purchase_list = purchaseList;
-            if (purchaseList.size() > 0) {
-                if (new JSONObject(purchaseList.get(0).getOriginalJson()).getBoolean("autoRenewing")) {
-                    purchaseTime = purchaseList.get(0).getPurchaseTime();
-                    isSubscriptionActive = true;
-                    _dates_subs = new ArrayList<>();
-                    _dates_subs = subscription_blocks(purchaseTime, _currentDate.getTime());
-                    //   next_year = CommonMethods.nextOneYear(purchaseTime);
-                } else {
-                    _dates_subs = new ArrayList<>();
-                    _dates_subs = subscription_blocks(purchaseTime, _currentDate.getTime());
-                    purchaseTime = purchaseList.get(0).getPurchaseTime();
-                    //   next_year = CommonMethods.nextOneYear(purchaseTime);
-                    isSubscriptionActive = false;
+        if(purchaseList!=null) {
+            try {
+                purchase_list = purchaseList;
+                if (purchaseList.size() > 0) {
+                    if (new JSONObject(purchaseList.get(0).getOriginalJson()).getBoolean("autoRenewing")) {
+                        purchaseTime = purchaseList.get(0).getPurchaseTime();
+                        isSubscriptionActive = true;
+                        _dates_subs = new ArrayList<>();
+                        _dates_subs = subscription_blocks(purchaseTime, _currentDate.getTime());
+                        //   next_year = CommonMethods.nextOneYear(purchaseTime);
+                    } else {
+                        _dates_subs = new ArrayList<>();
+                        _dates_subs = subscription_blocks(purchaseTime, _currentDate.getTime());
+                        purchaseTime = purchaseList.get(0).getPurchaseTime();
+                        //   next_year = CommonMethods.nextOneYear(purchaseTime);
+                        isSubscriptionActive = false;
+                    }
                 }
+                /*if (_dates_subs != null && _dates_subs.size() > 0) {
+
+                    long _sub_start = _dates_subs.get(_dates_subs.size() - 1);
+                    if (_currentDate.getTime() > _sub_start) {
+                        isExpired = true;
+                        editor.putBoolean("IsExpired", true).commit();
+                    } else {
+                        editor.putBoolean("IsExpired", false).commit();
+                        isExpired = false;
+                    }
+
+                }*/
+
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            if (_dates_subs != null && _dates_subs.size() > 0) {
-
-                long _sub_start = _dates_subs.get(_dates_subs.size() - 1);
-                if (_currentDate.getTime() > _sub_start) {
-                    isExpired = true;
-                } else {
-                    isExpired = false;
-                }
-
+            if (mAcquireFragment != null) {
+                mAcquireFragment.refreshUI();
             }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (mAcquireFragment != null) {
-            mAcquireFragment.refreshUI();
+        } else {
+            //isExpired = true;
+            editor.putBoolean("IsExpired", true).commit();
         }
     }
 
