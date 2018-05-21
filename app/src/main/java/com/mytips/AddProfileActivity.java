@@ -389,7 +389,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
 
                             dbOperations.insertProfileInfoIntoDatabase(profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString(), image_name, chosen_color, selectedDate);
+                                    joinedString.toString(), image_name, chosen_color, String.valueOf(start_dateCalendar != null ? start_dateCalendar.getTimeInMillis() : ""));
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -444,7 +444,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
                         try {
                             dbOperations.updateProfileValues(id, profile_id, profile_name, isSupervisor, isGettingTournament,
                                     isGetTips, payPeriod, startDay, hourly_pay, holidayPay,
-                                    joinedString.toString(), image_name, profileColors, selectedDate);
+                                    joinedString.toString(), image_name, profileColors, String.valueOf(start_dateCalendar != null ? start_dateCalendar.getTimeInMillis() : ""));
 
 
                         } catch (Exception e) {
@@ -559,7 +559,11 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
     public void fillAllFields(Profiles profiles, final List<String> selected) {
         editText_profilename.setText(profiles.getProfile_name());
         selectedDate = profiles.getBiWeeklyStartDate();
-        editText_startDay.setText(selectedDate);
+        /*Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(Long.valueOf(selectedDate));*/
+        if (selectedDate != null && !selectedDate.equals(""))
+            date = new SimpleDateFormat(date_format).format(new Date(Long.valueOf(selectedDate)));
+        editText_startDay.setText("" + date == null ? "" : date);
         if (profiles.getIs_supervisor() == 1) {
             checkBox_supervisor.setChecked(true);
             isSupervisor = true;
@@ -814,6 +818,7 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
 
     String date_format = "MMMM d, yyyy";
     String selectedDate, date;
+    Calendar start_dateCalendar;
 
     private String getDatePicker(int format_index, final int viewId) {
         // Infalating Dialog for Date Picker
@@ -847,6 +852,8 @@ public class AddProfileActivity extends AppCompatActivity implements View.OnClic
                         + String.valueOf(dayOfMonth) + "/"
                         + String.valueOf(year);
                 System.out.println("Selected date: " + selectedDate);
+                start_dateCalendar = Calendar.getInstance();
+                start_dateCalendar.set(year, month, dayOfMonth);
                 date = new SimpleDateFormat(date_format).format(new Date(
                         selectedDate));
                    /* if (viewId == R.id.editText_biweeklystart) {

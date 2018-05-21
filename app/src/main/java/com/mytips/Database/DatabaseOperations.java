@@ -234,7 +234,7 @@ public class DatabaseOperations {
     public ArrayList<Profiles> fetchAllProfile(Context context) {
         ArrayList<Profiles> profilesList;
         Cursor cursor = null;
-        String[] projections = new String[14];
+        String[] projections = new String[15];
         projections[0] = DatabaseUtils.ProfileID;
         projections[1] = DatabaseUtils.ProfileName;
         projections[2] = DatabaseUtils.IsSupervisor;
@@ -249,6 +249,7 @@ public class DatabaseOperations {
         projections[11] = DatabaseUtils.Profile_ID;
         projections[12] = DatabaseUtils.ProfilePic;
         projections[13] = DatabaseUtils.ProfileColor;
+        projections[14] = DatabaseUtils.BiWeeklyStartDay;
 //        String selection[] = new String[]{"1"};
         try {
             // only active profiles will show
@@ -302,6 +303,7 @@ public class DatabaseOperations {
 
                     profiles.setProfile_pic((cursor.getColumnIndex(DatabaseUtils.ProfilePic) != -1) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.ProfilePic)) : "");
                     profiles.setProfile_color((cursor.getColumnIndex(DatabaseUtils.ProfileColor) != -1) ? cursor.getInt(cursor.getColumnIndex(DatabaseUtils.ProfileColor)) : 0);
+                    profiles.setBiWeeklyStartDate((cursor.getColumnIndex(DatabaseUtils.BiWeeklyStartDay) != -1 ) ? cursor.getString(cursor.getColumnIndex(DatabaseUtils.BiWeeklyStartDay)) : "");
 
                     profilesList.add(profiles);
                 }
