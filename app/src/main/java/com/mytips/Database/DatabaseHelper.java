@@ -104,7 +104,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private void dbUpgradeVersion2(SQLiteDatabase db) {
         db.execSQL("ALTER TABLE " + DatabaseUtils.PROFILE_TABLE + " ADD COLUMN " + DatabaseUtils.BiWeeklyStartDay + " TEXT;");
-    }
+}
 
     public void dropIfTableExist(String table_name, SQLiteDatabase db) {
         db.execSQL("DROP TABLE IF EXISTS '" + table_name + "'");

@@ -63,6 +63,9 @@ public class DatabaseOperations {
         try {
             db.insert(DatabaseUtils.PROFILE_TABLE, null, contentValues);
         } catch (Exception e) {
+            db.execSQL("ALTER TABLE " + DatabaseUtils.PROFILE_TABLE + " ADD COLUMN " + DatabaseUtils.BiWeeklyStartDay + " TEXT;");
+            insertProfileInfoIntoDatabase(profile_id, profile_name, isSupervisor, isTournamentTips, isGetTips, payPeriod, startDay, hourPay, holidayPay, tipees, profile_pic, profile_color,
+            selectedDate);
             e.printStackTrace();
         }
 
@@ -112,6 +115,10 @@ public class DatabaseOperations {
             int changedRecord = db.update(DatabaseUtils.PROFILE_TABLE, contentValues, DatabaseUtils.Profile_ID + " =? ", new String[]{String.valueOf(id)});
             System.out.println("updated" + changedRecord);
         } catch (Exception e) {
+            db.execSQL("ALTER TABLE " + DatabaseUtils.PROFILE_TABLE + " ADD COLUMN " + DatabaseUtils.BiWeeklyStartDay + " TEXT;");
+            updateProfileValues(id, profile_id, profile_name, isSupervisor, isTournamentTips,
+            isGetTips, payPeriod, startDay, hourPay, holidayPay
+                    , tipees, profileImage, profile_color, selectedDate);
             e.printStackTrace();
         }
     }

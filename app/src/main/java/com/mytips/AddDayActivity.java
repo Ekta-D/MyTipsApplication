@@ -376,6 +376,8 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void afterTextChanged(Editable s) {
                 String str = s.toString();
+                if(str.equals("."))
+                    return;
                 if (!str.equalsIgnoreCase("")) {
                     count_perTd = Double.parseDouble(str);
                 }

@@ -97,7 +97,11 @@ public abstract class BaseDemoActivity extends AppCompatPreferenceActivity {
                 if (resultCode == RESULT_OK) {
                     DriveId driveId = data.getParcelableExtra(
                             OpenFileActivityOptions.EXTRA_RESPONSE_DRIVE_ID);
-                    mOpenItemTaskSource.setResult(driveId);
+                    try {
+                        mOpenItemTaskSource.setResult(driveId);
+                    } catch (IllegalStateException ex) {
+                        ex.printStackTrace();
+                    }
                 } else {
                     mOpenItemTaskSource.setException(new RuntimeException("Unable to open file"));
                 }
