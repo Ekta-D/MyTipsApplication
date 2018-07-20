@@ -203,6 +203,15 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         edittext_clockIn.setOnClickListener(this);
         edittext_clockOut.setOnClickListener(this);
 
+        Intent i = getIntent();
+        b = i.getExtras();
+        if (b != null) {
+            if (getSupportActionBar() != null)
+                ((TextView) findViewById(R.id.add_day_textview)).setText("Update Day");
+            addDay = (AddDay) b.getSerializable(Constants.AddDayProfile);
+            fillAllFields(addDay);
+        }
+
         edittext_count.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -376,7 +385,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void afterTextChanged(Editable s) {
                 String str = s.toString();
-                if(str.equals("."))
+                if (str.equals("."))
                     return;
                 if (!str.equalsIgnoreCase("")) {
                     count_perTd = Double.parseDouble(str);
@@ -523,15 +532,6 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
             }
         });
-        Intent i = getIntent();
-        b = i.getExtras();
-        if (b != null) {
-            if (getSupportActionBar() != null)
-                ((TextView) findViewById(R.id.add_day_textview)).setText("Update Day");
-            addDay = (AddDay) b.getSerializable(Constants.AddDayProfile);
-            fillAllFields(addDay);
-        }
-
 
         spinnerProfile.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -1378,7 +1378,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
 
     public void save_add_day() {
         StringBuilder joinedString = new StringBuilder();
-        if((start_dateCalendar.before(Calendar.getInstance()) || start_dateCalendar.equals(Calendar.getInstance())) && end_dateCalendar.before(Calendar.getInstance()) || end_dateCalendar.equals(Calendar.getInstance())) {
+        if ((start_dateCalendar.before(Calendar.getInstance()) || start_dateCalendar.equals(Calendar.getInstance())) && end_dateCalendar.before(Calendar.getInstance()) || end_dateCalendar.equals(Calendar.getInstance())) {
             if (!selected_profile.equals("Select Profile") && !selected_profile.equals("") && !editText_startShift.getText().toString().trim().equals("") &&
                     ((day_off == 0 && !texview_hours.getText().toString().trim().equals("")) || day_off == 1)) {
 
@@ -2365,8 +2365,14 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             updateDayOffView();
         }
+
+        int totalTDCount=0;
+        if(edittext_count!=null) {
+            totalTDCount = !edittext_count.getText().toString().equals("") ? Integer.valueOf(edittext_count.getText().toString()) : 0;
+        }
+
         if (!addDay.getTotal_tournament_downs().equalsIgnoreCase(""))
-            edittext_TournamentTotal.setText(String.valueOf(String.format("%.2f", Double.valueOf(addDay.getTotal_tournament_downs()))));
+            edittext_TournamentTotal.setText(String.valueOf(String.format("%.2f", Double.valueOf(totalTDCount*Double.valueOf(addDay.getTournament_perday()))/*Double.valueOf(addDay.getTotal_tournament_downs())*/)));
         if (!addDay.getTournament_perday().equalsIgnoreCase(""))
             edittext_perTD.setText(String.valueOf(String.format("%.2f", Double.valueOf(addDay.getTournament_perday()))));
     }
@@ -2447,7 +2453,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.ENGLISH);
                 ArrayList<String> string_dates = new ArrayList<>();
                 ArrayList<Long> dates = new ArrayList<>();
-                for (int i = 0; i < 7; i++) {
+                for (int i = 0; i < 8; i++) {
 
                     String str_date = dateFormat.format(cal.getTime().getTime());
                     Date date = cal.getTime();
@@ -2465,7 +2471,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
                 long reset_current = 0;
                 if (dates.size() > 0) {
 
-                    reset_current = dates.get(6);
+                    reset_current = dates.get(7);
                     reset_next_week = dates.get(0);
                 }
                 counts_list = new ArrayList<>();
@@ -2753,6 +2759,7 @@ public class AddDayActivity extends AppCompatActivity implements View.OnClickLis
             if (d.contains("-")) {
                 d = d.replace("-", "");
             }
+            result_tip_outpercentage = tipOut;
             calculateTotalEarnings(wage_hourly, Integer.parseInt(hr),
                     Integer.parseInt(m),
                     Integer.parseInt(d), tipOut, total_tipsInput, total_tournamentdown, holiday_off_value, b);
