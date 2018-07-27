@@ -2758,7 +2758,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
     }
 
 
-    public void addNextBlock(ArrayList<AddDay> _list) {
+    public void     addNextBlock(ArrayList<AddDay> _list) {
         /*dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size()-1).getmEndDateLong();
         _list.get(_list.size()-1).getStart_long();*/
         DateFormat dateFormat = new SimpleDateFormat("EEEE MM/dd/yyyy", Locale.ENGLISH);
@@ -2919,8 +2919,21 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
                     // make a week from zeroth date
-                    for (int k = 0; k < 14; k++) {
+                    for (int k = 0; k < 15; k++) {
+
                         String str_date = dateFormat.format(calendar.getTime().getTime());
+
+                        Date date = calendar.getTime();
+
+                        _stringDates.add(str_date);
+
+                        long lon = date.getTime();
+
+                        calendar.add(Calendar.DATE, -1);
+
+                        _weeklyDates.add(lon);
+
+                        /*String str_date = dateFormat.format(calendar.getTime().getTime());
 
                         Date date = calendar.getTime();
 
@@ -2931,7 +2944,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         _stringDates.add(str_date);
 
 
-                        _weeklyDates.add(lon);
+                        _weeklyDates.add(lon);*/
                     }
 
                     Collections.reverse(_weeklyDates);
@@ -2939,7 +2952,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     System.out.println("GF " + _weeklyDates.toString());
                     System.out.println("GF " + _stringDates.toString());
                     long reset_start_date = _weeklyDates.get(0);
-                    long reset_end_date = _weeklyDates.get(13);
+                    long reset_end_date = _weeklyDates.get(14);
 
                     newStartingDate = dateFormat.format(_weeklyDates.get(0));
 
@@ -3041,8 +3054,20 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
 
                 // make a week from zeroth date
-                for (int k = 0; k < 14; k++) {
+                for (int k = 0; k < 15; k++) {
+
                     String str_date = dateFormat.format(calendar.getTime().getTime());
+
+                    Date date = calendar.getTime();
+
+                    _stringDates.add(str_date);
+
+                    long lon = date.getTime();
+
+                    calendar.add(Calendar.DATE, 1);
+
+                    _weeklyDates.add(lon);
+                    /*String str_date = dateFormat.format(calendar.getTime().getTime());
 
                     Date date = calendar.getTime();
 
@@ -3053,18 +3078,18 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     _stringDates.add(str_date);
 
 
-                    _weeklyDates.add(lon);
+                    _weeklyDates.add(lon);*/
                 }
 
 
                 System.out.println("GF "+_weeklyDates.toString());
                 System.out.println("GF "+_stringDates.toString());
                 long reset_start_date = _weeklyDates.get(0);
-                long reset_end_date = _weeklyDates.get(13);
+                long reset_end_date = _weeklyDates.get(14);
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
-
+                reset_end_date = _weeklyDates.get(14);
                 if (addDayArrayList.size() > 0) {
                     DataBlocksSets dataBlocksSets;
                     String mLiveTips = "", mTournamentDown = "", mTDCounts = "", mHrlWage = "", mTotalTournamnetPerDay = "", mTotalIncome = "",
@@ -3190,8 +3215,20 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 _stringDates.clear();
                 _weeklyDates.clear();
                 // make week with start day of week
-                for (int j = 0; j < 14; j++) {
+                for (int j = 0; j < 15; j++) {
+
                     String str_date = dateFormat.format(calendar.getTime().getTime());
+
+                    Date date = calendar.getTime();
+
+                    _stringDates.add(str_date);
+
+                    long lon = date.getTime();
+
+                    calendar.add(Calendar.DATE, 1);
+
+                    _weeklyDates.add(lon);
+                    /*String str_date = dateFormat.format(calendar.getTime().getTime());
 
                     Date date = calendar.getTime();
 
@@ -3202,14 +3239,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     _stringDates.add(str_date);
 
 
-                    _weeklyDates.add(lon);
+                    _weeklyDates.add(lon);*/
                 }
 
                 System.out.println(_weeklyDates.toString());
                 System.out.println(_stringDates.toString());
 
                 long reset_start_date = _weeklyDates.get(0);
-                long reset_end_date = _weeklyDates.get(13);
+                long reset_end_date = _weeklyDates.get(14);
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -3299,7 +3336,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 calendar.set(Calendar.DAY_OF_WEEK, _day);
                 calendar.setTimeInMillis(zeroth_date);
 
-                for (int j = 0; j < 14; j++) {
+                for (int j = 0; j < 15; j++) {
                     String str_date = dateFormat.format(calendar.getTime().getTime());
 
                     Date date = calendar.getTime();
@@ -3318,7 +3355,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                 System.out.println(_stringDates.toString());
 
                 long reset_start_date = _weeklyDates.get(0);
-                long reset_end_date = _weeklyDates.get(13);
+                long reset_end_date = _weeklyDates.get(14);
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
@@ -3420,23 +3457,25 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         calendar.setTimeInMillis(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong());
         //calendar.add(Calendar.DATE, 1);
         if (new Date(_list.get(_list.size() - 1).getStart_long()).after(new Date(dataBlocksSetsArrayList.get(dataBlocksSetsArrayList.size() - 1).getmEndDateLong()))) {
-            for (int j = 0; j < 14; j++) {
+            for (int j = 0; j < 15; j++) {
 
                 String str_date = dateFormat.format(calendar.getTime().getTime());
-
                 Date date = calendar.getTime();
-
-                long lon = date.getTime();
-
-                calendar.add(Calendar.DATE, 1);
-
                 _stringDates.add(str_date);
-
-
+                long lon = date.getTime();
+                calendar.add(Calendar.DATE, 1);
                 _weeklyDates.add(lon);
+
+                /*Older*/
+                /*String str_date = dateFormat.format(calendar.getTime().getTime());
+                Date date = calendar.getTime();
+                long lon = date.getTime();
+                calendar.add(Calendar.DATE, 1);
+                _stringDates.add(str_date);
+                _weeklyDates.add(lon);*/
             }
             long reset_start_date = _weeklyDates.get(0);
-            long reset_end_date = _weeklyDates.get(13);
+            long reset_end_date = _weeklyDates.get(14);
 
             // data between day of week
             addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
