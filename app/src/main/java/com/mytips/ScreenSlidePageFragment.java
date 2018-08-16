@@ -32,6 +32,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * A fragment representing a single step in a wizard. The fragment shows a dummy title indicating
@@ -168,6 +169,7 @@ public class ScreenSlidePageFragment extends Fragment {
                     Math.pow(screenHeight, 2));
             // Tablet devices have a screen size greater than 6 inches
             tab_size = size;
+           // Toast.makeText(context,"Size: "+tab_size, Toast.LENGTH_LONG).show();
             return size >= 6;
         } catch (Throwable t) {
             return false;

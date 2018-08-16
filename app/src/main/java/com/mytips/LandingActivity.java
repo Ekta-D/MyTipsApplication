@@ -453,8 +453,8 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               startActivity(new Intent(getBaseContext(), AddDayActivity.class));
-                /*if (purchase_list != null && purchase_list.size() > 0) {
+               //startActivity(new Intent(getBaseContext(), AddDayActivity.class));
+                if (purchase_list != null && purchase_list.size() > 0) {
                     if (isSubscriptionActive) {
                         startActivity(new Intent(getBaseContext(), AddDayActivity.class));
                     } else if (!isSubscriptionActive && !sharedPreferences.getBoolean("IsExpired", false)) {
@@ -464,7 +464,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                     }
                 } else {
                     start_sub();
-                }*/
+                }
 
             }
         });
@@ -2647,7 +2647,7 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 // data between day of week
                 addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(reset_start_date, reset_end_date, profileName, Integer.parseInt(profileID));
-
+reset_end_date = _weeklyDates.get(6);
 
                 if (addDayArrayList.size() > 0) {
                     DataBlocksSets dataBlocksSets;
