@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -660,6 +661,10 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
                         }
                         addDayArrayList = new ArrayList<>();
 
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(new Date(startcalendar.getTimeInMillis()));
+                        cal.add(Calendar.DAY_OF_MONTH, -1); //Goes to previous day
+                        startcalendar = cal;
                       /*  addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
                                 getTimeInMillis(), selected_profileName);*/
                         addDayArrayList = new DatabaseOperations(LandingActivity.this).fetchDataBetweenDates(startcalendar.getTimeInMillis(), endcalendar.
@@ -761,7 +766,14 @@ public class LandingActivity extends AppCompatActivity implements View.OnClickLi
 
                 AlertDialog.Builder alert_build = new AlertDialog.Builder(LandingActivity.this);
                 alert_build.setTitle("App Info");
-                alert_build.setMessage("My Tips Ledger version 1.0");
+                String version = "";
+                try {
+                    PackageInfo pInfo = this.getPackageManager().getPackageInfo(getPackageName(), 0);
+                    version = pInfo.versionName;
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                alert_build.setMessage("My Tips Ledger version " + (!version.equalsIgnoreCase("")?version:"1.1"));
                 alert_build.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

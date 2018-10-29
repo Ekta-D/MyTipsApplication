@@ -34,6 +34,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -1088,7 +1089,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
         mOutput.close();
         in.close();
 
-        restartApp();
+        //restartApp();
         return is_completed;
     }
 
@@ -1166,6 +1167,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                             if (isDone) {
                                 final java.io.File data = Environment.getDataDirectory();
                                 String currentDBPath = "/data/" + "com.mytips" + "/databases/" + DatabaseUtils.db_Name;
+
                                 java.io.File currentDB = new java.io.File(data, currentDBPath);
                                 try {
                                     fileCopy(f1, currentDB);
@@ -1178,6 +1180,7 @@ public class SettingsActivity extends BaseDemoActivity implements GoogleApiClien
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
+                        //Toast.makeText(getBaseContext(), "Restored!", Toast.LENGTH_LONG).show();
 
                         Task<Void> discardTask = getDriveResourceClient().discardContents(contents);
                         // [END discard_contents]

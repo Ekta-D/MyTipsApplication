@@ -405,7 +405,7 @@ public class DatabaseOperations {
         projections[28] = DatabaseUtils.TotalMin;
         projections[29] = DatabaseUtils.PerHourProfileWage;
         try {
-            cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, projections,
+            cursor = new DatabaseOperations(context).dataFetch(DatabaseUtils.ADD_DAY_TABLE, null,
                     null, null, null);
         } catch (Exception e) {
             e.printStackTrace();
